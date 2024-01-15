@@ -1,0 +1,5 @@
+*iso
+.idea
+kernel/*.o
+kernel/*.elf
+printutils/*.o
