@@ -1,4 +1,4 @@
-*iso
+*.iso
 .idea
 *.o
 *.elf
