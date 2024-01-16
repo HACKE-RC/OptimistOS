@@ -65,7 +65,10 @@ static void memset(void *start, uint8_t value, uint64_t num)
         *(uint8_t *)((uint64_t)start + i) = value;
     }
 
-    return;
 }
 
-int ringOSX(Framebuffer framebuffer, PSF1_FONT *psf1_font, Memory memory);
+typedef struct {
+   Framebuffer framebuffer;
+   PSF1_FONT *psf1Font;
+   Memory memory;
+} bootInfo;

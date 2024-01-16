@@ -16,13 +16,13 @@ endef
 # We are only using "cc" as a placeholder here. It may work by using
 # the host system's toolchain, but this is not guaranteed.
 #$(eval $(call DEFAULT_VAR,CC,cc))
-CC = gcc
+CC = g++
 
 # Same thing for "ld" (the linker).
 $(eval $(call DEFAULT_VAR,LD,ld))
 
 # User controllable CFLAGS.
-CFLAGS ?= -g -O2 -pipe -Wall -Wextra
+CFLAGS ?= -g -O2 -pipe -Wextra -Wno-unused-parameter -lstdc++
 
 # User controllable preprocessor flags. We set none by default.
 PRECFLAGS ?=
@@ -59,8 +59,8 @@ CFLAGS2 = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fn
 
 # Internal linker flags that should not be changed by the user.
 override LDFLAGS +=         \
-    -nostdlib               \
     -static                 \
+    -nostdlib 		    \
     -Bsymbolic              \
     -m elf_x86_64           \
     -z max-page-size=0x1000 \

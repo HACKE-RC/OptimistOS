@@ -1,16 +1,7 @@
-//
-// Created by MODX on 1/15/2024.
-//
-
 #ifndef OPTIMISTOS_KERNELENTRY_HPP
 #define OPTIMISTOS_KERNELENTRY_HPP
+#include "renderer/BasicRenderer.hpp"
 
-
-
-class kernelEntry {
-
-};
-
-
+int setupOptimist(bootInfo bootInformation);
 
 #endif //OPTIMISTOS_KERNELENTRY_HPP
