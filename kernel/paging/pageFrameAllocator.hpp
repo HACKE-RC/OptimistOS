@@ -6,6 +6,7 @@
 #include "../printutils/e9print.h"
 #include "../renderer/BasicRenderer.hpp"
 #include "freeList.hpp"
+#include <cmath>
 
 void* allocateFrame(size_t requestSize);
 void freeFrame(void* frameAddr);
