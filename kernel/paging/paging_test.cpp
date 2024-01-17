@@ -47,8 +47,15 @@ void* allocateFrame(size_t requestSize){
     std::cout << "Ending addr: " << reinterpret_cast<void*>(reinterpret_cast<char*>(selectedBlock) + roundedRequestSize) << std::endl;
 
     fBlock* newBlock = reinterpret_cast<fBlock*>(reinterpret_cast<char*>(selectedBlock) + roundedRequestSize);
-    newBlock->size = (selectedBlock->size - (roundedRequestSize + sizeof(struct fBlock)));
+    newBlock->size = (selectedBlock->size - (roundedRequestSize));
+    newBlock->inUse = false;
+    newBlock->next = nullptr;
+    newBlock->prevSize = 0;
+
+    head = newBlock;
     std::cout << "New block addr: " << newBlock << std::endl;
+    std::cout << "New block size: " << newBlock->size << std::endl;
+    return nullptr;
 }
 
 int main(){
