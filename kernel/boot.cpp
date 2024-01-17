@@ -349,6 +349,7 @@ extern "C" void _start(void)
     bootInformation.framebuffer = fb;
     bootInformation.psf1Font = &font;
     bootInformation.memory = memory;
+    setBootInfo(bootInformation);
     setupOptimist(bootInformation);
     done();
 }

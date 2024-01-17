@@ -72,3 +72,13 @@ typedef struct {
    PSF1_FONT *psf1Font;
    Memory memory;
 } bootInfo;
+
+bootInfo globalBootInfo;
+
+void setBootInfo(bootInfo bootInfo){
+    globalBootInfo = bootInfo;
+}
+
+bootInfo getBootInfo(){
+    return globalBootInfo;
+}
