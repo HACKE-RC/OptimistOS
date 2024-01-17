@@ -1,6 +1,7 @@
 #include <iostream>
 #include "freeList.hpp"
 
+fBlock* head;
 fBlock* block = new fBlock;
 //fBlock *block= block;
 #define PAGESIZE 4096 // 4KBs
@@ -21,27 +22,33 @@ void* allocateFrame(size_t requestSize){
 
     size_t roundedRequestSize = roundUpToPageBoundary(requestSize);
     // best-fit algorithm to search for the appropriate block
-    fBlock *selectedBlock = new fBlock;
-    selectedBlock->size = 0;
+    fBlock *selectedBlock = nullptr;
 
-    do{
-        if ((block->size >= roundedRequestSize)){
-            if (selectedBlock->size){
-                if (selectedBlock->size > block->size){
+    if (!block->next && block->size >= roundedRequestSize) {
+        selectedBlock = block;
+    } else {
+        // Traverse through the linked list
+        while (block->next) {
+            if (block->size >= roundedRequestSize) {
+                if (!selectedBlock || selectedBlock->size > block->size) {
                     selectedBlock = block;
                 }
             }
-            else{
-                selectedBlock = block;
-            }
+            block = block->next;
         }
-    } while(block->next);
+    }
+    block = head;
 
     selectedBlock->inUse = true;
+    std::cout << "Requested size: " << roundedRequestSize << std::endl;
+    std::cout << "Selected size: " << selectedBlock->size << std::endl;
 
-    std::cout << "Inside func: " << block->size << std::endl;
-    std::cout << "Starting addr: " << (&selectedBlock) << std::endl;
-    std::cout << "Ending addr: " << (&selectedBlock + sizeof(struct fBlock)) << std::endl;
+    std::cout << "Starting addr: " << selectedBlock << std::endl;
+    std::cout << "Ending addr: " << reinterpret_cast<void*>(reinterpret_cast<char*>(selectedBlock) + roundedRequestSize) << std::endl;
+
+    fBlock* newBlock = reinterpret_cast<fBlock*>(reinterpret_cast<char*>(selectedBlock) + roundedRequestSize);
+    newBlock->size = (selectedBlock->size - (roundedRequestSize + sizeof(struct fBlock)));
+    std::cout << "New block addr: " << newBlock << std::endl;
 }
 
 int main(){
@@ -50,8 +57,10 @@ int main(){
     block->prevSize = 0;
     block->next = nullptr;
 
-    std::cout << block->size << std::endl;
-    allocateFrame(8200);
-    std::cout << block->size << std::endl;
+    head=block;
+
+    std::cout << "Initial block size: " << block->size << std::endl;
+    allocateFrame(1000);
+    std::cout << "Final block size: " << block->size << std::endl;
     return 0;
 }
