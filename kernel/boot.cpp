@@ -45,12 +45,14 @@ static volatile limine_memmap_request memmap_request = {
 //     .entry = _start
 // };
 
+// this file is our kernel
+// this request allows us to access the address of our kernel
 struct limine_kernel_address_request kernelMemoryRequest = {
         .id = LIMINE_KERNEL_ADDRESS_REQUEST,
         .revision = 0,
-        .response = NULL};
+        .response = NULL
+};
 
-//__attribute__((section(".limine_reqs")))
 
 static void done(void)
 {
@@ -198,7 +200,7 @@ extern "C" void _start(void)
     // We should now be able to call the Limine terminal to print out
     // a simple "Hello World" to screen.
     struct limine_terminal *terminal = terminal_request.response->terminals[0];
-
+    
     terminal_request.response->write(terminal, "Starting Boot init...\n\n", 24);
 
     if (framebuffer_request.response == NULL || framebuffer_request.response->framebuffer_count < 1)
@@ -224,7 +226,7 @@ extern "C" void _start(void)
 //    else
 //    {
 //        e9_printf("> LIMINE_SUCCESS: ");
-//        terminal_request.response->write(terminal, "RSDP loaded!\n\n", 15);
+//        terminal_request.response->write(terminal, "RSDP loaded!\n\n", 9);
 //    }
 
     Framebuffer fb{};
@@ -261,7 +263,7 @@ extern "C" void _start(void)
     }
 
     struct limine_kernel_address_response *kernelAddressResponse = kernelMemoryRequest.response;
-
+    e9_printf("Information about where the kernel is loaded: \n");
     e9_printf("Kernel address feature, revision %d\n", kernelAddressResponse->revision);
     e9_printf("Physical base: %x\n", kernelAddressResponse->physical_base);
     e9_printf("Virtual base: %x\n\n", kernelAddressResponse->virtual_base);
