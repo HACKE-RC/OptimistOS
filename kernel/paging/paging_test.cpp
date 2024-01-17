@@ -1,8 +1,8 @@
-#include "pageFrameAllocator.hpp"
+#include <iostream>
+#include "freeList.hpp"
 
-fBlock *freeBlock = initFreeList();
-bootInfo bootInformation = getBootInfo();
-
+fBlock* block = new fBlock;
+fBlock *freeBlock = block;
 #define PAGESIZE 4096 // 4KBs
 
 size_t roundUpToPageBoundary(size_t size){
@@ -15,13 +15,12 @@ size_t roundUpToPageBoundary(size_t size){
 
 void* allocateFrame(size_t requestSize){
     if (requestSize > freeBlock->size){
-        e9_print("ERR!\n");
-        e9_print("Not enough memory to allocate!");
+        std::cout << "ERROR" << std::endl;
         asm volatile("hlt");
     }
     size_t roundedRequestSize = roundUpToPageBoundary(requestSize);
     // best-fit algorithm to search for the appropriate block
-    fBlock *selectedBlock;
+    fBlock *selectedBlock = new fBlock;
     selectedBlock->size = 0;
 
     do{
@@ -41,3 +40,13 @@ void* allocateFrame(size_t requestSize){
 
 }
 
+int main(){
+    block->size = 20480;
+    block->inUse = false;
+    block->prevSize = 0;
+    block->next = nullptr;
+
+    allocateFrame(1000);
+    std::cout << block->size << std::endl;
+    return 0;
+}
