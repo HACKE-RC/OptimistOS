@@ -1,5 +1,6 @@
 #include <iostream>
 #include "freeList.hpp"
+#include <cstring>
 
 fBlock* head;
 fBlock* block = new fBlock;
@@ -52,10 +53,10 @@ void* allocateFrame(size_t requestSize){
     newBlock->next = nullptr;
     newBlock->prevSize = 0;
 
-    head = newBlock;
-    std::cout << "New block addr: " << newBlock << std::endl;
-    std::cout << "New block size: " << newBlock->size << std::endl;
-    return nullptr;
+    head = block = newBlock;
+    std::cout << "Allocated block size: " << newBlock->size << std::endl;
+    memset(selectedBlock, 0, roundedRequestSize);
+    return selectedBlock;
 }
 
 int main(){
@@ -63,11 +64,13 @@ int main(){
     block->inUse = false;
     block->prevSize = 0;
     block->next = nullptr;
-
     head=block;
 
     std::cout << "Initial block size: " << block->size << std::endl;
-    allocateFrame(1000);
+    void* page = allocateFrame(1000);
+    std::cout << "Allocated page addr: " << page << std::endl;
+    strcpy((char*)page, "Hello!");
+    std::cout << (char*)page << std::endl;
     std::cout << "Final block size: " << block->size << std::endl;
     return 0;
 }
