@@ -1,4 +1,6 @@
 #pragma once
+#ifndef boot_h
+#define boot_h
 
 #include <stdint.h>
 #include <stddef.h>
@@ -58,27 +60,14 @@ struct RSDP2
 
 } __attribute__((packed));
 
-static void memset(void *start, uint8_t value, uint64_t num)
-{
-    for (uint64_t i = 0; i < num; i++)
-    {
-        *(uint8_t *)((uint64_t)start + i) = value;
-    }
-
-}
-
 typedef struct {
    Framebuffer framebuffer;
    PSF1_FONT *psf1Font;
    Memory memory;
 } bootInfo;
 
-bootInfo globalBootInfo;
+static bootInfo globalBootInfo;
 
-void setBootInfo(bootInfo bootInfo){
-    globalBootInfo = bootInfo;
-}
-
-bootInfo getBootInfo(){
-    return globalBootInfo;
-}
+void setBootInfo(bootInfo bootInfo);
+bootInfo getBootInfo();
+#endif

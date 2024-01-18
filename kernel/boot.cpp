@@ -185,6 +185,14 @@ limine_file *getFile(const char *name)
     return NULL;
 }
 
+void setBootInfo(bootInfo bootInfo){
+    globalBootInfo = bootInfo;
+}
+
+bootInfo getBootInfo(){
+    return globalBootInfo;
+}
+
 // The following will be our kernel's entry point.
 extern "C" void _start(void)
 {

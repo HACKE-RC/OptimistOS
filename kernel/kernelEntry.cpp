@@ -4,6 +4,7 @@
 #include "idt/idt.hpp"
 #include "idt/isr.hpp"
 #include "printutils/e9print.h"
+#include "paging/pageFrameAllocator.hpp"
 
 static BasicRenderer renderer = BasicRenderer(NULL, NULL);
 
@@ -20,5 +21,10 @@ int setupOptimist(bootInfo bootInformation){
     GlobalRenderer->Print("Free Memory Size: ");
     e9_printf("%d\n", bootInformation.memory.freeMemSize);
     GlobalRenderer->Print("gdt is done!\n");
+    void* frame = allocateFrame(1000);
+    void* frame1 = allocateFrame(1000);
+//    frame = allocateFrame(1000);
+    freeFrame(frame);
+    freeFrame(frame1);
     return 0;
 }

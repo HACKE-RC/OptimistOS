@@ -1,10 +1,11 @@
-#ifndef OPTIMISTOS_FREELIST_HPP
-#define OPTIMISTOS_FREELIST_HPP
-//#include "../boot.h"
-//#include "../printutils/e9print.h"
-//#include "../renderer/BasicRenderer.hpp"
-//#include "pageFrameAllocator.hpp"
-#include <iostream>
+#pragma once
+#ifndef freelist
+#define freelist
+
+#include "../boot.h"
+#include "../printutils/e9print.h"
+#include "../renderer/BasicRenderer.hpp"
+#include "pageFrameAllocator.hpp"
 #include <cmath>
 #include <stdint.h>
 #include <stddef.h>
@@ -18,6 +19,6 @@ struct fBlock{
 };
 
 fBlock* initFreeList();
-void addNode(size_t size);
 
-#endif //OPTIMISTOS_FREELIST_HPP
+
+#endif

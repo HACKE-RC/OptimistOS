@@ -1,4 +1,7 @@
 #pragma once
+#ifndef pageframeallocator
+#define pageframeallocator
+
 #include <stdint.h>
 #include <stddef.h>
 #include "../boot.h"
@@ -7,7 +10,99 @@
 #include "../renderer/BasicRenderer.hpp"
 #include "freeList.hpp"
 #include <cmath>
+#include <cstring>
+#include <memory>
+
+//    memset()
+
+//#include <unordered_map>
+//std::unordered_map<void*, size_t> addressSizeHT;
+//
+#include <stddef.h>
+#include <stdbool.h>
+
+#define TABLE_SIZE 1024
+#define MAX_NODES (TABLE_SIZE * 2)
+
+typedef struct Node {
+    void* hash;
+    size_t key;
+    struct Node* next;
+} Node;
+
+typedef struct {
+    Node nodes[MAX_NODES];
+    Node* heads[TABLE_SIZE];
+    size_t numNodes;
+} HashMap;
+
+static void initHashMap(HashMap* map) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        map->heads[i] = &map->nodes[i];
+    }
+    map->numNodes = TABLE_SIZE;
+}
+
+static void insert(HashMap* map, void* hash, size_t key) {
+    size_t index = (size_t)hash % TABLE_SIZE;
+
+    Node* curr = map->heads[index];
+    while(curr->next != NULL) {
+        curr = curr->next;
+    }
+
+    if (map->numNodes == MAX_NODES) {
+        // handle overflow
+        return;
+    }
+
+    curr->next = &map->nodes[map->numNodes++];
+    curr->next->hash = hash;
+    curr->next->key = key;
+    curr->next->next = NULL;
+}
+static size_t findKeyByHash(HashMap* map, void* hash) {
+    size_t index = (size_t)hash % TABLE_SIZE;
+
+    Node* current = map->heads[index];
+    while(current != NULL) {
+        if(current->hash == hash) {
+            return current->key;
+        }
+        current = current->next;
+    }
+
+    return -1; // value not found
+}
+static void removeEntry(HashMap* map, void* hash) {
+    size_t index = (size_t)hash % TABLE_SIZE;
+
+    Node *curr = map->heads[index];
+    Node *prev = NULL;
+
+    while(curr != NULL) {
+        if (curr->hash == hash) {
+            if (prev == NULL) {
+                // removing head
+                map->heads[index] = curr->next;
+            } else {
+                prev->next = curr->next;
+            }
+            curr->hash = NULL;
+            curr->next = NULL;
+            map->numNodes--;
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+}
+static HashMap addressSizeHT;
+void freeFrame(void* allocatedFrame);
+void* allocateFrame(size_t requestSize);
+size_t roundUpToPageBoundary(size_t size);
 
 void* allocateFrame(size_t requestSize);
 void freeFrame(void* frameAddr);
 
+#endif
