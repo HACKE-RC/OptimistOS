@@ -1,11 +1,13 @@
 #include <iostream>
 #include "freeList.hpp"
 #include <cstring>
+#include <unordered_map>
 
 fBlock* head;
 fBlock* block = new fBlock;
-//fBlock *block= block;
 #define PAGESIZE 4096 // 4KBs
+
+std::unordered_map<void*, size_t> addressSizeHT;
 
 size_t roundUpToPageBoundary(size_t size){
     if ((size % PAGESIZE) == 0){
@@ -54,9 +56,15 @@ void* allocateFrame(size_t requestSize){
     newBlock->prevSize = 0;
 
     head = block = newBlock;
-    std::cout << "Allocated block size: " << newBlock->size << std::endl;
+    std::cout << "New block start: " << newBlock << std::endl;
+    std::cout << "New block size: " << newBlock << std::endl;
     memset(selectedBlock, 0, roundedRequestSize);
+    addressSizeHT.insert({reinterpret_cast<void*>(selectedBlock), roundedRequestSize});
     return selectedBlock;
+}
+
+void freeFrame(void* allocatedFrame){
+    std::cout << "The size of the given block is: " << addressSizeHT[allocatedFrame] << std::endl;
 }
 
 int main(){
@@ -64,7 +72,8 @@ int main(){
     block->inUse = false;
     block->prevSize = 0;
     block->next = nullptr;
-    head=block;
+    head = block;
+//  this setup is equivalent to calling initFreeList
 
     std::cout << "Initial block size: " << block->size << std::endl;
     void* page = allocateFrame(1000);
@@ -72,5 +81,6 @@ int main(){
     strcpy((char*)page, "Hello!");
     std::cout << (char*)page << std::endl;
     std::cout << "Final block size: " << block->size << std::endl;
+    freeFrame(page);
     return 0;
 }
