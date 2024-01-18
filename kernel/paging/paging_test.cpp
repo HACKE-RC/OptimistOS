@@ -64,7 +64,24 @@ void* allocateFrame(size_t requestSize){
 }
 
 void freeFrame(void* allocatedFrame){
-    std::cout << "The size of the given block is: " << addressSizeHT[allocatedFrame] << std::endl;
+    size_t allocatedFrameSize = addressSizeHT[allocatedFrame];
+    std::cout << "The size of the toBeFreed block is: " << allocatedFrameSize << std::endl;
+    std::cout << "The address of the toBeFreed block is: " << allocatedFrame << std::endl;
+    memset(allocatedFrame, 0, allocatedFrameSize);
+    fBlock* freedBlock = reinterpret_cast<fBlock*>(allocatedFrame);
+    freedBlock->size = allocatedFrameSize;
+    freedBlock->inUse = false;
+
+    head->prevSize = freedBlock->size;
+    freedBlock->next = head;
+    head = block = freedBlock;
+    addressSizeHT.erase(allocatedFrame);
+    std::cout << "address of the new head: " << head << std::endl;
+    fBlock *temp = head;
+    while(temp->next) {
+        std::cout << "address of the next node: " << head << std::endl;
+        temp = temp->next;
+    }
 }
 
 int main(){
@@ -73,9 +90,10 @@ int main(){
     block->prevSize = 0;
     block->next = nullptr;
     head = block;
-//  this setup is equivalent to calling initFreeList
+//  this setup until here is equivalent to calling initFreeList
 
     std::cout << "Initial block size: " << block->size << std::endl;
+    std::cout << "Initial block address: " << block << std::endl;
     void* page = allocateFrame(1000);
     std::cout << "Allocated page addr: " << page << std::endl;
     strcpy((char*)page, "Hello!");
