@@ -12,6 +12,7 @@
 struct fBlock{
     size_t size;
     fBlock *next;
+    fBlock *previous;
     bool inUse;
     size_t prevSize;
 };
