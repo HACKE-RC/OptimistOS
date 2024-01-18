@@ -73,16 +73,15 @@ void* allocateFrame(size_t requestSize){
         }
 
         // actual coalescing
-        fBlock* prevBlock = reinterpret_cast<fBlock*>(reinterpret_cast<char*>(selectedBlock) - selectedBlock->prevSize);
+        fBlock* prevBlock = selectedBlock->previous;
         std::cout << "address of prevBlock: " << prevBlock << std::endl;
         std::cout << "address of currentBlock: "  << selectedBlock << std::endl << std::endl;
-        exit(0);
-//        std::cout << "Coalesced two blocks of " << prevBlock->size << " and " <<  selectedBlock->size << std::endl;
-//        prevBlock->size += selectedBlock->size;
-//        prevBlock->next = selectedBlock->next;
-//        memset(selectedBlock, 0, selectedBlock->size);
-//        selectedBlock = prevBlock;
-//        std::cout << "Coalesced size " << selectedBlock->size << std::endl << std::endl;
+        std::cout << "Coalesced two blocks of " << prevBlock->size << " and " <<  selectedBlock->size << std::endl;
+        prevBlock->size += selectedBlock->size;
+        prevBlock->next = selectedBlock->next;
+        memset(selectedBlock, 0, selectedBlock->size);
+        selectedBlock = prevBlock;
+        std::cout << "Coalesced size " << selectedBlock->size << std::endl << std::endl;
     }
 
     selectedBlock->inUse = true;
@@ -96,9 +95,11 @@ void* allocateFrame(size_t requestSize){
 //    std::cout << "new block: " << newBlock << std::endl;
     newBlock->size = (selectedBlock->size - (roundedRequestSize));
     newBlock->inUse = false;
-    newBlock->next = nullptr;
+    newBlock->next = selectedBlock->next;
     newBlock->prevSize = 0;
+    std::cout << "head before change: " << head << std::endl;
     head = block = newBlock;
+    std::cout << "head after change: " << head << std::endl;
 //    std::cout << "New block start: " << newBlock << std::endl;
 //    std::cout << "New block size: " << newBlock->size << std::endl;
 
@@ -168,12 +169,14 @@ int main(){
     void* page4 = allocateFrame(1000);
     std::cout << "Final block size: " << block->size << std::endl << std::endl;
     std::cout << "Used Memory: " << usedMemory << std::endl;
-    std::cout << "Free Memory Memory: " << totalMemory - usedMemory << std::endl << std::endl;
+    std::cout << "Free Memory: " << totalMemory - usedMemory << std::endl << std::endl;
     freeFrame(page);
     freeFrame(page2);
     printBlocks();
-    std::cout << std::endl << "Free Memory Memory after: " << totalMemory - usedMemory << std::endl << std::endl;
+    std::cout << std::endl << "Free Memory after two frees: " << totalMemory - usedMemory << std::endl << std::endl;
     void* page5 = allocateFrame(8192);
+    std::cout << std::endl << "Free Memory after coalescing: " << totalMemory - usedMemory << std::endl << std::endl;
+    printBlocks();
     free(blockC);
 
     return 0;
