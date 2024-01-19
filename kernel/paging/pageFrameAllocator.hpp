@@ -52,8 +52,8 @@ static void insert(HashMap* map, void* hash, size_t key) {
     curr->next->key = key;
     curr->next->next = NULL;
 }
-static size_t findKeyByHash(HashMap* map, void* hash) {
-    size_t index = (size_t)hash % TABLE_SIZE;
+static int findKeyByHash(HashMap* map, void* hash) {
+    int index = (size_t)hash % TABLE_SIZE;
 
     Node* current = map->heads[index];
     while(current != NULL) {

@@ -70,6 +70,7 @@ void* allocateFrame(size_t requestSize){
         freeBlock = head;
 
         if (selectedBlock == nullptr){
+            e9_printf("coalescing halt");
             asm volatile ("hlt");
         }
 
@@ -90,9 +91,7 @@ void* allocateFrame(size_t requestSize){
     newBlock->prevSize = 0;
     head = freeBlock = newBlock;
 
-//    totalMemory -= roundedRequestSize;
 
-//    e9_printf("\nnew freemem size: %d\n", bootInformation.memory.freeMemSize);
     bootInformation.memory.freeMemSize = bootInformation.memory.freeMemSize - roundedRequestSize;
     setBootInfo(bootInformation);
     usedMemory += roundedRequestSize;
@@ -102,7 +101,11 @@ void* allocateFrame(size_t requestSize){
 }
 
 void freeFrame(void* allocatedFrame){
-    size_t allocatedFrameSize = findKeyByHash(&addressSizeHT, allocatedFrame);
+    int allocatedFrameSize = findKeyByHash(&addressSizeHT, allocatedFrame);
+    if (allocatedFrameSize == -1){
+//        double free or wrong memory freeing attempt
+        asm volatile("hlt");
+    }
     memoryset(allocatedFrame, 0, allocatedFrameSize);
 
     fBlock* freedBlock = (fBlock*)(allocatedFrame);
