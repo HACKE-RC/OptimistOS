@@ -1,43 +1,42 @@
 #include "pageFrameAllocator.hpp"
-size_t totalMemory = 0;
-size_t usedMemory = 0;
-
-void memoryset(void *start, uint8_t value, uint64_t num)
-{
-    for (uint64_t i = 0; i < num; i++)
-    {
-        *(uint8_t *)((uint64_t)start + i) = value;
-    }
-
-}
-
-fBlock *head = initFreeList();
-fBlock *freeBlock = head;
-bootInfo bootInformation = getBootInfo();
-
 #define PAGESIZE 4096 // 4KBs
+#define TEST e9_printf("test\n"); asm volatile("hlt");
+fBlock *head = nullptr;
+fBlock *freeBlock = head;
+
+size_t totalMemory;
+size_t usedMemory = 0;
+bootInfo bootInformation{};
 
 size_t roundUpToPageBoundary(size_t size){
     if ((size % PAGESIZE) == 0){
         return size;
     }
     return (size + PAGESIZE - 1) & ~(PAGESIZE - 1);
-//    return static_cast<size_t>(std::ceil((size) / PAGESIZE)) * PAGESIZE;
 }
 
 void* allocateFrame(size_t requestSize){
+    if (head == nullptr){
+        head = initFreeList();
+        freeBlock = head;
+    }
+
+    bootInformation = getBootInfo();
     initHashMap(&addressSizeHT);
-    size_t freeMemorySize = totalMemory - usedMemory;
+
+    size_t freeMemorySize = totalMemory = bootInformation.memory.freeMemSize;
     size_t roundedRequestSize = roundUpToPageBoundary(requestSize);
     fBlock *selectedBlock = nullptr;
 
     if (roundedRequestSize > freeMemorySize){
+        e9_printf("ERROR!!");
         asm volatile("hlt");
     }
-
+//    e9_printf("%d\n", roundedRequestSize);
     // best-fit algorithm to search for the appropriate freeBlock
     if (!freeBlock->next && freeBlock->size >= roundedRequestSize) {
         selectedBlock = freeBlock;
+//        TEST
     } else {
         // Traverse through the linked list
         while (freeBlock->next) {
@@ -53,6 +52,7 @@ void* allocateFrame(size_t requestSize){
 
     if (selectedBlock == nullptr){
         // coalescing setup (merge blocks)
+        e9_printf("coalescing setup");
         while(freeBlock->next){
             if (freeBlock->prevSize != 0){
                 if ((freeBlock->prevSize + freeBlock->size) >= roundedRequestSize){
@@ -90,17 +90,19 @@ void* allocateFrame(size_t requestSize){
     newBlock->prevSize = 0;
     head = freeBlock = newBlock;
 
+//    totalMemory -= roundedRequestSize;
+
+//    e9_printf("\nnew freemem size: %d\n", bootInformation.memory.freeMemSize);
+    bootInformation.memory.freeMemSize = bootInformation.memory.freeMemSize - roundedRequestSize;
+    setBootInfo(bootInformation);
     usedMemory += roundedRequestSize;
     memoryset(selectedBlock, 0, roundedRequestSize);
-//    addressSizeHT.insert({reinterpret_cast<void*>(selectedBlock), roundedRequestSize});
     insert(&addressSizeHT, (void*)selectedBlock, roundedRequestSize);
     return selectedBlock;
 }
 
 void freeFrame(void* allocatedFrame){
     size_t allocatedFrameSize = findKeyByHash(&addressSizeHT, allocatedFrame);
-//    size_t allocatedFrameSize = addressSizeHT[allocatedFrame];
-//    size_t allocatedFrameSize = 123;
     memoryset(allocatedFrame, 0, allocatedFrameSize);
 
     fBlock* freedBlock = (fBlock*)(allocatedFrame);
@@ -112,8 +114,12 @@ void freeFrame(void* allocatedFrame){
     freedBlock->next = head;
     head = freeBlock = freedBlock;
     removeEntry(&addressSizeHT, allocatedFrame);
-//    addressSizeHT.erase(allocatedFrame);
     usedMemory -= allocatedFrameSize;
+    if (bootInformation.memory.freeMemSize != 0){
+        bootInformation.memory.freeMemSize += allocatedFrameSize;
+        setBootInfo(bootInformation);
+    }
+
 }
 
 //void printBlocks() {

@@ -22,7 +22,7 @@ CC = g++
 $(eval $(call DEFAULT_VAR,LD,ld))
 
 # User controllable CFLAGS.
-CFLAGS ?= -g -O2 -pipe -Wextra -Wno-unused-parameter -lstdc++
+CFLAGS ?= -g -O0 -pipe -Wextra -Wno-unused-parameter -lstdc++
 
 # User controllable preprocessor flags. We set none by default.
 PRECFLAGS ?=

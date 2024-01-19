@@ -58,6 +58,53 @@ void BasicRenderer::Print(const char *str)
     }
 }
 
+#include <limits.h>  // for LONG_MIN and LONG_MAX
+
+void BasicRenderer::PrintInt(int num)
+{
+    // Handle the case when the number is 0
+    if (num == 0)
+    {
+        PutChar('0', CursorPosition.X, CursorPosition.Y);
+        CursorPosition.X += 8;
+        return;
+    }
+
+    // Handle negative numbers
+    if (num < 0)
+    {
+        PutChar('-', CursorPosition.X, CursorPosition.Y);
+        CursorPosition.X += 8;
+        // Avoid overflow when num is LONG_MIN
+        if (num == LONG_MIN)
+        {
+            PutChar('8', CursorPosition.X, CursorPosition.Y);
+            CursorPosition.X += 8;
+            num /= -10;
+        }
+        num = -num;
+    }
+
+    // Temporary buffer to store digits in reverse order
+    char buffer[21];  // 21 is enough for 64-bit integers
+    int bufferIndex = 0;
+
+    // Extract digits in reverse order
+    while (num > 0)
+    {
+        buffer[bufferIndex++] = '0' + (num % 10);
+        num /= 10;
+    }
+
+    // Print digits in correct order
+    for (int i = bufferIndex - 1; i >= 0; --i)
+    {
+        PutChar(buffer[i], CursorPosition.X, CursorPosition.Y);
+        CursorPosition.X += 8;
+    }
+}
+
+
 void BasicRenderer::Clear(uint32_t color, bool resetCursor)
 {
     uint64_t fbBase = (uint64_t)framebuffer->BaseAddress;

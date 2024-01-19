@@ -17,5 +17,6 @@ fBlock* initFreeList(){
     freeBlock->inUse = false;
     freeBlock->prevSize = 0;
     head = freeBlock;
+    e9_printf("freeList init: %x", freeBlock);
     return head;
 }

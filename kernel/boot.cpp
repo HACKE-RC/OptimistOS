@@ -358,6 +358,6 @@ extern "C" void _start(void)
     bootInformation.psf1Font = &font;
     bootInformation.memory = memory;
     setBootInfo(bootInformation);
-    setupOptimist(bootInformation);
+    setupOptimist();
     done();
 }

@@ -9,15 +9,6 @@
 #include "../printutils/e9print.h"
 #include "../renderer/BasicRenderer.hpp"
 #include "freeList.hpp"
-#include <cmath>
-#include <cstring>
-#include <memory>
-
-//    memset()
-
-//#include <unordered_map>
-//std::unordered_map<void*, size_t> addressSizeHT;
-//
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -97,6 +88,16 @@ static void removeEntry(HashMap* map, void* hash) {
         curr = curr->next;
     }
 }
+
+static void memoryset(void *start, uint8_t value, uint64_t num)
+{
+    for (uint64_t i = 0; i < num; i++)
+    {
+        *(uint8_t *)((uint64_t)start + i) = value;
+    }
+
+}
+
 static HashMap addressSizeHT;
 void freeFrame(void* allocatedFrame);
 void* allocateFrame(size_t requestSize);
