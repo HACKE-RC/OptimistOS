@@ -124,22 +124,3 @@ void freeFrame(void* allocatedFrame){
     }
 
 }
-
-//void printBlocks() {
-//    fBlock* temp = head;
-//    size_t accumulatedPrevSize = 0;
-//
-//
-//    while (temp) {
-//        std::cout << "address of the current node: " << temp << std::endl;
-//        std::cout << "address of the next node: " << temp->next << std::endl << "address of the prev node: " << temp->previous << std::endl;
-//        std::cout << "size of the prev node: " << temp->prevSize << std::endl;
-//        std::cout << "-----" << std::endl << std::endl;
-////        std::cout << "address of the prev node: "
-////                  << reinterpret_cast<void*>(reinterpret_cast<char*>(temp) - accumulatedPrevSize) << std::endl;
-//
-//        temp = temp->next;
-//    }
-//
-//    std::cout << "-----" << std::endl << std::endl;
-//}
