@@ -28,6 +28,11 @@ static volatile limine_memmap_request memmap_request = {
         .id = LIMINE_MEMMAP_REQUEST,
         .revision = 0};
 
+static volatile limine_hhdm_request hhdm_request = {
+        .id = LIMINE_HHDM_REQUEST,
+        .revision = 0
+};
+
 // #define LIMINE_5_LEVEL_PAGING_REQUEST { LIMINE_COMMON_MAGIC, 0x94469551da9b3192, 0xebe5e86db7382888}
 
 // static volatile limine_5_level_paging_request paging_request = {
@@ -185,6 +190,8 @@ limine_file *getFile(const char *name)
     return NULL;
 }
 
+bootInfo globalBootInfo;
+
 void setBootInfo(bootInfo bootInfo){
     globalBootInfo = bootInfo;
 }
@@ -304,6 +311,7 @@ extern "C" void _start(void)
         e9_printf("No valid Memory space found for OS!\n");
         done();
     }
+
     startRAMAddr = freeMemStart;
 
     if (module_request.response == NULL)
@@ -335,7 +343,10 @@ extern "C" void _start(void)
 
         font.glyphBuffer = (void *)((uint64_t)file->address + sizeof(PSF1_HEADER));
     }
-
+    if (hhdm_request.response == NULL){
+        e9_printf("HHDM request wasn't fulfilled");
+        done();
+    }
     Memory memory{};
     {
         memory.freeMemStart = startRAMAddr;
@@ -344,6 +355,7 @@ extern "C" void _start(void)
         memory.kernelStart = kernelStart;
         memory.kernelSize = kernelSize;
         memory.kernelStartV = kernelStartV;
+        memory.hhdmOffset = hhdm_request.response->offset;
     }
 
     e9_printf("LIMINE_INFO: ");

@@ -38,6 +38,7 @@ struct Memory
     void *kernelStart;
     uint64_t kernelSize;
     void *kernelStartV;
+    uint64_t hhdmOffset;
 };
 
 struct RSDP1
@@ -66,7 +67,6 @@ typedef struct {
    Memory memory;
 } bootInfo;
 
-static bootInfo globalBootInfo;
 
 void setBootInfo(bootInfo bootInfo);
 bootInfo getBootInfo();

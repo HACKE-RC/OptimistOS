@@ -5,6 +5,7 @@
 #include "idt/isr.hpp"
 #include "printutils/e9print.h"
 #include "paging/pageFrameAllocator.hpp"
+#include "paging/paging.hpp"
 
 static BasicRenderer renderer = BasicRenderer(NULL, NULL);
 
@@ -26,5 +27,6 @@ int setupOptimist(){
     GlobalRenderer->Print("\nMemory size after allocation: ");
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
     freeFrame(frame);
+    initPaging();
     return 0;
 }

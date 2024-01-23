@@ -1,12 +1,12 @@
 #include "pageFrameAllocator.hpp"
+
 #define PAGESIZE 4096 // 4KBs
-#define TEST e9_printf("test\n"); asm volatile("hlt");
+
 fBlock *head = nullptr;
 fBlock *freeBlock = head;
-
 size_t totalMemory;
 size_t usedMemory = 0;
-bootInfo bootInformation{};
+static bootInfo bootInformation{};
 
 size_t roundUpToPageBoundary(size_t size){
     if ((size % PAGESIZE) == 0){
@@ -32,11 +32,9 @@ void* allocateFrame(size_t requestSize){
         e9_printf("ERROR!!");
         asm volatile("hlt");
     }
-//    e9_printf("%d\n", roundedRequestSize);
     // best-fit algorithm to search for the appropriate freeBlock
     if (!freeBlock->next && freeBlock->size >= roundedRequestSize) {
         selectedBlock = freeBlock;
-//        TEST
     } else {
         // Traverse through the linked list
         while (freeBlock->next) {
@@ -71,6 +69,7 @@ void* allocateFrame(size_t requestSize){
 
         if (selectedBlock == nullptr){
             e9_printf("coalescing halt");
+//          implement disk paging
             asm volatile ("hlt");
         }
 
