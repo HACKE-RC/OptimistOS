@@ -15,7 +15,7 @@ size_t roundUpToPageBoundary(size_t size){
     return (size + PAGESIZE - 1) & ~(PAGESIZE - 1);
 }
 
-void* allocateFrame(size_t requestSize){
+uintptr_t allocateFrame(size_t requestSize){
     if (head == nullptr){
         head = initFreeList();
         freeBlock = head;
@@ -96,16 +96,20 @@ void* allocateFrame(size_t requestSize){
     usedMemory += roundedRequestSize;
     memoryset(selectedBlock, 0, roundedRequestSize);
     insert(&addressSizeHT, (void*)selectedBlock, roundedRequestSize);
-    return selectedBlock;
-}
 
+    return (uintptr_t)selectedBlock + bootInformation.memory.hhdmOffset;
+}
+void *toPhysicalAddr(void *addr){
+    return (void*)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
+}
 void freeFrame(void* allocatedFrame){
+    allocatedFrame = toPhysicalAddr(allocatedFrame);
     int allocatedFrameSize = findKeyByHash(&addressSizeHT, allocatedFrame);
     if (allocatedFrameSize == -1){
 //        double free or wrong memory freeing attempt
         asm volatile("hlt");
     }
-    memoryset(allocatedFrame, 0, allocatedFrameSize);
+    memoryset((allocatedFrame), 0, allocatedFrameSize);
 
     fBlock* freedBlock = (fBlock*)(allocatedFrame);
     freedBlock->size = allocatedFrameSize;

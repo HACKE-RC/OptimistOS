@@ -22,7 +22,7 @@ int setupOptimist(){
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
     GlobalRenderer->Print(" bytes");
 
-    void* frame = allocateFrame(214000800);
+    void* frame = (void*)allocateFrame(214000800);
     bootInformation = getBootInfo();
     GlobalRenderer->Print("\nMemory size after allocation: ");
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);

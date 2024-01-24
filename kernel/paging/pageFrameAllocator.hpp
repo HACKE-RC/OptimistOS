@@ -100,10 +100,10 @@ static void memoryset(void *start, uint8_t value, uint64_t num)
 
 static HashMap addressSizeHT;
 void freeFrame(void* allocatedFrame);
-void* allocateFrame(size_t requestSize);
+//void* allocateFrame(size_t requestSize);
 size_t roundUpToPageBoundary(size_t size);
 
-void* allocateFrame(size_t requestSize);
+uintptr_t allocateFrame(size_t requestSize);
 void freeFrame(void* frameAddr);
 
 #endif
