@@ -105,5 +105,7 @@ size_t roundUpToPageBoundary(size_t size);
 
 uintptr_t allocateFrame(size_t requestSize);
 void freeFrame(void* frameAddr);
+void *toVirtualAddr(void *addr);
+uintptr_t toPhysicalAddr(void *addr);
 
 #endif

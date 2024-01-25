@@ -15,6 +15,14 @@ size_t roundUpToPageBoundary(size_t size){
     return (size + PAGESIZE - 1) & ~(PAGESIZE - 1);
 }
 
+uintptr_t toPhysicalAddr(void *addr){
+    return (uintptr_t)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
+}
+
+void *toVirtualAddr(void *addr){
+    return (void*)((uintptr_t)addr + bootInformation.memory.hhdmOffset);
+}
+
 uintptr_t allocateFrame(size_t requestSize){
     if (head == nullptr){
         head = initFreeList();
@@ -97,13 +105,11 @@ uintptr_t allocateFrame(size_t requestSize){
     memoryset(selectedBlock, 0, roundedRequestSize);
     insert(&addressSizeHT, (void*)selectedBlock, roundedRequestSize);
 
-    return (uintptr_t)selectedBlock + bootInformation.memory.hhdmOffset;
+    return toPhysicalAddr(selectedBlock);
 }
-void *toPhysicalAddr(void *addr){
-    return (void*)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
-}
+
 void freeFrame(void* allocatedFrame){
-    allocatedFrame = toPhysicalAddr(allocatedFrame);
+//    allocatedFrame = allocatedFrame;
     int allocatedFrameSize = findKeyByHash(&addressSizeHT, allocatedFrame);
     if (allocatedFrameSize == -1){
 //        double free or wrong memory freeing attempt
