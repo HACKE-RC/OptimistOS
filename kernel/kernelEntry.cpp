@@ -20,13 +20,20 @@ int setupOptimist(){
     GlobalRenderer->Print("Memory Information: \n");
     GlobalRenderer->Print("Old Memory Size: ");
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
-    GlobalRenderer->Print(" bytes");
+    GlobalRenderer->Print(" bytes\n");
+    GlobalRenderer->Print("bootinfo: ");
+    GlobalRenderer->PrintInt(bootInformation.memory.hhdmOffset);
 
-    void* frame = (void*)allocateFrame(214000800);
+    char* frame = (char*)allocateFrame(1000);
+    char* frame1 = (char*)allocateFrame(1000);
+//    frame = "bruh";
+//    GlobalRenderer->Print(frame);
     bootInformation = getBootInfo();
     GlobalRenderer->Print("\nMemory size after allocation: ");
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
     freeFrame(frame);
-    initPaging();
+    freeFrame(frame1);
+    GlobalRenderer->Print("\nFreed stuff");
+//    initPaging();
     return 0;
 }

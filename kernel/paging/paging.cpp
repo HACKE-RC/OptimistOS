@@ -8,15 +8,15 @@ uint64_t readCr3();
 
 void initPaging(){
     bootInformation = getBootInfo();
-    PageTable* PML4 = (struct PageTable*)allocateFrame(4096);
-    uintptr_t cr3 = (uintptr_t)PML4 - bootInformation.memory.hhdmOffset;
-    __asm__ volatile ("mov %%cr3, %0" : "=r" (cr3));
+    auto* PML4 = (struct PageTable*)allocateFrame(4096);
+    auto cr3 = (uintptr_t)PML4;
+    e9_printf("\nPhysical Address of PML4 #2: %x", PML4);
+//    __asm__ volatile ("mov %%cr3, %0" : "=r" (cr3));
 //    e9_printf("\nPhysical Address of PML4 #1: %x", virtual_to_physical(PML4));
-    e9_printf("\nPhysical Address of PML4 #2: %x", PML4 - bootInformation.memory.hhdmOffset);
 //    e9_printf("\nHHDM offset: %x", bootInformation.memory.hhdmOffset);
 //    setCR3((void*)PML4 - bootInformation.memory.hhdmOffset);
-    e9_printf("\nreg value: %x", readCr3());
-    e9_printf("\nPML4 setup complete");
+//    e9_printf("\nreg value: %x", readCr3());
+//    e9_printf("\nPML4 setup complete");
 }
 
 uint64_t readCr3() {

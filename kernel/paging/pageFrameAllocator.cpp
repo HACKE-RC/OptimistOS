@@ -109,9 +109,11 @@ uintptr_t allocateFrame(size_t requestSize){
 }
 
 void freeFrame(void* allocatedFrame){
-//    allocatedFrame = allocatedFrame;
-    int allocatedFrameSize = findKeyByHash(&addressSizeHT, allocatedFrame);
+    void* test = toVirtualAddr(allocatedFrame);
+//    allocatedFrame = (void*)((uintptr_t)allocatedFrame - bootInformation.memory.hhdmOffset);
+    int allocatedFrameSize = findKeyByHash(&addressSizeHT, (test));
     if (allocatedFrameSize == -1){
+        e9_printf("ERROR: Double Free / Wrong Memory Freeing attempt. Blocked.");
 //        double free or wrong memory freeing attempt
         asm volatile("hlt");
     }

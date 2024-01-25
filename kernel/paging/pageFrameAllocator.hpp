@@ -47,11 +47,21 @@ static void insert(HashMap* map, void* hash, size_t key) {
         return;
     }
 
-    curr->next = &map->nodes[map->numNodes++];
+    int i;
+    for(i = 0; i < MAX_NODES; i++) {
+        if(map->nodes[i].hash == NULL) {
+            // found unused node
+            break;
+        }
+    }
+
+    curr->next = &map->nodes[i];
     curr->next->hash = hash;
     curr->next->key = key;
     curr->next->next = NULL;
+    map->numNodes++;
 }
+
 static int findKeyByHash(HashMap* map, void* hash) {
     int index = (size_t)hash % TABLE_SIZE;
 
