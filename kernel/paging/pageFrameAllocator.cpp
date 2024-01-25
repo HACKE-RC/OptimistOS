@@ -24,13 +24,16 @@ void *toVirtualAddr(void *addr){
 }
 
 uintptr_t allocateFrame(size_t requestSize){
+    if(!isSet){
+        initHash();
+    }
     if (head == nullptr){
         head = initFreeList();
         freeBlock = head;
     }
 
     bootInformation = getBootInfo();
-    initHashMap(&addressSizeHT);
+//    initHashMap(&addressSizeHT);
 
     size_t freeMemorySize = totalMemory = bootInformation.memory.freeMemSize;
     size_t roundedRequestSize = roundUpToPageBoundary(requestSize);
@@ -111,13 +114,13 @@ uintptr_t allocateFrame(size_t requestSize){
 void freeFrame(void* allocatedFrame){
     void* test = toVirtualAddr(allocatedFrame);
 //    allocatedFrame = (void*)((uintptr_t)allocatedFrame - bootInformation.memory.hhdmOffset);
-    int allocatedFrameSize = findKeyByHash(&addressSizeHT, (test));
+    int allocatedFrameSize = search(&addressSizeHT, (test));
     if (allocatedFrameSize == -1){
         e9_printf("ERROR: Double Free / Wrong Memory Freeing attempt. Blocked.");
 //        double free or wrong memory freeing attempt
         asm volatile("hlt");
     }
-    memoryset((allocatedFrame), 0, allocatedFrameSize);
+//    memoryset((allocatedFrame), 0, allocatedFrameSize);
 
     fBlock* freedBlock = (fBlock*)(allocatedFrame);
     freedBlock->size = allocatedFrameSize;
@@ -127,7 +130,7 @@ void freeFrame(void* allocatedFrame){
     head->previous = freedBlock;
     freedBlock->next = head;
     head = freeBlock = freedBlock;
-    removeEntry(&addressSizeHT, allocatedFrame);
+    deleteKey(&addressSizeHT, allocatedFrame);
     usedMemory -= allocatedFrameSize;
     if (bootInformation.memory.freeMemSize != 0){
         bootInformation.memory.freeMemSize += allocatedFrameSize;

@@ -1,31 +1,36 @@
-#include <stdio.h>
 #include <string.h>
 #include "hashtable.hpp"
-#define TABLE_SIZE 100
+//#define TABLE_SIZE 100
 
-// Structure for the key-value pair
+// Hash function
 
 // Hash function
 int hash(void* key) {
-    size_t hashValue = *(size_t*)key;
+    size_t hashValue = (size_t)key;
+
+    // Additional hashing algorithm for better distribution
+    hashValue = ((hashValue >> 16) ^ hashValue) * 0x45d9f3b;
+    hashValue = ((hashValue >> 16) ^ hashValue) * 0x45d9f3b;
+    hashValue = (hashValue >> 16) ^ hashValue;
+
     return (int)(hashValue % TABLE_SIZE);
 }
 
 // Function to insert a key-value pair into the hash table
-void insert(HashTable* ht, size_t key, int value) {
-    int index = hash(&key);
+void insert(HashTable* ht, void* key, int value) {
+    int index = hash(key);
     while (ht->table[index].value != -1) {
         index = (index + 1) % TABLE_SIZE; // Linear probing for collision resolution
     }
-    ht->table[index].key = key;
+    ht->table[index].key = (size_t)key; // Cast the key to size_t
     ht->table[index].value = value;
 }
 
 // Function to search for a key in the hash table
-int search(HashTable* ht, size_t key) {
-    int index = hash(&key);
+int search(HashTable* ht, void* key) {
+    int index = hash(key);
     int originalIndex = index;
-    while (ht->table[index].key != key || ht->table[index].value == -1) {
+    while (ht->table[index].key != (size_t)key || ht->table[index].value == -1) {
         index = (index + 1) % TABLE_SIZE; // Linear probing
         if (index == originalIndex) {
             return -1; // Key not found
@@ -35,10 +40,10 @@ int search(HashTable* ht, size_t key) {
 }
 
 // Function to delete a key from the hash table
-void deleteKey(HashTable* ht, size_t key) {
-    int index = hash(&key);
+void deleteKey(HashTable* ht, void* key) {
+    int index = hash(key);
     int originalIndex = index;
-    while (ht->table[index].key != key || ht->table[index].value == -1) {
+    while (ht->table[index].key != (size_t)key || ht->table[index].value == -1) {
         index = (index + 1) % TABLE_SIZE; // Linear probing
         if (index == originalIndex) {
             return; // Key not found
@@ -46,4 +51,5 @@ void deleteKey(HashTable* ht, size_t key) {
     }
     ht->table[index].value = -1; // Marking as deleted
 }
+// Function to search for a key in the hash table
 
