@@ -18,6 +18,7 @@ int setupOptimist(){
     initGDT();
     isrInstall(renderer);
     GlobalRenderer->Print("Memory Information: \n");
+    e9_printf("memory addr: %x", bootInformation.memory.freeMemStart);
     GlobalRenderer->Print("Old Memory Size: ");
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
     GlobalRenderer->Print(" bytes\n");
@@ -34,6 +35,6 @@ int setupOptimist(){
     freeFrame(frame);
     freeFrame(frame1);
     GlobalRenderer->Print("\nFreed stuff");
-//    initPaging();
+    initPaging();
     return 0;
 }

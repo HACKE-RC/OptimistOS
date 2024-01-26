@@ -6,17 +6,31 @@ bootInfo bootInformation{};
 //}
 uint64_t readCr3();
 
+void setCr3(uint64_t value) {
+    asm volatile("movq %0, %%cr3" : : "r" (value));
+}
+
 void initPaging(){
     bootInformation = getBootInfo();
     auto* PML4 = (struct PageTable*)allocateFrame(4096);
     auto cr3 = (uintptr_t)PML4;
     e9_printf("\nPhysical Address of PML4 #2: %x", PML4);
-//    __asm__ volatile ("mov %%cr3, %0" : "=r" (cr3));
+    e9_printf("\nLast call!");
+    PML4 = (struct PageTable*)toVirtualAddr(PML4);
+    unsigned long long entry;
+    for (auto & pageDirectoryEntry : PML4->entries){
+        pageDirectoryEntry.setFlag(UserOrSuperuser, true);
+        pageDirectoryEntry.setFlag(ReadWrite, true);
+        pageDirectoryEntry.setFlag(Present, false);
+        entry = pageDirectoryEntry.value;
+    }
+    e9_printf("\nentry value: %x\n", entry);
+//    setCr3(cr3);
 //    e9_printf("\nPhysical Address of PML4 #1: %x", virtual_to_physical(PML4));
 //    e9_printf("\nHHDM offset: %x", bootInformation.memory.hhdmOffset);
-//    setCR3((void*)PML4 - bootInformation.memory.hhdmOffset);
-//    e9_printf("\nreg value: %x", readCr3());
-//    e9_printf("\nPML4 setup complete");
+    e9_printf("\nLast call 2!");
+    e9_printf("\nPML4 setup complete");
+    e9_printf("\nreg value: %x", readCr3());
 }
 
 uint64_t readCr3() {

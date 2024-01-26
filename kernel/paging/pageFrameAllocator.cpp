@@ -112,9 +112,9 @@ uintptr_t allocateFrame(size_t requestSize){
 }
 
 void freeFrame(void* allocatedFrame){
-    void* test = toVirtualAddr(allocatedFrame);
+    allocatedFrame = toVirtualAddr(allocatedFrame);
 //    allocatedFrame = (void*)((uintptr_t)allocatedFrame - bootInformation.memory.hhdmOffset);
-    int allocatedFrameSize = search(&addressSizeHT, (test));
+    int allocatedFrameSize = search(&addressSizeHT, (allocatedFrame));
     if (allocatedFrameSize == -1){
         e9_printf("ERROR: Double Free / Wrong Memory Freeing attempt. Blocked.");
 //        double free or wrong memory freeing attempt
@@ -122,7 +122,7 @@ void freeFrame(void* allocatedFrame){
     }
 //    memoryset((allocatedFrame), 0, allocatedFrameSize);
 
-    fBlock* freedBlock = (fBlock*)(allocatedFrame);
+    fBlock* freedBlock = (fBlock*)((allocatedFrame));
     freedBlock->size = allocatedFrameSize;
     freedBlock->inUse = false;
 
