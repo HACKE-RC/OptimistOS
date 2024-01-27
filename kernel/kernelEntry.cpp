@@ -24,17 +24,10 @@ int setupOptimist(){
     GlobalRenderer->Print(" bytes\n");
     GlobalRenderer->Print("bootinfo: ");
     GlobalRenderer->PrintInt(bootInformation.memory.hhdmOffset);
-
-    char* frame = (char*)allocateFrame(1000);
-    char* frame1 = (char*)allocateFrame(1000);
-//    frame = "bruh";
-//    GlobalRenderer->Print(frame);
+    initPaging();
     bootInformation = getBootInfo();
     GlobalRenderer->Print("\nMemory size after allocation: ");
     GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
-    freeFrame(frame);
-    freeFrame(frame1);
     GlobalRenderer->Print("\nFreed stuff");
-    initPaging();
     return 0;
 }

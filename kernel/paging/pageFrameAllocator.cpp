@@ -24,16 +24,14 @@ void *toVirtualAddr(void *addr){
 }
 
 uintptr_t allocateFrame(size_t requestSize){
-    if(!isSet){
-        initHash();
-    }
+
+
     if (head == nullptr){
         head = initFreeList();
         freeBlock = head;
     }
 
     bootInformation = getBootInfo();
-//    initHashMap(&addressSizeHT);
 
     size_t freeMemorySize = totalMemory = bootInformation.memory.freeMemSize;
     size_t roundedRequestSize = roundUpToPageBoundary(requestSize);
@@ -88,7 +86,7 @@ uintptr_t allocateFrame(size_t requestSize){
         fBlock* prevBlock = selectedBlock->previous;
         prevBlock->size += selectedBlock->size;
         prevBlock->next = selectedBlock->next;
-        memoryset(selectedBlock, 0, selectedBlock->size);
+//        memoryset(selectedBlock, 0, selectedBlock->size);
         selectedBlock = prevBlock;
     }
 
@@ -105,19 +103,16 @@ uintptr_t allocateFrame(size_t requestSize){
     bootInformation.memory.freeMemSize = bootInformation.memory.freeMemSize - roundedRequestSize;
     setBootInfo(bootInformation);
     usedMemory += roundedRequestSize;
-    memoryset(selectedBlock, 0, roundedRequestSize);
+//    memoryset(selectedBlock, 0, roundedRequestSize);
     insert(&addressSizeHT, (void*)selectedBlock, roundedRequestSize);
 
     return toPhysicalAddr(selectedBlock);
 }
-
 void freeFrame(void* allocatedFrame){
     allocatedFrame = toVirtualAddr(allocatedFrame);
-//    allocatedFrame = (void*)((uintptr_t)allocatedFrame - bootInformation.memory.hhdmOffset);
     int allocatedFrameSize = search(&addressSizeHT, (allocatedFrame));
     if (allocatedFrameSize == -1){
         e9_printf("ERROR: Double Free / Wrong Memory Freeing attempt. Blocked.");
-//        double free or wrong memory freeing attempt
         asm volatile("hlt");
     }
 
@@ -125,15 +120,18 @@ void freeFrame(void* allocatedFrame){
     freedBlock->size = allocatedFrameSize;
     freedBlock->inUse = false;
 
-    head->prevSize = freedBlock->size;
-    head->previous = freedBlock;
-    freedBlock->next = head;
-    head = freeBlock = freedBlock;
+    if (freedBlock == head) {
+        head = freeBlock = freedBlock;
+    } else {
+        freedBlock->next = head;
+        head->previous = freedBlock;
+        head = freedBlock;
+    }
+
     deleteKey(&addressSizeHT, allocatedFrame);
     usedMemory -= allocatedFrameSize;
     if (bootInformation.memory.freeMemSize != 0){
         bootInformation.memory.freeMemSize += allocatedFrameSize;
         setBootInfo(bootInformation);
     }
-
 }

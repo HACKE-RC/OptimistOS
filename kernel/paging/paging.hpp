@@ -39,11 +39,12 @@ struct PageDirectoryEntry{
       return ((value & bitSelector) > 0);
   }
 
-  void setAddress(uint64_t address){
-      address &= 0x000000ffffffffff;
-      value &= 0xfff0000000000fff;
-      value &= (address << 12);
-  }
+void setAddress(uint64_t address){
+    address &= 0x000000ffffffffff;
+    value &= 0xfff0000000000fff; // Clear address bits
+    value |= (address << 12); // Set new address
+    value |= (value & 0xf000000000000fff); // Set flags back
+}
 
   uint64_t getAddress(){
       return (value & 0x000ffffffffff000) >> 12;
@@ -64,7 +65,7 @@ struct PageTable{
 void initPaging();
 bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags);
 void setCr3(uint64_t value);
-uintptr_t getNextLevelPointer(PageDirectoryEntry entry, bool allocate);
+uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate);
 PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate);
 uint64_t readCr3();
 #endif

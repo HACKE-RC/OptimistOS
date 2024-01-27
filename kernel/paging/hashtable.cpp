@@ -17,9 +17,11 @@ int hash(void* key) {
 }
 
 // Function to insert a key-value pair into the hash table
+static bool done = false;
 void insert(HashTable* ht, void* key, int value) {
     int index = hash(key);
-    while (ht->table[index].value != -1) {
+
+    for (int i = 0; i < 100; i++){
         index = (index + 1) % TABLE_SIZE; // Linear probing for collision resolution
     }
     ht->table[index].key = (size_t)key; // Cast the key to size_t
@@ -30,11 +32,13 @@ void insert(HashTable* ht, void* key, int value) {
 int search(HashTable* ht, void* key) {
     int index = hash(key);
     int originalIndex = index;
-    while (ht->table[index].key != (size_t)key || ht->table[index].value == -1) {
+    int i =0;
+    while (ht->table[index].key != (size_t)key || ht->table[index].value == -1 || i < 100) {
         index = (index + 1) % TABLE_SIZE; // Linear probing
         if (index == originalIndex) {
             return -1; // Key not found
         }
+        i++;
     }
     return ht->table[index].value;
 }
@@ -43,11 +47,13 @@ int search(HashTable* ht, void* key) {
 void deleteKey(HashTable* ht, void* key) {
     int index = hash(key);
     int originalIndex = index;
-    while (ht->table[index].key != (size_t)key || ht->table[index].value == -1) {
+    int i = 0;
+    while (ht->table[index].key != (size_t)key || ht->table[index].value == -1 || i < 100) {
         index = (index + 1) % TABLE_SIZE; // Linear probing
         if (index == originalIndex) {
             return; // Key not found
         }
+        i++;
     }
     ht->table[index].value = -1; // Marking as deleted
 }

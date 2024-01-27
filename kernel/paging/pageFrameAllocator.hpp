@@ -23,13 +23,7 @@ static void memoryset(void *start, uint8_t value, uint64_t num)
 }
 
 static HashTable addressSizeHT;
-static int isSet = 0;
-static void initHash(){
-    for (auto & i : addressSizeHT.table) {
-        i.value = -1; // Initialize all values to -1 (indicating empty)
-    }
-    isSet = 1;
-}
+static bool initialised = false;
 void freeFrame(void* allocatedFrame);
 //void* allocateFrame(size_t requestSize);
 size_t roundUpToPageBoundary(size_t size);
