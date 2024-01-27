@@ -48,6 +48,13 @@ struct PageDirectoryEntry{
   uint64_t getAddress(){
       return (value & 0x000ffffffffff000) >> 12;
   }
+
+  bool isValid(){
+      if (getAddress()!=0){
+          return true;
+      }
+      return false;
+  }
 } __attribute__((packed));
 
 struct PageTable{
@@ -55,6 +62,9 @@ struct PageTable{
 };
 
 void initPaging();
-uintptr_t cpuGetControlReg(uint32_t reg);
-uintptr_t virtual_to_physical(void* virtual_address);
+bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags);
+void setCr3(uint64_t value);
+uintptr_t getNextLevelPointer(PageDirectoryEntry entry, bool allocate);
+PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate);
+uint64_t readCr3();
 #endif

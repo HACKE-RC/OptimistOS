@@ -120,7 +120,6 @@ void freeFrame(void* allocatedFrame){
 //        double free or wrong memory freeing attempt
         asm volatile("hlt");
     }
-//    memoryset((allocatedFrame), 0, allocatedFrameSize);
 
     fBlock* freedBlock = (fBlock*)((allocatedFrame));
     freedBlock->size = allocatedFrameSize;

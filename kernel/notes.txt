@@ -1,0 +1,2 @@
+remap the first 0x1000 4gb to the same address
+then map your own stuff
