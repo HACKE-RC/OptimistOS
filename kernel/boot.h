@@ -68,24 +68,11 @@ typedef struct {
    Memory memory;
 } bootInfo;
 
-static struct limine_kernel_address_request kernelMemoryRequest = {
-        .id = LIMINE_KERNEL_ADDRESS_REQUEST,
-        .revision = 0,
-        .response = nullptr
-};
+extern volatile struct limine_kernel_address_request kernelMemoryRequest;
 
-static volatile limine_kernel_file_request kernelFileRequest
-{
-    .id = LIMINE_KERNEL_FILE_REQUEST,
-    .revision = 0,
-    .response = nullptr
-};
+extern volatile limine_kernel_file_request kernelFileRequest;
 
-static volatile limine_memmap_request memmap_request = {
-        .id = LIMINE_MEMMAP_REQUEST,
-        .revision = 0,
-        .response = nullptr
-};
+extern volatile limine_memmap_request memmap_request;
 
 void setBootInfo(bootInfo bootInfo);
 bootInfo getBootInfo();

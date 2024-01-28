@@ -1,5 +1,5 @@
-#include <stdint.h>
-#include <stddef.h>
+#include <cstdint>
+#include <cstddef>
 #include "../limine/limine.h"
 #include "boot.h"
 #include "kernelEntry.hpp"
@@ -31,6 +31,26 @@ static volatile limine_hhdm_request hhdm_request = {
         .revision = 0
 };
 
+volatile limine_kernel_address_request kernelMemoryRequest = {
+        .id = LIMINE_KERNEL_ADDRESS_REQUEST,
+        .revision = 0,
+        .response = nullptr
+};
+
+volatile limine_kernel_file_request kernelFileRequest
+{
+    .id = LIMINE_KERNEL_FILE_REQUEST,
+    .revision = 0,
+    .response = nullptr
+};
+
+volatile limine_memmap_request memmap_request = {
+        .id = LIMINE_MEMMAP_REQUEST,
+        .revision = 0,
+        .response = nullptr
+};
+
+
 // #define LIMINE_5_LEVEL_PAGING_REQUEST { LIMINE_COMMON_MAGIC, 0x94469551da9b3192, 0xebe5e86db7382888}
 
 // static volatile limine_5_level_paging_request paging_request = {
@@ -52,7 +72,7 @@ static volatile limine_hhdm_request hhdm_request = {
 // this request allows us to access the address of our kernel
 
 
-static void done(void)
+static void done()
 {
     for (;;)
     {

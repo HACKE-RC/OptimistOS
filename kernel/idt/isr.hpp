@@ -1,6 +1,6 @@
 #ifndef OPTIMISTOS_ISR_HPP
 #define OPTIMISTOS_ISR_HPP
-#include <stdint.h>
+#include <cstdint>
 #include "../renderer/BasicRenderer.hpp"
 #include "../printutils/e9print.h"
 typedef struct{

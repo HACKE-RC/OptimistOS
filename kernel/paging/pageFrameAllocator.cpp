@@ -28,7 +28,6 @@ uintptr_t toPhysicalAddr(void *addr){
 }
 
 void *toVirtualAddr(void *addr){
-    e9_printf("returning virtual addr\n");
     return (void*)((uintptr_t)addr + bootInformation.memory.hhdmOffset);
 }
 
