@@ -10,12 +10,33 @@ void initPaging(){
    
     e9_printf("\nPhysical Address of PML4 #2: %x", PML4);
     e9_printf("\nLast call!");
-   
-    PML4 = (struct PageTable*)toVirtualAddr(PML4);
 
-    for (long i = 0x1000; i < 0x100000000; i+=0x1000) {
+    PML4 = (struct PageTable*)toVirtualAddr(PML4);
+//100000000
+
+    for (uint64_t i = 0x1000; i < 0x40000000; i+=0x1000) {
+        e9_printf("\nmapping %x\n", i);
         map(i, (void*)i, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present));
     }
+
+    for (size_t i = 0x40000000; i < 0x80000000; i += 0x1000)
+    {
+        map(i, (void*)i, ReadWrite);
+    }
+
+    for (size_t i = 0x80000000; i < 0xc0000000; i += 0x1000)
+    {
+        map(i, (void*)i, ReadWrite);
+    }
+
+    for (size_t i = 0xc0000000; i < (0x100000000); i += 0x1000)
+    {
+        e9_printf("\nmapping %x\n", i);
+        map(i, (void*)i, ReadWrite);
+    }
+
+
+
 
 //    setCr3(cr3);
     e9_printf("\nLast call 2!");

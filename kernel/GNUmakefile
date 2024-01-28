@@ -37,8 +37,8 @@ LDFLAGS ?=
 override CFLAGS +=       \
     -std=c11             \
     -ffreestanding       \
-    -fno-stack-protector \
-    -fno-stack-check     \
+#    -fno-stack-protector \
+#    -fno-stack-check     \
     -fno-lto             \
     -fno-pie             \
     -fno-pic             \
