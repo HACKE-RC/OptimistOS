@@ -7,7 +7,15 @@
 #include <stdint.h>
 
 extern "C" void setCr3(void*);
+#define writeReg(reg, val) asm volatile ("mov %0, %%" #reg :: "r"(val) : "memory");
 
+enum controlRegs
+{
+    cr0 = 0000000,
+    cr1 = 0001000,
+    cr2 = 0002000,
+    cr3 = 0003000,
+};
 enum pageTableFlag{
     Present = (1 << 0),
     ReadWrite = (1 << 1),
@@ -65,7 +73,8 @@ void setAddress(uint64_t address){
 struct PageTable{
     PageDirectoryEntry entries[512];
 };
-
+bool isHigherHalf(uintptr_t addr);
+uintptr_t toHigherHalf(uintptr_t addr);
 void initPaging();
 bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags);
 void setCr3(uint64_t value);

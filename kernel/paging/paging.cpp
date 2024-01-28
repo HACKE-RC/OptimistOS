@@ -3,20 +3,16 @@
 #include "../../limine/limine.h"
 bootInfo bootInformation{};
 
+uint64_t hhdmOffset = 0;
+
 PageTable* PML4 = nullptr;
 
 void initPaging(){
     bootInformation = getBootInfo();
-    PML4 = (struct PageTable*)allocateFrame(4096);
-    auto cr3 = (uintptr_t)PML4;
-   
-    e9_printf("\nPhysical Address of PML4 #2: %x", PML4);
-    e9_printf("\nLast call!");
-
-    PML4 = (struct PageTable*)toVirtualAddr(PML4);
+    hhdmOffset = hhdm_request.response->offset;
 
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
-        map(i, (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages));
+        map(i, (void*) toHigherHalf(i), (pageTableFlag)(ReadWrite |  Present | LargerPages));
     }
 
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
@@ -39,7 +35,7 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | LargerPages));
+            map(k, (void*)toHigherHalf(k), (pageTableFlag)(ReadWrite | Present | LargerPages));
         }
 
         start += roundedSize;
@@ -49,7 +45,7 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)k, (pageTableFlag)(ReadWrite | Present));
+            map(k, (void*)toHigherHalf(k), (pageTableFlag)(ReadWrite | Present));
         }
     }
 
@@ -60,7 +56,8 @@ void initPaging(){
         map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present));
     }
 
-    setCr3(cr3);
+    writeReg(cr3, PML4);
+//    setCr3(PML4);
     e9_printf("\nLast call 2!");
     e9_printf("\nPML4 setup complete");
     e9_printf("\nreg value: %x", readCr3());
@@ -139,4 +136,17 @@ uint64_t readCr3() {
     uint64_t cr3Value;
     __asm__ volatile ("mov %%cr3, %0" : "=r" (cr3Value));
     return cr3Value;
+}
+
+bool isHigherHalf(uintptr_t addr) {
+    return (addr >= hhdmOffset);
+}
+
+uintptr_t toHigherHalf(uintptr_t addr) {
+    if (isHigherHalf(addr)){
+        return addr;
+    }
+    else{
+        return addr + hhdmOffset;
+    };
 }

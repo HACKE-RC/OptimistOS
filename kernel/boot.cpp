@@ -26,7 +26,7 @@ static volatile limine_module_request module_request = {
 
 
 
-static volatile limine_hhdm_request hhdm_request = {
+volatile limine_hhdm_request hhdm_request = {
         .id = LIMINE_HHDM_REQUEST,
         .revision = 0
 };

@@ -73,6 +73,7 @@ extern volatile struct limine_kernel_address_request kernelMemoryRequest;
 extern volatile limine_kernel_file_request kernelFileRequest;
 
 extern volatile limine_memmap_request memmap_request;
+extern volatile limine_hhdm_request hhdm_request;
 
 void setBootInfo(bootInfo bootInfo);
 bootInfo getBootInfo();
