@@ -2,8 +2,6 @@
 #include "idt.hpp"
 #include "../printutils/e9print.h"
 
-// static BasicRenderer renderer = BasicRenderer(NULL, NULL);
-
 char *exception_messages[] = {
         "Division by Zero",
         "Debug",

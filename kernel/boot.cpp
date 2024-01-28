@@ -24,9 +24,7 @@ static volatile limine_module_request module_request = {
         .id = LIMINE_MODULE_REQUEST,
         .revision = 0};
 
-static volatile limine_memmap_request memmap_request = {
-        .id = LIMINE_MEMMAP_REQUEST,
-        .revision = 0};
+
 
 static volatile limine_hhdm_request hhdm_request = {
         .id = LIMINE_HHDM_REQUEST,
@@ -52,11 +50,6 @@ static volatile limine_hhdm_request hhdm_request = {
 
 // this file is our kernel
 // this request allows us to access the address of our kernel
-struct limine_kernel_address_request kernelMemoryRequest = {
-        .id = LIMINE_KERNEL_ADDRESS_REQUEST,
-        .revision = 0,
-        .response = NULL
-};
 
 
 static void done(void)
@@ -134,8 +127,8 @@ static void write_shim(const char *s, uint64_t l)
     terminal_request.response->write(terminal, s, l);
 }
 
-void *startRAMAddr = nullptr;
-void *quickMalloc(uint64_t size)
+static void *startRAMAddr = nullptr;
+static void *quickMalloc(uint64_t size)
 {
     if (startRAMAddr == nullptr)
     {
@@ -147,7 +140,7 @@ void *quickMalloc(uint64_t size)
     return temp;
 }
 
-bool checkStringEndsWith(const char *str, const char *end)
+static bool checkStringEndsWith(const char *str, const char *end)
 {
     const char *_str = str;
     const char *_end = end;
@@ -178,19 +171,19 @@ bool checkStringEndsWith(const char *str, const char *end)
     return true;
 }
 
-limine_file *getFile(const char *name)
+static limine_file *getFile()
 {
     limine_module_response *module_response = module_request.response;
     for (size_t i = 0; i < module_response->module_count; i++)
     {
         limine_file *f = module_response->modules[i];
-        if (checkStringEndsWith(f->path, name))
+        if (checkStringEndsWith(f->path, "zap-light16.psf"))
             return f;
     }
-    return NULL;
+    return nullptr;
 }
 
-bootInfo globalBootInfo;
+static bootInfo globalBootInfo;
 
 void setBootInfo(bootInfo bootInfo){
     globalBootInfo = bootInfo;
@@ -212,8 +205,8 @@ extern "C" void _start(void)
 
     limine_print = write_shim;
 
-    // We should now be able to call the Limine terminal to print out
-    // a simple "Hello World" to screen.
+    // we should now be able to call the limine terminal to print out
+    // a simple "hello world" to screen.
     struct limine_terminal *terminal = terminal_request.response->terminals[0];
     
     terminal_request.response->write(terminal, "Starting Boot init...\n\n", 24);
@@ -230,19 +223,6 @@ extern "C" void _start(void)
         e9_printf("> LIMINE_SUCCESS: ");
         terminal_request.response->write(terminal, "Framebuffer loaded!\n", 21);
     }
-
-//    if (rsdp_request.response == NULL || rsdp_request.response->address == NULL)
-//    {
-//        e9_printf("LIMINE_ERROR: ");
-//        terminal_request.response->write(terminal, "RSDP is NULL!\n", 15);
-//
-//        done();
-//    }
-//    else
-//    {
-//        e9_printf("> LIMINE_SUCCESS: ");
-//        terminal_request.response->write(terminal, "RSDP loaded!\n\n", 9);
-//    }
 
     Framebuffer fb{};
     {
@@ -288,11 +268,10 @@ extern "C" void _start(void)
     uint64_t kernelSize = 1;
 
     limine_memmap_response *memoryMapResponse = memmap_request.response;
-    for (size_t i = 0; i < memoryMapResponse->entryCount; i++)
+    for (size_t i = 0; i < memoryMapResponse->entry_count; i++)
     {
         limine_memmap_entry *e = memoryMapResponse->entries[i];
-        if (e->type == LIMINE_MEMMAP_USABLE)
-        {
+        if (e->type == LIMINE_MEMMAP_USABLE) {
 //          use the largest free memory block
             if (e->length > freeMemSize)
             {
@@ -314,7 +293,7 @@ extern "C" void _start(void)
 
     startRAMAddr = freeMemStart;
 
-    if (module_request.response == NULL)
+    if (module_request.response == nullptr)
     {
         e9_printf("Modules not passed!\n\n");
         done();
@@ -323,7 +302,7 @@ extern "C" void _start(void)
     PSF1_FONT font{};
     {
         const char *fName = "zap-light16.psf";
-        limine_file *file = getFile(fName);
+        limine_file *file = getFile();
         if (file == nullptr)
         {
             e9_printf("LIMINE_ERROR: ");

@@ -1,4 +1,6 @@
 #include "paging.hpp"
+#include "../boot.h"
+#include "../../limine/limine.h"
 bootInfo bootInformation{};
 
 PageTable* PML4 = nullptr;
@@ -12,10 +14,50 @@ void initPaging(){
     e9_printf("\nLast call!");
 
     PML4 = (struct PageTable*)toVirtualAddr(PML4);
-//100000000
 
-    for (uint64_t i = 0; i < (_1GB * 4); i += _1GB) {
+    for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
         map(i, (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages));
+    }
+
+    for (size_t i = 0; i < memmap_request.response->entry_count; i++){
+        limine_memmap_entry *mmap = memmap_request.response->entries[i];
+
+        uint64_t start = roundDown(mmap->base, 4 * _1GB);
+        uint64_t end = roundUp(mmap->base + mmap->length, 4 * _1GB);
+
+        if (end < (4 * _1GB)){
+            continue;
+        }
+
+        auto size = end - start;
+        auto pageSize = 4 * _1GB;
+        auto roundedSize = roundDown(size, 4 * _1GB);
+        auto difference = size - roundedSize;
+
+        for (uint64_t k = start; k < (start + roundedSize); k += 4 * _1GB){
+            if (k < (4 * _1GB)){
+                continue;
+            }
+
+            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | LargerPages));
+        }
+
+        start += roundedSize;
+
+        for (uint64_t k = start; k < (start + difference); k += _4KB){
+            if (k < (4 * _1GB)){
+                continue;
+            }
+
+            map(k, (void*)k, (pageTableFlag)(ReadWrite | Present));
+        }
+    }
+
+    for (size_t i = 0; i < kernelFileRequest.response->kernel_file->size; i += (4 * _1GB)) {
+        uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
+        uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
+
+        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present));
     }
 
 //    setCr3(cr3);

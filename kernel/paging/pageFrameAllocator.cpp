@@ -15,6 +15,14 @@ size_t roundUpToPageBoundary(size_t size){
     return (size + PAGESIZE - 1) & ~(PAGESIZE - 1);
 }
 
+uint64_t roundDown(uint64_t n, uint64_t alignTo){
+    return n & ~(alignTo - 1);
+}
+
+uint64_t roundUp(uint64_t n, uint64_t alignTo) {
+    return (n + alignTo - 1) & ~(alignTo - 1);
+}
+
 uintptr_t toPhysicalAddr(void *addr){
     return (uintptr_t)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
 }

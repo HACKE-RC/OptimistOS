@@ -1,6 +1,7 @@
 #ifndef paging 
 #define paging 
 #define _1GB 0x40000000ul
+#define _4KB 0x1000
 #include "../boot.h"
 #include "pageFrameAllocator.hpp"
 #include <stdint.h>

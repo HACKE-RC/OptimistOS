@@ -27,7 +27,8 @@ static bool initialised = false;
 void freeFrame(void* allocatedFrame);
 //void* allocateFrame(size_t requestSize);
 size_t roundUpToPageBoundary(size_t size);
-
+uint64_t roundUp(uint64_t n, uint64_t toAlign);
+uint64_t roundDown(uint64_t n, uint64_t toAlign);
 uintptr_t allocateFrame(size_t requestSize);
 void freeFrame(void* frameAddr);
 void *toVirtualAddr(void *addr);
