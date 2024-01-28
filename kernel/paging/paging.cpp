@@ -16,7 +16,7 @@ void initPaging(){
 
     for (uint64_t i = 0x1000; i < 0x40000000; i+=0x1000) {
         e9_printf("\nmapping %x\n", i);
-        map(i, (void*)i, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present));
+        map(i, (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages));
     }
 
     for (size_t i = 0x40000000; i < 0x80000000; i += 0x1000)
@@ -34,9 +34,6 @@ void initPaging(){
         e9_printf("\nmapping %x\n", i);
         map(i, (void*)i, ReadWrite);
     }
-
-
-
 
 //    setCr3(cr3);
     e9_printf("\nLast call 2!");
@@ -64,7 +61,8 @@ uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate){
 
     return -1;
 }
-PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate){
+PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags){
+    e9_printf("converting virtual addr to pte");
     size_t pml4Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 39)) >> 39;
     size_t pml3Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 30)) >> 30;
     size_t pml2Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 21)) >> 21;
@@ -76,33 +74,43 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate){
 
     PageTable *PML3, *PML2, *PML1;
 
+    e9_printf("PML3 setup start\n");
     PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4->entries[pml4Entry], true));
     if (PML3 == nullptr){
         return nullptr;
     }
+    e9_printf("PML3 setup end\n");
 
+    uint64_t bitSelector = ((uint64_t) 1 << LargerPages);
+    if (((flags & bitSelector) > 0)){
+        return &PML3->entries[pml3Entry];
+    }
+
+    e9_printf("PML2 setup start\n");
     PML2 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML3->entries[pml3Entry], true));
     if (PML2 == nullptr){
         return nullptr;
     }
+    e9_printf("PML2 setup end\n");
 
-    PML1 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML2->entries[pml2Entry], true));
-    if (PML1 == nullptr){
+    e9_printf("PML1 setup start\n");
+    PML1 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML2->entries[pml2Entry], true)); if (PML1 == nullptr){
         return nullptr;
     }
+    e9_printf("PML1 setup end\n");
 
     return &PML1->entries[pml1Entry];
 }
 
 bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags){
-    PageDirectoryEntry *entry = virtualAddrToPTE(virtualAddr, true);
+    e9_printf("calling virtualAddrToPTE\n");
+    auto *entry = (PageDirectoryEntry*)(virtualAddrToPTE(virtualAddr, true, flags));
+    e9_printf("recieved entry at: %x\n", entry);
 
     if (entry != nullptr){
-        entry->setFlag(ReadWrite, true);
-        entry->setFlag(Present, true);
-        entry->setFlag(UserOrSuperuser, true);
+        entry->setFlag(flags, true);
         entry->setAddress(physicalAddr);
-        // entry->setFlag(flags, true);
+        e9_printf("entry flags set\n");
         return true;
     }
 

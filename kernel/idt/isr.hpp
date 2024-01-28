@@ -2,7 +2,7 @@
 #define OPTIMISTOS_ISR_HPP
 #include <stdint.h>
 #include "../renderer/BasicRenderer.hpp"
-
+#include "../printutils/e9print.h"
 typedef struct{
     uint64_t ds;
     uint64_t rdi, rsi, rbp, rsp, rdx, rcx, rbx, rax;
@@ -16,15 +16,60 @@ extern "C" void isr2();
 extern "C" void isr3();
 extern "C" void isr4();
 extern "C" void isr5();
-extern "C" void isr6();
+
+static void isr6(){
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    e9_printf("invalid opcode!");
+    asm volatile("hlt");
+}
 extern "C" void isr7();
 extern "C" void isr8();
 extern "C" void isr9();
 extern "C" void isr10();
 extern "C" void isr11();
 extern "C" void isr12();
-extern "C" void isr13();
-extern "C" void isr14();
+static void isr13(){
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    e9_printf("general protection fault!");
+    asm volatile("hlt");
+}
+
+static void isr14(){
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    e9_printf("page fault!");
+    asm volatile("hlt");
+}
+
 extern "C" void isr15();
 extern "C" void isr16();
 extern "C" void isr17();

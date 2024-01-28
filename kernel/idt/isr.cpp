@@ -1,5 +1,6 @@
 #include "isr.hpp"
 #include "idt.hpp"
+#include "../printutils/e9print.h"
 
 // static BasicRenderer renderer = BasicRenderer(NULL, NULL);
 
@@ -37,8 +38,8 @@ char *exception_messages[] = {
         "Reserved"
 };
 
+
 void isrInstall(BasicRenderer renderer){
-    // ::renderer = renderer;
     setIDTGate(0, (uint64_t)isr0);
     setIDTGate(1, (uint64_t)isr1);
     setIDTGate(2, (uint64_t)isr2);
@@ -77,11 +78,7 @@ void isrInstall(BasicRenderer renderer){
 }
 
 void isrHandler(registers regs){
-    // GlobalRenderer = &renderer;
-    // GlobalRenderer->Clear(Colors.black, true);
-    // GlobalRenderer->Print("Interrupt!");
-    // const char* message = exception_messages[regs.int_no];
-    // GlobalRenderer->Print(message);
-    // GlobalRenderer->Print("\n");
+    e9_printf("\nRIP: \n", regs.rip);
+    e9_printf("interrupt no. : %d", regs.int_no);
     asm("hlt");
 }

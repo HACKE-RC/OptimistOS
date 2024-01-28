@@ -34,7 +34,16 @@ isrCommon:
     mov fs, ax
     mov gs, ax
 
+    ; Save the RIP value
+    mov rax, [rsp + 8]
+    push rax
+
+    ; Call isrHandler
     call isrHandler
+
+    ; Restore the RIP value
+    pop rax
+    mov [rsp + 8], rax
 
     pop rax
     mov ds, ax

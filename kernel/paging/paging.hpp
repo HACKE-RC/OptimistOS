@@ -8,17 +8,20 @@
 extern "C" void setCr3(void*);
 
 enum pageTableFlag{
-    Present = 0,
-    ReadWrite = 1,
-    UserOrSuperuser = 2,
-    WriteThrough = 3,
-    CacheDisabled = 4,
-    Accessed = 5,
-    Dirty = 6,
-    LargePage = 7,
-    Global = 8,
-//  9 - 11 can be used for OS-specific usage
-    NX = 63
+    Present = (1 << 0),
+    ReadWrite = (1 << 1),
+    UserOrSuperuser = (1 << 2),
+    WriteThrough = (1 << 3), // PWT
+    CacheDisable = (1 << 4), // PCD
+    Accessed = (1 << 5),
+    LargerPages = (1 << 7),
+    PAT4k = (1 << 7), // PAT lvl1
+    Global = (1 << 8),
+    Custom0 = (1 << 9),
+    Custom1 = (1 << 10),
+    Custom2 = (1 << 11),
+    PATlg = (1 << 12), // PAT lvl2+
+    NoExec = (1UL << 63)
 };
 
 struct PageDirectoryEntry{
@@ -66,6 +69,6 @@ void initPaging();
 bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags);
 void setCr3(uint64_t value);
 uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate);
-PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate);
+PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags);
 uint64_t readCr3();
 #endif
