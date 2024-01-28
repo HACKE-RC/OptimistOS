@@ -14,25 +14,8 @@ void initPaging(){
     PML4 = (struct PageTable*)toVirtualAddr(PML4);
 //100000000
 
-    for (uint64_t i = 0x1000; i < 0x40000000; i+=0x1000) {
-        e9_printf("\nmapping %x\n", i);
+    for (uint64_t i = 0; i < (_1GB * 4); i += _1GB) {
         map(i, (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages));
-    }
-
-    for (size_t i = 0x40000000; i < 0x80000000; i += 0x1000)
-    {
-        map(i, (void*)i, ReadWrite);
-    }
-
-    for (size_t i = 0x80000000; i < 0xc0000000; i += 0x1000)
-    {
-        map(i, (void*)i, ReadWrite);
-    }
-
-    for (size_t i = 0xc0000000; i < (0x100000000); i += 0x1000)
-    {
-        e9_printf("\nmapping %x\n", i);
-        map(i, (void*)i, ReadWrite);
     }
 
 //    setCr3(cr3);
@@ -81,8 +64,7 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
     }
     e9_printf("PML3 setup end\n");
 
-    uint64_t bitSelector = ((uint64_t) 1 << LargerPages);
-    if (((flags & bitSelector) > 0)){
+    if (flags & LargerPages){
         return &PML3->entries[pml3Entry];
     }
 
