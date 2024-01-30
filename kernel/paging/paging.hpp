@@ -34,7 +34,7 @@ enum pageTableFlag{
 };
 
 struct PageDirectoryEntry{
-  uint64_t value;
+  uint64_t value = 0;
 
   void setFlag(pageTableFlag flag, bool enable){
         uint64_t bitSelector = (uint64_t) 1 << flag;
@@ -46,7 +46,7 @@ struct PageDirectoryEntry{
         }
   }
 
-  bool getFlag(pageTableFlag flag){
+  [[nodiscard]] bool getFlag(pageTableFlag flag) const{
       uint64_t bitSelector = (uint64_t) 1 << flag;
       return ((value & bitSelector) > 0);
   }
@@ -58,12 +58,17 @@ void setAddress(uint64_t address){
     value |= (value & 0xf000000000000fff); // Set flags back
 }
 
-  uint64_t getAddress(){
-      return (value & 0x000ffffffffff000) >> 12;
+  [[nodiscard]] uint64_t getAddress() const{
+      if (value!=0){
+          return (value & 0x000ffffffffff000) >> 12;
+      }
+      else{
+          return 0;
+      }
   }
 
-  bool isValid(){
-      if (getAddress()!=0){
+  [[nodiscard]] bool isValid() const{
+      if (getFlag(Present)){
           return true;
       }
       return false;
@@ -76,10 +81,10 @@ struct PageTable{
 bool isHigherHalf(uintptr_t addr);
 uintptr_t toHigherHalf(uintptr_t addr);
 void initPaging();
-bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags);
+bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize = _4KB);
 void setCr3(uint64_t value);
-uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate);
-PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags);
+uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr= nullptr, size_t pageSize = _4KB);
+PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize = _4KB);
 uint64_t readCr3();
 static PageTable* PML4;
 #endif

@@ -18,7 +18,7 @@ void initPaging(){
     hhdmOffset = hhdm_request.response->offset;
 
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
-        map(i, (void*) toHigherHalf(i), (pageTableFlag)(ReadWrite |  Present | LargerPages));
+        map(toHigherHalf(i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), 4 * _1GB);
     }
     e9_printf("first 4 gb mapping done!");
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
@@ -41,7 +41,7 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)toHigherHalf(k), (pageTableFlag)(ReadWrite | Present | LargerPages));
+            map(toHigherHalf(k), (void*)k, (pageTableFlag)(ReadWrite | Present | LargerPages), 4 * _1GB);
         }
 
         start += roundedSize;
@@ -51,18 +51,18 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)toHigherHalf(k), (pageTableFlag)(ReadWrite | Present));
+            map(toHigherHalf(k), (void*)(k), (pageTableFlag)(ReadWrite | Present), _4KB);
         }
 
     }
 
     e9_printf("\nsecond memmap mapping done!\n");
-    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (4 * _1GB)) {
-        uint64_t physicalAddr = (uintptr_t)bootInformation.memory.kernelStart + i;
-        uint64_t virtualAddr = (uintptr_t)bootInformation.memory.kernelStartV + i;
-
-        map(physicalAddr, (void*)toHigherHalf(virtualAddr), (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ));
-    }
+//    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (4 * _1GB)) {
+//        uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
+//        uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
+//
+//        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ));
+//    }
     e9_printf("\nkernel mapping done!\n");
     if (PML4 == nullptr){
         e9_printf("pml4 empty");
@@ -70,17 +70,34 @@ void initPaging(){
     }
     e9_printf("PML4 addr: %x", PML4);
 //    writeCR3(PML4);
-    setCr3(PML4);
+//    setCr3(PML4);
     e9_printf("\nLast call 2!");
     e9_printf("\nPML4 setup complete");
     e9_printf("\nreg value: %x", readCr3());
 }
 
-uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate){
+uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr, size_t pageSize){
     uintptr_t nextLevelPointer = 0;
 
     if (entry.isValid()){
-        nextLevelPointer = entry.getAddress();
+        if (pageSize > _4KB){
+            auto oldPhysicalAddr = entry.getAddress();
+            auto oldVirtualAddr = (uint64_t)virtualAddr & ~(pageSize - 1);
+//            if (oldPhysicalAddr & (pageSize - 1)){
+//                e9_printf("Unexpected page table memory address: %x", oldPhysicalAddr);
+//                asm volatile("hlt");
+//            }
+            nextLevelPointer = allocateFrame(0x1000);
+            entry.setAddress(nextLevelPointer);
+            entry.setFlag((pageTableFlag)(Present | ReadWrite | UserOrSuperuser), true);
+            for (size_t i = 0; i < pageSize; i += pageSize){
+                map((oldPhysicalAddr + i), (void*)(oldVirtualAddr + i), (pageTableFlag)(Present | ReadWrite | UserOrSuperuser | LargerPages));
+            }
+        }
+        else{
+            nextLevelPointer = entry.getAddress();
+        }
+
     }
     else if (allocate){
         nextLevelPointer = allocateFrame(0x1000);
@@ -96,7 +113,7 @@ uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate){
 
     return -1;
 }
-PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags){
+PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize){
     size_t pml4Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 39)) >> 39;
     size_t pml3Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 30)) >> 30;
     size_t pml2Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 21)) >> 21;
@@ -107,8 +124,9 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
     }
 
     PageTable *PML3, *PML2, *PML1;
+    PML4 = (PageTable*)toVirtualAddr(PML4);
 
-    PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4->entries[pml4Entry], true));
+    PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4->entries[pml4Entry], true, virtualAddr, pageSize));
     if (PML3 == nullptr){
         return nullptr;
     }
@@ -117,20 +135,21 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
         return &PML3->entries[pml3Entry];
     }
 
-    PML2 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML3->entries[pml3Entry], true));
+    PML2 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML3->entries[pml3Entry], true, virtualAddr, pageSize));
     if (PML2 == nullptr){
         return nullptr;
     }
 
-    PML1 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML2->entries[pml2Entry], true)); if (PML1 == nullptr){
+    PML1 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML2->entries[pml2Entry], true, virtualAddr, pageSize));
+    if (PML1 == nullptr){
         return nullptr;
     }
 
     return &PML1->entries[pml1Entry];
 }
 
-bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags){
-    auto *entry = (PageDirectoryEntry*)(virtualAddrToPTE(virtualAddr, true, flags));
+bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize){
+    auto *entry = (PageDirectoryEntry*)toVirtualAddr((virtualAddrToPTE(virtualAddr, true, flags, pageSize)));
 
     if (entry != nullptr){
         entry->setFlag(flags, true);
