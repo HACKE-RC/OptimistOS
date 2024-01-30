@@ -5,16 +5,22 @@ bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
 
-PageTable* PML4 = nullptr;
+
+void init(){
+    PML4 = (struct PageTable*)((void*)allocateFrame(0x1000));
+}
+
 
 void initPaging(){
+    init();
+//    auto PML4x = (struct PageTable*) toVirtualAddr((void*)allocateFrame(0x1000));
     bootInformation = getBootInfo();
     hhdmOffset = hhdm_request.response->offset;
 
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
         map(i, (void*) toHigherHalf(i), (pageTableFlag)(ReadWrite |  Present | LargerPages));
     }
-
+    e9_printf("first 4 gb mapping done!");
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
         limine_memmap_entry *mmap = memmap_request.response->entries[i];
 
@@ -47,17 +53,24 @@ void initPaging(){
 
             map(k, (void*)toHigherHalf(k), (pageTableFlag)(ReadWrite | Present));
         }
+
     }
 
-    for (size_t i = 0; i < kernelFileRequest.response->kernel_file->size; i += (4 * _1GB)) {
-        uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
-        uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
+    e9_printf("\nsecond memmap mapping done!\n");
+    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (4 * _1GB)) {
+        uint64_t physicalAddr = (uintptr_t)bootInformation.memory.kernelStart + i;
+        uint64_t virtualAddr = (uintptr_t)bootInformation.memory.kernelStartV + i;
 
-        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present));
+        map(physicalAddr, (void*)toHigherHalf(virtualAddr), (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ));
     }
-
-    writeReg(cr3, PML4);
-//    setCr3(PML4);
+    e9_printf("\nkernel mapping done!\n");
+    if (PML4 == nullptr){
+        e9_printf("pml4 empty");
+        asm volatile("hlt");
+    }
+    e9_printf("PML4 addr: %x", PML4);
+//    writeCR3(PML4);
+    setCr3(PML4);
     e9_printf("\nLast call 2!");
     e9_printf("\nPML4 setup complete");
     e9_printf("\nreg value: %x", readCr3());

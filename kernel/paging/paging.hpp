@@ -4,11 +4,11 @@
 #define _4KB 0x1000
 #include "../boot.h"
 #include "pageFrameAllocator.hpp"
-#include <stdint.h>
+#include <cstdint>
 
 extern "C" void setCr3(void*);
 #define writeReg(reg, val) asm volatile ("mov %0, %%" #reg :: "r"(val) : "memory");
-
+#define writeCR3(val) asm volatile ("mov %0, %%cr3" :: "r"(val) : "memory");
 enum controlRegs
 {
     cr0 = 0000000,
@@ -81,4 +81,5 @@ void setCr3(uint64_t value);
 uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate);
 PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags);
 uint64_t readCr3();
+static PageTable* PML4;
 #endif

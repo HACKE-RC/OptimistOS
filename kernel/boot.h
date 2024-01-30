@@ -2,8 +2,8 @@
 #ifndef boot_h
 #define boot_h
 
-#include <stdint.h>
-#include <stddef.h>
+#include <cstdint>
+#include <cstddef>
 #include "../limine/limine.h"
 
 struct Framebuffer
