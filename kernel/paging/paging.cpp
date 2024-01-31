@@ -7,7 +7,7 @@ uint64_t hhdmOffset = 0;
 
 
 void init(){
-    PML4 = (struct PageTable*)((void*)allocateFrame(0x1000));
+    PML4 = (struct PageTable*)(allocateFrame(0x1000));
 }
 
 
@@ -66,12 +66,12 @@ void initPaging(){
     }
 
     e9_printf("\nsecond memmap mapping done!\n");
-//    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (4 * _1GB)) {
-//        uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
-//        uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
-//
-//        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ));
-//    }
+    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (4 * _1GB)) {
+        uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
+        uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
+
+        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ));
+    }
     e9_printf("\nkernel mapping done!\n");
     if (PML4 == nullptr){
         e9_printf("pml4 empty");
