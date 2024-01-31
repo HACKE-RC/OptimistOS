@@ -8,7 +8,11 @@
 
 extern "C" void setCr3(void*);
 #define writeReg(reg, val) asm volatile ("mov %0, %%" #reg :: "r"(val) : "memory");
-#define writeCR3(val) asm volatile ("mov %0, %%cr3" :: "r"(val) : "memory");
+#define writeCR3(val) asm volatile ("movq %0, %%cr3" :: "r"(val) : "memory");
+#define asm_write_cr(reg, value)			\
+({							\
+    asm volatile("mov %0, %%cr" #reg : : "r" (value));	\
+})
 enum controlRegs
 {
     cr0 = 0000000,

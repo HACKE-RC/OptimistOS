@@ -13,35 +13,44 @@ void init(){
 
 void initPaging(){
     init();
-//    auto PML4x = (struct PageTable*) toVirtualAddr((void*)allocateFrame(0x1000));
+
     bootInformation = getBootInfo();
     hhdmOffset = hhdm_request.response->offset;
 
+//  identity map 0 to 0x100000000
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
-        map(toHigherHalf(i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), 4 * _1GB);
+        map((i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), _1GB);
     }
     e9_printf("first 4 gb mapping done!");
+//  map 0xFFFF800000000000 - 0xFFFF800100000000 to 0x0 - 0x100000000
+    for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
+        map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
+    }
+//
+    for (uint64_t i = 0; i < (2 * _1GB); i += _1GB){
+        map(i, (void*)(i + 0xFFFFFFFF80000000UL), (pageTableFlag)Present, _1GB);
+    }
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
         limine_memmap_entry *mmap = memmap_request.response->entries[i];
 
-        uint64_t start = roundDown(mmap->base, 4 * _1GB);
-        uint64_t end = roundUp(mmap->base + mmap->length, 4 * _1GB);
+        uint64_t start = roundDown(mmap->base, _1GB);
+        uint64_t end = roundUp(mmap->base + mmap->length, _1GB);
 
         if (end < (4 * _1GB)){
             continue;
         }
 
         auto size = end - start;
-        auto pageSize = 4 * _1GB;
-        auto roundedSize = roundDown(size, 4 * _1GB);
+        auto pageSize = _1GB;
+        auto roundedSize = roundDown(size, _1GB);
         auto difference = size - roundedSize;
 
-        for (uint64_t k = start; k < (start + roundedSize); k += 4 * _1GB){
+        for (uint64_t k = start; k < (start + roundedSize); k += _1GB){
             if (k < (4 * _1GB)){
                 continue;
             }
 
-            map(toHigherHalf(k), (void*)k, (pageTableFlag)(ReadWrite | Present | LargerPages), 4 * _1GB);
+            map(k, (void*)(k + 0xFFFF800000000000UL), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
         }
 
         start += roundedSize;
@@ -51,7 +60,7 @@ void initPaging(){
                 continue;
             }
 
-            map(toHigherHalf(k), (void*)(k), (pageTableFlag)(ReadWrite | Present), _4KB);
+            map(k, (void*)(k + 0xFFFF800000000000UL), (pageTableFlag)(ReadWrite | Present), _4KB);
         }
 
     }
@@ -69,6 +78,7 @@ void initPaging(){
         asm volatile("hlt");
     }
     e9_printf("PML4 addr: %x", PML4);
+    asm_write_cr(3, PML4);
 //    writeCR3(PML4);
 //    setCr3(PML4);
     e9_printf("\nLast call 2!");
@@ -80,24 +90,7 @@ uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* vi
     uintptr_t nextLevelPointer = 0;
 
     if (entry.isValid()){
-        if (pageSize > _4KB){
-            auto oldPhysicalAddr = entry.getAddress();
-            auto oldVirtualAddr = (uint64_t)virtualAddr & ~(pageSize - 1);
-//            if (oldPhysicalAddr & (pageSize - 1)){
-//                e9_printf("Unexpected page table memory address: %x", oldPhysicalAddr);
-//                asm volatile("hlt");
-//            }
-            nextLevelPointer = allocateFrame(0x1000);
-            entry.setAddress(nextLevelPointer);
-            entry.setFlag((pageTableFlag)(Present | ReadWrite | UserOrSuperuser), true);
-            for (size_t i = 0; i < pageSize; i += pageSize){
-                map((oldPhysicalAddr + i), (void*)(oldVirtualAddr + i), (pageTableFlag)(Present | ReadWrite | UserOrSuperuser | LargerPages));
-            }
-        }
-        else{
-            nextLevelPointer = entry.getAddress();
-        }
-
+        nextLevelPointer = entry.getAddress();
     }
     else if (allocate){
         nextLevelPointer = allocateFrame(0x1000);
@@ -113,6 +106,7 @@ uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* vi
 
     return -1;
 }
+
 PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize){
     size_t pml4Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 39)) >> 39;
     size_t pml3Entry = ((uintptr_t)virtualAddr & (0x1FFULL << 30)) >> 30;
@@ -123,10 +117,14 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
         return nullptr;
     }
 
-    PageTable *PML3, *PML2, *PML1;
-    PML4 = (PageTable*)toVirtualAddr(PML4);
+    PageTable *PML3 = nullptr;
+    PageTable *PML2 = nullptr;
+    PageTable *PML1 = nullptr;
 
-    PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4->entries[pml4Entry], true, virtualAddr, pageSize));
+//  x is just a copy of the original to avoid overwriting to it
+    auto PML4x = (PageTable*)toVirtualAddr(PML4);
+
+    PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4x->entries[pml4Entry], true, virtualAddr, pageSize));
     if (PML3 == nullptr){
         return nullptr;
     }
@@ -149,11 +147,11 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
 }
 
 bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize){
-    auto *entry = (PageDirectoryEntry*)toVirtualAddr((virtualAddrToPTE(virtualAddr, true, flags, pageSize)));
+    auto *entry = (PageDirectoryEntry*)((virtualAddrToPTE(virtualAddr, true, flags, pageSize)));
 
     if (entry != nullptr){
-        entry->setFlag(flags, true);
         entry->setAddress(physicalAddr);
+        entry->setFlag(flags, true);
         return true;
     }
 
