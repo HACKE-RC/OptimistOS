@@ -66,7 +66,7 @@ void initPaging(){
     }
 
     e9_printf("\nsecond memmap mapping done!\n");
-    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (4 * _1GB)) {
+    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (_4KB)) {
         uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
         uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
 
