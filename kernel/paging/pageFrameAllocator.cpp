@@ -8,31 +8,7 @@ size_t totalMemory;
 size_t usedMemory = 0;
 static bootInfo bootInformation{};
 
-size_t roundUpToPageBoundary(size_t size){
-    if ((size % PAGESIZE) == 0){
-        return size;
-    }
-    return (size + PAGESIZE - 1) & ~(PAGESIZE - 1);
-}
-
-uint64_t roundDown(uint64_t n, uint64_t alignTo){
-    return n & ~(alignTo - 1);
-}
-
-uint64_t roundUp(uint64_t n, uint64_t alignTo) {
-    return (n + alignTo - 1) & ~(alignTo - 1);
-}
-
-uintptr_t toPhysicalAddr(void *addr){
-    return (uintptr_t)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
-}
-
-void *toVirtualAddr(void *addr){
-    return (void*)((uintptr_t)addr + bootInformation.memory.hhdmOffset);
-}
-
 uintptr_t allocateFrame(size_t requestSize){
-
 
     if (head == nullptr){
         head = initFreeList();
@@ -49,6 +25,7 @@ uintptr_t allocateFrame(size_t requestSize){
         e9_printf("ERROR!!");
         asm volatile("hlt");
     }
+
     // best-fit algorithm to search for the appropriate freeBlock
     if (!freeBlock->next && freeBlock->size >= roundedRequestSize) {
         selectedBlock = freeBlock;
@@ -81,7 +58,6 @@ uintptr_t allocateFrame(size_t requestSize){
             }
             freeBlock = freeBlock->next;
         }
-
         freeBlock = head;
 
         if (selectedBlock == nullptr){
@@ -94,19 +70,17 @@ uintptr_t allocateFrame(size_t requestSize){
         fBlock* prevBlock = selectedBlock->previous;
         prevBlock->size += selectedBlock->size;
         prevBlock->next = selectedBlock->next;
-//        memoryset(selectedBlock, 0, selectedBlock->size);
         selectedBlock = prevBlock;
     }
 
     selectedBlock->inUse = true;
 
-    fBlock* newBlock = (fBlock*)((char*)(selectedBlock) + roundedRequestSize);
+    auto* newBlock = (fBlock*)((char*)(selectedBlock) + roundedRequestSize);
     newBlock->size = (selectedBlock->size - (roundedRequestSize));
     newBlock->inUse = false;
     newBlock->next = selectedBlock->next;
     newBlock->prevSize = 0;
     head = freeBlock = newBlock;
-
 
     bootInformation.memory.freeMemSize = bootInformation.memory.freeMemSize - roundedRequestSize;
     setBootInfo(bootInformation);
@@ -142,4 +116,32 @@ void freeFrame(void* allocatedFrame){
         bootInformation.memory.freeMemSize += allocatedFrameSize;
         setBootInfo(bootInformation);
     }
+}
+
+
+size_t roundUpToPageBoundary(size_t size){
+    if ((size % PAGESIZE) == 0){
+        return size;
+    }
+    return (size + PAGESIZE - 1) & ~(PAGESIZE - 1);
+}
+
+uint64_t roundDown(uint64_t n, uint64_t alignTo){
+    return n & ~(alignTo - 1);
+}
+
+uint64_t roundUp(uint64_t n, uint64_t alignTo) {
+    return (n + alignTo - 1) & ~(alignTo - 1);
+}
+
+uintptr_t toPhysicalAddr(void *addr){
+    return (uintptr_t)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
+}
+
+void *toVirtualAddr(void *addr){
+//  getNextLevelPointer failed
+    if ((uintptr_t)addr == (uintptr_t)-1) {
+        return nullptr;
+    }
+    return (void*)((uintptr_t)addr + bootInformation.memory.hhdmOffset);
 }

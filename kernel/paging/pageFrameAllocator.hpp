@@ -12,6 +12,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include "hashtable.hpp"
+#include <cassert>
 
 static void memoryset(void *start, uint8_t value, uint64_t num)
 {

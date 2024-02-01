@@ -21,27 +21,26 @@ void initPaging(){
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
         map((i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), _1GB);
     }
-    e9_printf("first 4 gb mapping done!");
+    e9_printf("first 4 gb mapping done!\n");
 //  map 0xFFFF800000000000 - 0xFFFF800100000000 to 0x0 - 0x100000000
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
         map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
     }
 //
     for (uint64_t i = 0; i < (2 * _1GB); i += _1GB){
-        map(i, (void*)(i + 0xFFFFFFFF80000000UL), (pageTableFlag)Present, _1GB);
+        map(i, (void*)(i + 0xFFFFFFFF80000000UL), (pageTableFlag)(Present | LargerPages), _1GB);
     }
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
         limine_memmap_entry *mmap = memmap_request.response->entries[i];
 
-        uint64_t start = roundDown(mmap->base, _1GB);
-        uint64_t end = roundUp(mmap->base + mmap->length, _1GB);
+        uint64_t start = roundDown(mmap->base, _4KB);
+        uint64_t end = roundUp(mmap->base + mmap->length, _4KB);
 
         if (end < (4 * _1GB)){
             continue;
         }
 
         auto size = end - start;
-        auto pageSize = _1GB;
         auto roundedSize = roundDown(size, _1GB);
         auto difference = size - roundedSize;
 
@@ -50,7 +49,7 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)(k + 0xFFFF800000000000UL), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
+            map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
         }
 
         start += roundedSize;
@@ -60,19 +59,22 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)(k + 0xFFFF800000000000UL), (pageTableFlag)(ReadWrite | Present), _4KB);
+            map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present), _4KB);
         }
 
     }
 
     e9_printf("\nsecond memmap mapping done!\n");
-    for (size_t i = 0; i < bootInformation.memory.kernelSize; i += (_4KB)) {
+
+    for (uint64_t i = 0; i < bootInformation.memory.kernelSize; i += (_1GB)) {
         uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
         uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
 
-        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ));
+        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present | LargerPages ), _1GB);
     }
+
     e9_printf("\nkernel mapping done!\n");
+
     if (PML4 == nullptr){
         e9_printf("pml4 empty");
         asm volatile("hlt");
@@ -99,11 +101,14 @@ uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* vi
         entry.setFlag(UserOrSuperuser, true);
         entry.setFlag(Present, true);
     }
+    else{
+        reportError();
+    }
 
     if (nextLevelPointer != 0){
         return nextLevelPointer;
     }
-
+    reportError();
     return -1;
 }
 
@@ -126,7 +131,7 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
 
     PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4x->entries[pml4Entry], true, virtualAddr, pageSize));
     if (PML3 == nullptr){
-        return nullptr;
+        haltAndCatchFire(__FILE__, __LINE__);
     }
 
     if (flags & LargerPages){
@@ -135,12 +140,12 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
 
     PML2 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML3->entries[pml3Entry], true, virtualAddr, pageSize));
     if (PML2 == nullptr){
-        return nullptr;
+        haltAndCatchFire(__FILE__, __LINE__);
     }
 
     PML1 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML2->entries[pml2Entry], true, virtualAddr, pageSize));
     if (PML1 == nullptr){
-        return nullptr;
+        haltAndCatchFire(__FILE__, __LINE__);
     }
 
     return &PML1->entries[pml1Entry];

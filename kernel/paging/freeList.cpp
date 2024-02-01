@@ -9,7 +9,7 @@ static fBlock* head;
 fBlock* initFreeList(){
     bootInfo bootInformation = getBootInfo();
     Memory availableMemory = bootInformation.memory;
-    fBlock *freeBlock = (fBlock*)(toVirtualAddr(availableMemory.freeMemStart));
+    auto *freeBlock = (fBlock*)(availableMemory.freeMemStart);
 //    not subtracting the size of the struct because we are going to zero it out
 //    anyway before returning it
     freeBlock->size = availableMemory.freeMemSize;
@@ -17,6 +17,7 @@ fBlock* initFreeList(){
     freeBlock->inUse = false;
     freeBlock->prevSize = 0;
     head = freeBlock;
+
     e9_printf("\nfreeList init: %x", freeBlock);
     return head;
 }

@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <cstddef>
 #include "../limine/limine.h"
+#include "printutils/e9print.h"
+#define reportError() haltAndCatchFire(__FILE__, __LINE__);
 
 struct Framebuffer
 {
@@ -67,6 +69,12 @@ typedef struct {
    PSF1_FONT *psf1Font;
    Memory memory;
 } bootInfo;
+
+static void haltAndCatchFire(const char* fileName, uint32_t lineNo){
+    e9_printf("\nERROR at %s:%d\n", fileName, lineNo);
+    e9_printf("Halting and catching fire!!\n");
+    asm volatile("hlt");
+}
 
 extern volatile struct limine_kernel_address_request kernelMemoryRequest;
 
