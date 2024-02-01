@@ -135,6 +135,12 @@ uint64_t roundUp(uint64_t n, uint64_t alignTo) {
 }
 
 uintptr_t toPhysicalAddr(void *addr){
+    if (bootInformation.memory.hhdmOffset == 0){
+        bootInformation = getBootInfo();
+    }
+//    if ((uintptr_t)addr >= bootInformation.memory.hhdmOffset){
+//        return (uintptr_t)addr;
+//    }
     return (uintptr_t)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
 }
 
@@ -142,6 +148,9 @@ void *toVirtualAddr(void *addr){
 //  getNextLevelPointer failed
     if ((uintptr_t)addr == (uintptr_t)-1) {
         return nullptr;
+    }
+    if (bootInformation.memory.hhdmOffset == 0){
+        bootInformation = getBootInfo();
     }
     return (void*)((uintptr_t)addr + bootInformation.memory.hhdmOffset);
 }

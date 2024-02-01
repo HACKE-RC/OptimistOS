@@ -26,7 +26,7 @@ void initPaging(){
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
         map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
     }
-//
+//  2gb mapping for later use
     for (uint64_t i = 0; i < (2 * _1GB); i += _1GB){
         map(i, (void*)(i + 0xFFFFFFFF80000000UL), (pageTableFlag)(Present | LargerPages), _1GB);
     }
@@ -66,11 +66,11 @@ void initPaging(){
 
     e9_printf("\nsecond memmap mapping done!\n");
 
-    for (uint64_t i = 0; i < bootInformation.memory.kernelSize; i += (_1GB)) {
+    for (uint64_t i = 0; i < roundUp(bootInformation.memory.kernelSize, _1GB); i += (_1GB)) {
         uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
         uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
 
-        map(physicalAddr, (void*)virtualAddr, (pageTableFlag)(ReadWrite | UserOrSuperuser | Present | LargerPages ), _1GB);
+        map(physicalAddr, (void*)(virtualAddr), (pageTableFlag)(ReadWrite | UserOrSuperuser | Present | LargerPages ), _1GB);
     }
 
     e9_printf("\nkernel mapping done!\n");
@@ -79,13 +79,13 @@ void initPaging(){
         e9_printf("pml4 empty");
         asm volatile("hlt");
     }
-    e9_printf("PML4 addr: %x", PML4);
-    asm_write_cr(3, PML4);
+    e9_printf("PML4 addr: %x\n", PML4);
+    e9_printf("\nreg value: %x\n", readCr3());
+    asm_write_cr(3, (uint64_t)PML4);
 //    writeCR3(PML4);
 //    setCr3(PML4);
-    e9_printf("\nLast call 2!");
-    e9_printf("\nPML4 setup complete");
-    e9_printf("\nreg value: %x", readCr3());
+    e9_printf("\nLast call 2!\n");
+    e9_printf("\nPML4 setup complete\n");
 }
 
 uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr, size_t pageSize){
