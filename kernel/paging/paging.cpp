@@ -40,18 +40,11 @@ void initPaging(){
         uint64_t start = roundDown(mmap->base, _4KB);
         uint64_t end = roundUp(mmap->base + mmap->length, _4KB);
 
-        if (end < (4 * _1GB)){
-            continue;
-        }
-
         auto size = end - start;
         auto roundedSize = roundDown(size, _1GB);
         auto difference = size - roundedSize;
 
         for (uint64_t k = start; k < (start + roundedSize); k += _1GB){
-            if (k < (4 * _1GB)){
-                continue;
-            }
 
             map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
         }
@@ -59,10 +52,6 @@ void initPaging(){
         start += roundedSize;
 
         for (uint64_t k = start; k < (start + difference); k += _4KB){
-            if (k < (4 * _1GB)){
-                continue;
-            }
-
             if (!map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present), _4KB)){
                 haltAndCatchFire(__FILE__, __LINE__);
             }
