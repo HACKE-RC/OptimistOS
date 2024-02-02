@@ -89,7 +89,7 @@ extern bool isHigherHalf(uintptr_t addr);
 extern bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize = _4KB);
 extern PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize = _4KB);
 extern uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr= nullptr, size_t pageSize = _4KB);
-
+extern std::pair<size_t, size_t> requiredSize(size_t size);
 static PageTable* PML4;
 
 #endif

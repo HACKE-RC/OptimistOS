@@ -16,24 +16,13 @@ void initPaging(){
     bootInformation = getBootInfo();
     hhdmOffset = hhdm_request.response->offset;
 
-    //  identity map 0 to 0x100000000
-    for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
-        if (!map((i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), _1GB)){
-            haltAndCatchFire(__FILE__, __LINE__);
-        }
+//     map the first 4gb without the null page
+    for (uint64_t i = 0x1000; i < (4 * _1GB); i += _1GB){
+        (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
     }
 
     e9_printf("first 4 gb mapping done!\n");
 
-    //  map 0xFFFF800000000000 - 0xFFFF800100000000 to 0x0 - 0x100000000
-    for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
-        map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
-    }
-
-    //  2gb mapping for later use
-    for (uint64_t i = 0; i < (2 * _1GB); i += _1GB){
-        map(i, (void*)(i + 0xFFFFFFFF80000000UL), (pageTableFlag)(Present | LargerPages), _1GB);
-    }
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
         limine_memmap_entry *mmap = memmap_request.response->entries[i];
 
@@ -41,18 +30,19 @@ void initPaging(){
         uint64_t end = roundUp(mmap->base + mmap->length, _4KB);
 
         auto size = end - start;
-        auto roundedSize = roundDown(size, _1GB);
+        auto [pageSize, sizeFlags] = requiredSize(size);
+        e9_printf("\nend-start: %x\npageSize: %x : %d", size, pageSize, pageSize);
+        auto roundedSize = roundDown(size, pageSize);
         auto difference = size - roundedSize;
 
-        for (uint64_t k = start; k < (start + roundedSize); k += _1GB){
-
-            map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
+        for (uint64_t k = start; k < (start + roundedSize); k += pageSize){
+            map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
         }
 
         start += roundedSize;
 
-        for (uint64_t k = start; k < (start + difference); k += _4KB){
-            if (!map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present), _4KB)){
+        for (uint64_t k = start; k < (start + difference); k += pageSize){
+            if (!map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize)){
                 haltAndCatchFire(__FILE__, __LINE__);
             }
         }
@@ -61,11 +51,11 @@ void initPaging(){
 
     e9_printf("\nsecond memmap mapping done!\n");
 
-    for (uint64_t i = 0; i < roundUp(bootInformation.memory.kernelSize, _1GB); i += (_1GB)) {
+    for (uint64_t i = 0; i < bootInformation.memory.kernelSize; i += (_4KB)) {
         uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
         uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
 
-        map(physicalAddr, (void*)(virtualAddr), (pageTableFlag)(ReadWrite | UserOrSuperuser | Present | LargerPages ), _1GB);
+        map(physicalAddr, (void*)(virtualAddr), (pageTableFlag)(ReadWrite | UserOrSuperuser | Present ), _4KB);
     }
 
     e9_printf("\nkernel mapping done!\n");
@@ -174,6 +164,16 @@ uint64_t readCr3() {
 
 bool isHigherHalf(uintptr_t addr) {
     return (addr >= hhdmOffset);
+}
+
+std::pair<size_t, size_t> requiredSize(size_t size) {
+    if (size >= _1GB){
+        return {_1GB, LargerPages};
+    }
+    if (size >= _4KB){
+        return {_4KB, 0};
+    }
+    return {_4KB, 0};
 }
 
 uintptr_t toHigherHalf(uintptr_t addr) {
