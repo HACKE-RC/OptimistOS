@@ -5,7 +5,6 @@ bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
 
-
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
 }
@@ -17,16 +16,21 @@ void initPaging(){
     bootInformation = getBootInfo();
     hhdmOffset = hhdm_request.response->offset;
 
-//  identity map 0 to 0x100000000
+    //  identity map 0 to 0x100000000
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB) {
-        map((i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), _1GB);
+        if (!map((i), (void*)i, (pageTableFlag)(ReadWrite |  Present | LargerPages), _1GB)){
+            haltAndCatchFire(__FILE__, __LINE__);
+        }
     }
+
     e9_printf("first 4 gb mapping done!\n");
-//  map 0xFFFF800000000000 - 0xFFFF800100000000 to 0x0 - 0x100000000
+
+    //  map 0xFFFF800000000000 - 0xFFFF800100000000 to 0x0 - 0x100000000
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
         map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB);
     }
-//  2gb mapping for later use
+
+    //  2gb mapping for later use
     for (uint64_t i = 0; i < (2 * _1GB); i += _1GB){
         map(i, (void*)(i + 0xFFFFFFFF80000000UL), (pageTableFlag)(Present | LargerPages), _1GB);
     }
@@ -59,7 +63,9 @@ void initPaging(){
                 continue;
             }
 
-            map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present), _4KB);
+            if (!map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present), _4KB)){
+                haltAndCatchFire(__FILE__, __LINE__);
+            }
         }
 
     }
@@ -79,11 +85,12 @@ void initPaging(){
         e9_printf("pml4 empty");
         asm volatile("hlt");
     }
+
     e9_printf("PML4 addr: %x\n", PML4);
     e9_printf("\nreg value: %x\n", readCr3());
-    asm_write_cr(3, (uint64_t)PML4);
-//    writeCR3(PML4);
-//    setCr3(PML4);
+
+    writeCrReg(3, (uint64_t)PML4);
+
     e9_printf("\nLast call 2!\n");
     e9_printf("\nPML4 setup complete\n");
 }
@@ -122,17 +129,20 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
         return nullptr;
     }
 
+    auto PML4x = PML4;  // copy to avoid calling toPhysicalAddr later
+
     PageTable *PML3 = nullptr;
     PageTable *PML2 = nullptr;
     PageTable *PML1 = nullptr;
 
-//  x is just a copy of the original to avoid overwriting to it
-    auto PML4x = (PageTable*)toVirtualAddr(PML4);
+    PML4 = (PageTable*)toVirtualAddr(PML4);
 
-    PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4x->entries[pml4Entry], true, virtualAddr, pageSize));
+    PML3 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML4->entries[pml4Entry], true, virtualAddr, pageSize));
     if (PML3 == nullptr){
         haltAndCatchFire(__FILE__, __LINE__);
     }
+
+    PML4 = PML4x;
 
     if (flags & LargerPages){
         return &PML3->entries[pml3Entry];

@@ -85,7 +85,7 @@ uintptr_t allocateFrame(size_t requestSize){
     bootInformation.memory.freeMemSize = bootInformation.memory.freeMemSize - roundedRequestSize;
     setBootInfo(bootInformation);
     usedMemory += roundedRequestSize;
-//    memoryset(selectedBlock, 0, roundedRequestSize);
+    memoryset(selectedBlock, 0, roundedRequestSize);
     insert(&addressSizeHT, (void*)selectedBlock, roundedRequestSize);
 
     return toPhysicalAddr(selectedBlock);
@@ -138,9 +138,6 @@ uintptr_t toPhysicalAddr(void *addr){
     if (bootInformation.memory.hhdmOffset == 0){
         bootInformation = getBootInfo();
     }
-//    if ((uintptr_t)addr >= bootInformation.memory.hhdmOffset){
-//        return (uintptr_t)addr;
-//    }
     return (uintptr_t)((uintptr_t)addr - bootInformation.memory.hhdmOffset);
 }
 
@@ -149,8 +146,10 @@ void *toVirtualAddr(void *addr){
     if ((uintptr_t)addr == (uintptr_t)-1) {
         return nullptr;
     }
+
     if (bootInformation.memory.hhdmOffset == 0){
         bootInformation = getBootInfo();
     }
+
     return (void*)((uintptr_t)addr + bootInformation.memory.hhdmOffset);
 }

@@ -9,6 +9,10 @@ run: optimist.iso
 #	qemu-system-x86_64.exe -M q35 -m 2G -cdrom optimist.iso -boot d
 	qemu-system-x86_64 -M q35 -m 4G -cdrom optimist.iso -boot d
 
+.PHONY: debug
+debug: optimist.iso
+	qemu-system-x86_64 -M q35 -m 4G -cdrom optimist.iso -boot d -d int -s -S
+
 .PHONY: run-uefi
 run-uefi: ovmf-x64 optimist.iso
 	qemu-system-x86_64 -M q35 -m 2G -bios ovmf-x64/OVMF.fd -cdrom optimist.iso -boot d

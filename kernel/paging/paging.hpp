@@ -1,18 +1,18 @@
 #ifndef paging 
 #define paging 
+
 #define _1GB 0x40000000ul
 #define _4KB 0x1000
+
 #include "../boot.h"
 #include "pageFrameAllocator.hpp"
 #include <cstdint>
 
-extern "C" void setCr3(void*);
-#define writeReg(reg, val) asm volatile ("mov %0, %%" #reg :: "r"(val) : "memory");
-#define writeCR3(val) asm volatile ("movq %0, %%cr3" :: "r"(val) : "memory");
-#define asm_write_cr(reg, value)			\
+#define writeCrReg(reg, value)			\
 ({							\
     asm volatile("mov %0, %%cr" #reg : : "r" (value));	\
 })
+
 enum controlRegs
 {
     cr0 = 0000000,
@@ -82,13 +82,14 @@ void setAddress(uint64_t address){
 struct PageTable{
     PageDirectoryEntry entries[512];
 };
-bool isHigherHalf(uintptr_t addr);
-uintptr_t toHigherHalf(uintptr_t addr);
-void initPaging();
-bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize = _4KB);
-void setCr3(uint64_t value);
-uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr= nullptr, size_t pageSize = _4KB);
-PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize = _4KB);
-uint64_t readCr3();
+
+extern void initPaging();
+extern uint64_t readCr3();
+extern bool isHigherHalf(uintptr_t addr);
+extern bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize = _4KB);
+extern PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize = _4KB);
+extern uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr= nullptr, size_t pageSize = _4KB);
+
 static PageTable* PML4;
+
 #endif
