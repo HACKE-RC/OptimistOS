@@ -9,10 +9,20 @@ void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
 }
 
+extern "C"
+{
+    extern char KERNEL_BLOB_BEGIN[];
+    extern char KERNEL_BLOB_SIZE[];
+    extern char KERNEL_TEXT_BEGIN[];
+    extern char KERNEL_TEXT_SIZE[];
+    extern uint64_t KERNEL_RODATA_BEGIN[];
+    extern uint64_t KERNEL_RODATA_SIZE[];
+    extern uint64_t KERNEL_DATA_BEGIN[];
+    extern uint64_t KERNEL_DATA_SIZE[];
+}
 
 void initPaging(){
     init();
-
     bootInformation = getBootInfo();
     hhdmOffset = hhdm_request.response->offset;
 
@@ -59,11 +69,10 @@ void initPaging(){
     }
 
     e9_printf("\nsecond memmap mapping done!\n");
-
-    for (uint64_t i = 0; i < kernelFileRequest.response->kernel_file->size; i += (_4KB)) {
-        uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
-        uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
-        map(physicalAddr, (void*)(virtualAddr), (pageTableFlag)(ReadWrite | Present), _4KB);
+    uint64_t physicalBase = kernelMemoryRequest.response->physical_base;
+    uint64_t virtualBase = kernelMemoryRequest.response->virtual_base;
+    for (uint64_t i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundUp((uintptr_t )KERNEL_BLOB_SIZE, _4KB); i += (_4KB)) {
+        map(i - virtualBase + physicalBase, (void*)(i), (pageTableFlag)(ReadWrite | Present), _4KB);
     }
 
 //    e9_printf("\nflags for kernel: %x\n", (pageTableFlag)(ReadWrite | Present));
