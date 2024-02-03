@@ -18,6 +18,7 @@ void initPaging(){
 
 //     map the first 4gb without the null page
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
+        (map(i, (void*)(i), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
         (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
     }
 
