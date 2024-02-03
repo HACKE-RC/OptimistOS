@@ -22,6 +22,8 @@ void initPaging(){
         (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
     }
 
+//    e9_printf("\nflags for first 4gb: %x\n", (pageTableFlag)(ReadWrite | Present | LargerPages));
+
     e9_printf("first 4 gb mapping done!\n");
 
     for (size_t i = 0; i < memmap_request.response->entry_count; i++){
@@ -37,18 +39,22 @@ void initPaging(){
         auto difference = size - roundedSize;
 
         for (uint64_t k = start; k < (start + roundedSize); k += pageSize){
-            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
+//            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
             map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
         }
+
+        e9_printf("\nflags for memmap: %x\n", (pageTableFlag)(ReadWrite | Present | sizeFlags));
 
         start += roundedSize;
 
         for (uint64_t k = start; k < (start + difference); k += pageSize){
-            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
+//            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
             if (!map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize)){
                 haltAndCatchFire(__FILE__, __LINE__);
             }
         }
+
+//        e9_printf("flags for mapping: %x\n", (pageTableFlag)(ReadWrite | Present | sizeFlags));
 
     }
 
@@ -57,9 +63,10 @@ void initPaging(){
     for (uint64_t i = 0; i < kernelFileRequest.response->kernel_file->size; i += (_4KB)) {
         uint64_t physicalAddr = kernelMemoryRequest.response->physical_base + i;
         uint64_t virtualAddr = kernelMemoryRequest.response->virtual_base + i;
-
         map(physicalAddr, (void*)(virtualAddr), (pageTableFlag)(ReadWrite | Present), _4KB);
     }
+
+//    e9_printf("\nflags for kernel: %x\n", (pageTableFlag)(ReadWrite | Present));
 
     e9_printf("\nkernel mapping done!\n");
 
@@ -145,7 +152,6 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
 
 bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize){
     auto *entry = (PageDirectoryEntry*)((virtualAddrToPTE(virtualAddr, true, flags, pageSize)));
-
     if (entry != nullptr){
         entry->setAddress(physicalAddr);
         entry->setFlag(flags, true);
