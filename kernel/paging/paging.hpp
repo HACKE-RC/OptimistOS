@@ -56,15 +56,13 @@ struct PageDirectoryEntry{
   }
 
 void setAddress(uint64_t address){
-    address &= 0x000000ffffffffff;
-    value &= 0xfff0000000000fff; // Clear address bits
-    value |= (address << 12); // Set new address
-    value |= (value & 0xf000000000000fff); // Set flags back
-}
+    value &= ~0x000FFFFFFFFFF000;
+    value |= (address & 0x000FFFFFFFFFF000);
+  }
 
   [[nodiscard]] uint64_t getAddress() const{
       if (value!=0){
-          return (value & 0x000ffffffffff000) >> 12;
+          return value & 0x000FFFFFFFFFF000;
       }
       else{
           return 0;
