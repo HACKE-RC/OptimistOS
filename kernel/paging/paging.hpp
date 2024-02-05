@@ -60,6 +60,7 @@ void setAddress(uint64_t address){
 
   [[nodiscard]] uint64_t getAddress() const{
       if (value!=0){
+          haltAndCatchFire(__FILE__, __LINE__);
           return value & 0x000FFFFFFFFFF000;
       }
       else{
@@ -89,6 +90,6 @@ extern bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, 
 extern PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize = _4KB);
 extern uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr= nullptr, size_t pageSize = _4KB);
 extern std::pair<size_t, size_t> requiredSize(size_t size);
-static PageTable* PML4;
+extern PageTable* PML4;
 
 #endif

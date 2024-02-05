@@ -4,7 +4,7 @@
 bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
-
+PageTable* PML4;
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
 }
@@ -26,7 +26,7 @@ void initPaging(){
     bootInformation = getBootInfo();
     hhdmOffset = hhdm_request.response->offset;
 
-//     map the first 4gb without the null page
+//     map the first 4gb
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
         (map(i, (void*)(i), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
         (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
@@ -71,7 +71,7 @@ void initPaging(){
     e9_printf("\nsecond memmap mapping done!\n");
     uint64_t physicalBase = kernelMemoryRequest.response->physical_base;
     uint64_t virtualBase = kernelMemoryRequest.response->virtual_base;
-    for (uint64_t i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundUp((uintptr_t )KERNEL_BLOB_SIZE, _4KB); i += (_4KB)) {
+    for (auto i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundUp((uintptr_t )KERNEL_BLOB_BEGIN + (uintptr_t)KERNEL_BLOB_SIZE, _4KB); i += (_4KB)) {
         map(i - virtualBase + physicalBase, (void*)(i), (pageTableFlag)(ReadWrite | Present), _4KB);
     }
 
