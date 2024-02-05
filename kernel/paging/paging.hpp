@@ -50,7 +50,7 @@ struct PageDirectoryEntry{
   }
 
   [[nodiscard]] bool getFlag(pageTableFlag flag) const{
-      return ((value & flag) > 0);
+      return ((value & flag));
   }
 
 void setAddress(uint64_t address){
@@ -69,6 +69,9 @@ void setAddress(uint64_t address){
 
   [[nodiscard]] bool isValid() const{
       if (getFlag(Present)){
+          if (getAddress() == (uintptr_t)nullptr){
+              return false;
+          }
           return true;
       }
       return false;
