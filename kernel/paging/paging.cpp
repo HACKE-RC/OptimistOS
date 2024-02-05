@@ -27,7 +27,7 @@ void initPaging(){
     hhdmOffset = hhdm_request.response->offset;
 
 //     map the first 4gb without the null page
-    for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
+    for (uint64_t i = 0x1000; i < (4 * _1GB); i += _1GB){
         (map(i, (void*)(i), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
         (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
     }

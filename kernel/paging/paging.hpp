@@ -41,18 +41,16 @@ struct PageDirectoryEntry{
   uint64_t value = 0;
 
   void setFlag(pageTableFlag flag, bool enable){
-        uint64_t bitSelector = (uint64_t) 1 << flag;
-        value &= ~bitSelector;
+        value &= ~flag;
 
         // request to set the flag
         if (enable){
-            value |= bitSelector;
+            value |= flag;
         }
   }
 
   [[nodiscard]] bool getFlag(pageTableFlag flag) const{
-      uint64_t bitSelector = (uint64_t) 1 << flag;
-      return ((value & bitSelector) > 0);
+      return ((value & flag) > 0);
   }
 
 void setAddress(uint64_t address){
