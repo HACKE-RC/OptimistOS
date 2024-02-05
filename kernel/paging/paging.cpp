@@ -59,7 +59,7 @@ void initPaging(){
 
         for (uint64_t k = start; k < (start + difference); k += pageSize){
 //            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
-            if (!map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize)){
+            if (!(map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize))){
                 haltAndCatchFire(__FILE__, __LINE__);
             }
         }

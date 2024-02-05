@@ -60,7 +60,6 @@ void setAddress(uint64_t address){
 
   [[nodiscard]] uint64_t getAddress() const{
       if (value!=0){
-          haltAndCatchFire(__FILE__, __LINE__);
           return value & 0x000FFFFFFFFFF000;
       }
       else{
