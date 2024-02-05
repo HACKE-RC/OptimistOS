@@ -71,7 +71,8 @@ void initPaging(){
     e9_printf("\nsecond memmap mapping done!\n");
     uint64_t physicalBase = kernelMemoryRequest.response->physical_base;
     uint64_t virtualBase = kernelMemoryRequest.response->virtual_base;
-    for (auto i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundUp((uintptr_t )KERNEL_BLOB_BEGIN + (uintptr_t)KERNEL_BLOB_SIZE, _4KB); i += (_4KB)) {
+    for (auto i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundDown((uintptr_t )KERNEL_BLOB_BEGIN, _4KB) + roundUp((uintptr_t)KERNEL_BLOB_SIZE + (uintptr_t)(KERNEL_BLOB_BEGIN -
+            roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB)) , _4KB); i += (_4KB)) {
         map(i - virtualBase + physicalBase, (void*)(i), (pageTableFlag)(ReadWrite | Present), _4KB);
     }
 
