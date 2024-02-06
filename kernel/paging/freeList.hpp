@@ -7,8 +7,8 @@
 #include "../renderer/BasicRenderer.hpp"
 #include "pageFrameAllocator.hpp"
 #include <cmath>
-#include <stdint.h>
-#include <stddef.h>
+#include <cstdint>
+#include <cstddef>
 
 struct fBlock{
     size_t size;

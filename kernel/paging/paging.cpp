@@ -24,7 +24,7 @@ extern "C"
 void initPaging(){
     init();
     bootInformation = getBootInfo();
-    hhdmOffset = hhdm_request.response->offset;
+    hhdmOffset = hhdmRequest.response->offset;
 
 //     map the first 4gb
     for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
@@ -36,8 +36,8 @@ void initPaging(){
 
     e9_printf("first 4 gb mapping done!\n");
 
-    for (size_t i = 0; i < memmap_request.response->entry_count; i++){
-        limine_memmap_entry *mmap = memmap_request.response->entries[i];
+    for (size_t i = 0; i < memmapRequest.response->entry_count; i++){
+        limine_memmap_entry *mmap = memmapRequest.response->entries[i];
 
         uint64_t start = roundDown(mmap->base, _4KB);
         uint64_t end = roundUp(mmap->base + mmap->length, _4KB);
@@ -49,7 +49,6 @@ void initPaging(){
         auto difference = size - roundedSize;
 
         for (uint64_t k = start; k < (start + roundedSize); k += pageSize){
-//            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
             map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
         }
 
@@ -58,13 +57,11 @@ void initPaging(){
         start += roundedSize;
 
         for (uint64_t k = start; k < (start + difference); k += pageSize){
-//            map(k, (void*)(k), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
             if (!(map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize))){
                 haltAndCatchFire(__FILE__, __LINE__);
             }
         }
 
-//        e9_printf("flags for mapping: %x\n", (pageTableFlag)(ReadWrite | Present | sizeFlags));
 
     }
 

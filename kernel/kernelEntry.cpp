@@ -1,13 +1,6 @@
 #include "kernelEntry.hpp"
-#include "boot.h"
-#include "gdt/gdt.hpp"
-#include "idt/idt.hpp"
-#include "idt/isr.hpp"
-#include "printutils/e9print.h"
-#include "paging/pageFrameAllocator.hpp"
-#include "paging/paging.hpp"
 
-static BasicRenderer renderer = BasicRenderer(NULL, NULL);
+static BasicRenderer renderer = BasicRenderer(nullptr, nullptr);
 
 int setupOptimist(){
     bootInfo bootInformation = getBootInfo();
@@ -19,15 +12,18 @@ int setupOptimist(){
     isrInstall(renderer);
     GlobalRenderer->Print("Memory Information: \n");
     e9_printf("memory addr: %x", bootInformation.memory.freeMemStart);
-    GlobalRenderer->Print("Old Memory Size: ");
-    GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
-    GlobalRenderer->Print(" bytes\n");
-    GlobalRenderer->Print("bootinfo: ");
-    GlobalRenderer->PrintInt(bootInformation.memory.hhdmOffset);
-    initPaging();
-    bootInformation = getBootInfo();
-    GlobalRenderer->Print("\nMemory size after allocation: ");
-    GlobalRenderer->PrintInt(bootInformation.memory.freeMemSize);
-    GlobalRenderer->Print("\nFreed stuff");
+//    initPaging();
+
+//  root / eXtended system descriptor table
+    uintptr_t SDT = initACPI();
+
+    if (SDT != 0){
+        e9_printf("ACPI initialized!\n");
+        e9_printf("SDT addr: %x", SDT);
+    }
+    else{
+        haltAndCatchFire(__FILE__, __LINE__);
+    }
+
     return 0;
 }

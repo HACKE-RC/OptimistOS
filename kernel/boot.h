@@ -77,11 +77,10 @@ static void haltAndCatchFire(const char* fileName, uint32_t lineNo){
 }
 
 extern volatile struct limine_kernel_address_request kernelMemoryRequest;
-
 extern volatile limine_kernel_file_request kernelFileRequest;
-
-extern volatile limine_memmap_request memmap_request;
-extern volatile limine_hhdm_request hhdm_request;
+extern volatile limine_memmap_request memmapRequest;
+extern volatile limine_hhdm_request hhdmRequest;
+extern volatile limine_rsdp_request rsdpRequest;
 
 void setBootInfo(bootInfo bootInfo);
 bootInfo getBootInfo();

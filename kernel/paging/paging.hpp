@@ -6,6 +6,7 @@
 
 #include "../boot.h"
 #include "pageFrameAllocator.hpp"
+#include <utility>
 #include <cstdint>
 
 #define writeCrReg(reg, value)			\

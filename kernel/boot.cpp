@@ -14,13 +14,15 @@ static volatile struct limine_terminal_request terminal_request = {
 static volatile struct limine_framebuffer_request framebuffer_request = {
     .id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0};
 
-static volatile limine_rsdp_request rsdp_request = {.id = LIMINE_RSDP_REQUEST,
-                                                    .revision = 0};
+volatile struct limine_rsdp_request rsdpRequest = {
+        .id = LIMINE_RSDP_REQUEST,
+        .revision = 0
+};
 
 static volatile limine_module_request module_request = {
     .id = LIMINE_MODULE_REQUEST, .revision = 0};
 
-volatile limine_hhdm_request hhdm_request = {.id = LIMINE_HHDM_REQUEST,
+volatile limine_hhdm_request hhdmRequest = {.id = LIMINE_HHDM_REQUEST,
                                              .revision = 0};
 
 volatile limine_kernel_address_request kernelMemoryRequest = {
@@ -29,7 +31,7 @@ volatile limine_kernel_address_request kernelMemoryRequest = {
 volatile limine_kernel_file_request kernelFileRequest{
     .id = LIMINE_KERNEL_FILE_REQUEST, .revision = 0, .response = nullptr};
 
-volatile limine_memmap_request memmap_request = {
+volatile limine_memmap_request memmapRequest = {
     .id = LIMINE_MEMMAP_REQUEST, .revision = 0, .response = nullptr};
 
 // #define LIMINE_5_LEVEL_PAGING_REQUEST { LIMINE_COMMON_MAGIC,
@@ -210,10 +212,10 @@ extern "C" void _start(void) {
   }
   //    RSDP2 *rsdp;
   //    {
-  //        rsdp = (RSDP2 *)rsdp_request.response->address;
+  //        rsdp = (RSDP2 *)rsdpRequest.response->address;
   //    }
 
-  if (memmap_request.response == NULL) {
+  if (memmapRequest.response == NULL) {
     e9_printf("LIMINE_ERROR: ");
     e9_printf("Memory map not passed\n");
 
@@ -242,7 +244,7 @@ extern "C" void _start(void) {
   void *kernelStartV = (void *)kernelAddressResponse->virtual_base;
   uint64_t kernelSize = 1;
 
-  limine_memmap_response *memoryMapResponse = memmap_request.response;
+  limine_memmap_response *memoryMapResponse = memmapRequest.response;
   for (size_t i = 0; i < memoryMapResponse->entry_count; i++) {
     limine_memmap_entry *e = memoryMapResponse->entries[i];
     if (e->type == LIMINE_MEMMAP_USABLE) {
@@ -290,7 +292,7 @@ extern "C" void _start(void) {
 
     font.glyphBuffer = (void *)((uint64_t)file->address + sizeof(PSF1_HEADER));
   }
-  if (hhdm_request.response == NULL) {
+  if (hhdmRequest.response == NULL) {
     e9_printf("HHDM request wasn't fulfilled");
     done();
   }
@@ -302,7 +304,7 @@ extern "C" void _start(void) {
     memory.kernelStart = kernelStart;
     memory.kernelSize = kernelSize;
     memory.kernelStartV = kernelStartV;
-    memory.hhdmOffset = hhdm_request.response->offset;
+    memory.hhdmOffset = hhdmRequest.response->offset;
   }
 
   e9_printf("LIMINE_INFO: ");
