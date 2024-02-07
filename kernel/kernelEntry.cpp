@@ -24,6 +24,10 @@ int setupOptimist(){
     else{
         haltAndCatchFire(__FILE__, __LINE__);
     }
+    auto *table = acpiFindTable("APIC");
+    if (table != nullptr){
+        e9_printf("APIC found!\n");
+    }
 
     return 0;
 }

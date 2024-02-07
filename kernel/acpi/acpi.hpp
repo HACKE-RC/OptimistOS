@@ -56,6 +56,7 @@ struct xsdtInfo{
     XSDT *rootXSDT;
 };
 
+void *acpiFindTable(const char* name);
 extern xsdtInfo xsdtInformation;
 uintptr_t initACPI();
 extern RSDT *rootRSDT;
