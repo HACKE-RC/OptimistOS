@@ -5,4 +5,5 @@ paging/pageFrameAllocator.o: paging/pageFrameAllocator.cpp \
  paging/../gdt/gdt.hpp paging/../idt/idt.hpp paging/../idt/isr.hpp \
  paging/../paging/paging.hpp paging/../acpi/acpi.hpp \
  paging/../acpi/../lib/string.hpp paging/../acpi/../paging/paging.hpp \
- paging/freeList.hpp paging/../lib/string.hpp paging/hashtable.hpp
+ paging/../acpi/madt.hpp paging/../acpi/acpi.hpp paging/freeList.hpp \
+ paging/../lib/string.hpp paging/hashtable.hpp

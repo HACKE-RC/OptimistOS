@@ -1,0 +1,4 @@
+#ifndef PAGING_CPP_LAPIC_HPP
+#define PAGING_CPP_LAPIC_HPP
+
+#endif

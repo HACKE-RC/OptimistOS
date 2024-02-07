@@ -10,6 +10,7 @@
 #include "paging/pageFrameAllocator.hpp"
 #include "paging/paging.hpp"
 #include "acpi/acpi.hpp"
+#include "acpi/madt.hpp"
 
 int setupOptimist();
 
