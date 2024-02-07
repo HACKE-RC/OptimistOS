@@ -26,7 +26,7 @@ int setupOptimist(){
     }
     auto *table = acpiFindTable("APIC");
     if (table != nullptr){
-        e9_printf("APIC found!\n");
+        e9_printf("\nAPIC found!\n");
     }
 
     return 0;
