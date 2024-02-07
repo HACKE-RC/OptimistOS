@@ -6,7 +6,6 @@
 #include "../printutils/e9print.h"
 #include "../renderer/BasicRenderer.hpp"
 #include "pageFrameAllocator.hpp"
-#include <cmath>
 #include <cstdint>
 #include <cstddef>
 

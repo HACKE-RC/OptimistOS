@@ -29,7 +29,7 @@ struct xsdpInfo {
 
 struct SDT{
     char signature[4];
-    uint32_t len;
+    uint32_t length;
     uint8_t revision;
     uint8_t checksum;
     char oemID[6];
@@ -56,6 +56,7 @@ struct xsdtInfo{
     XSDT *rootXSDT;
 };
 
+extern xsdtInfo xsdtInformation;
 uintptr_t initACPI();
 extern RSDT *rootRSDT;
 #endif //PAGING_CPP_ACPI_HPP

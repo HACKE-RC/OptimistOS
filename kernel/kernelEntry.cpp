@@ -6,7 +6,7 @@ int setupOptimist(){
     bootInfo bootInformation = getBootInfo();
     renderer = BasicRenderer(&bootInformation.framebuffer, bootInformation.psf1Font);
     GlobalRenderer = &renderer;
-    GlobalRenderer->Clear(Colors.black, true);
+    GlobalRenderer->Clear(col::black, true);
     GlobalRenderer->Print("this is working!\n");
     initGDT();
     isrInstall(renderer);

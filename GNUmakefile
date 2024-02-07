@@ -11,7 +11,13 @@ run: optimist.iso
 
 .PHONY: debug
 debug: optimist.iso
+	qemu-system-x86_64.exe -M q35 -m 4G -cdrom optimist.iso -boot d -s -S
+
+.PHONY: debugi
+debugi: optimist.iso
 	qemu-system-x86_64.exe -M q35 -m 4G -cdrom optimist.iso -boot d -d int -s -S
+
+
 
 .PHONY: run-uefi
 run-uefi: ovmf-x64 optimist.iso
