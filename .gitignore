@@ -1,5 +1,7 @@
-
+*.d
+*.o
+.gdb_history
+.idea/
 kernel/idt/isr.asm_o
 kernel/gdt/gdt.asm_o
-kernel/boot.d
 kernel/paging/paging.asm_o
