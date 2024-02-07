@@ -16,7 +16,6 @@ int setupOptimist(){
 
 //  root / eXtended system descriptor table
     uintptr_t SDT = initACPI();
-    initMADT();
 
     if (SDT != 0){
         e9_printf("ACPI initialized!\n");
@@ -26,5 +25,9 @@ int setupOptimist(){
         haltAndCatchFire(__FILE__, __LINE__);
     }
 
+    initMADT();
+    initLAPIC();
+
+    e9_printf("\nEntry completed successfully!\n");
     return 0;
 }

@@ -6,5 +6,6 @@ acpi/madt.o: acpi/madt.cpp acpi/madt.hpp acpi/acpi.hpp acpi/../boot.h \
  acpi/../paging/../gdt/gdt.hpp acpi/../paging/../idt/idt.hpp \
  acpi/../paging/../idt/isr.hpp acpi/../paging/../paging/paging.hpp \
  acpi/../paging/../acpi/acpi.hpp acpi/../paging/../acpi/madt.hpp \
- acpi/../paging/freeList.hpp acpi/../paging/../lib/string.hpp \
- acpi/../paging/hashtable.hpp
+ acpi/../paging/../acpi/lapic.hpp \
+ acpi/../paging/../acpi/../lib/memory.hpp acpi/../paging/freeList.hpp \
+ acpi/../paging/../lib/string.hpp acpi/../paging/hashtable.hpp

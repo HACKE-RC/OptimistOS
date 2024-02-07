@@ -11,6 +11,7 @@
 #include "paging/paging.hpp"
 #include "acpi/acpi.hpp"
 #include "acpi/madt.hpp"
+#include "acpi/lapic.hpp"
 
 int setupOptimist();
 
