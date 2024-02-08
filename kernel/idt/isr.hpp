@@ -3,12 +3,13 @@
 #include <cstdint>
 #include "../renderer/BasicRenderer.hpp"
 #include "../printutils/e9print.h"
+
 typedef struct{
-    uint64_t ds;
-    uint64_t rdi, rsi, rbp, rsp, rdx, rcx, rbx, rax;
+    uint64_t rax, rbx, rcx, rdx, rbp, rsp, rsi, rdi;
+    uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
     uint64_t int_no, error_code;
-    uint64_t rip, cs, eFlags, userEsp, ss;
-} registers;
+    uint64_t rip, cs, ds , eFlags, userEsp, ss;
+} __attribute__((packed)) registers;
 
 extern "C" void isr0();
 extern "C" void isr1();

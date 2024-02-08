@@ -13,6 +13,7 @@
 #include "acpi/madt.hpp"
 #include "acpi/lapic.hpp"
 #include "acpi/ioapic.hpp"
+#include "smp/smp.hpp"
 
 int setupOptimist();
 

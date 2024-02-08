@@ -44,35 +44,18 @@ struct Memory
     uint64_t hhdmOffset;
 };
 
-struct RSDP1
-{
-    unsigned char Signature[8];
-    uint8_t Checksum;
-    uint8_t OEM_ID[6];
-    uint8_t Revision;
-    uint32_t RSDTAddress;
-} __attribute__((packed));
-
-struct RSDP2
-{
-    RSDP1 firstPart;
-
-    uint32_t Length;
-    uint64_t XSDTAddress;
-    uint8_t ExtendedChecksum;
-    uint8_t Reserved[3];
-
-} __attribute__((packed));
-
 typedef struct {
    Framebuffer framebuffer;
    PSF1_FONT *psf1Font;
    Memory memory;
 } bootInfo;
 
-static void haltAndCatchFire(const char* fileName, uint32_t lineNo){
+static void haltAndCatchFire(const char* fileName, uint32_t lineNo, const char* msg = ""){
     e9_printf("\nERROR at %s:%d\n", fileName, lineNo);
     e9_printf("Halting and catching fire!!\n");
+    if (msg != ""){
+        e9_printf("Error message: %s\n", msg);
+    }
     asm volatile("hlt");
 }
 
@@ -81,6 +64,8 @@ extern volatile limine_kernel_file_request kernelFileRequest;
 extern volatile limine_memmap_request memmapRequest;
 extern volatile limine_hhdm_request hhdmRequest;
 extern volatile limine_rsdp_request rsdpRequest;
+extern volatile limine_smp_request smpRequest;
+
 
 void setBootInfo(bootInfo bootInfo);
 bootInfo getBootInfo();

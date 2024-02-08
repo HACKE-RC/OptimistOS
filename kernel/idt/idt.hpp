@@ -1,6 +1,6 @@
 #ifndef OPTIMISTOS_IDT_HPP
 #define OPTIMISTOS_IDT_HPP
-#include <stdint.h>
+#include <cstdint>
 
 typedef struct __attribute__((packed)){
    uint16_t offsetLow;
