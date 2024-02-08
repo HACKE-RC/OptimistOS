@@ -27,7 +27,8 @@ int setupOptimist(){
 
     initMADT();
     initLAPIC();
-
+    initIOAPIC();
+    e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
     return 0;
 }

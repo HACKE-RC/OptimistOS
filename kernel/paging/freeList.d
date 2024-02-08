@@ -5,6 +5,7 @@ paging/freeList.o: paging/freeList.cpp paging/freeList.hpp \
  paging/../gdt/gdt.hpp paging/../idt/idt.hpp paging/../idt/isr.hpp \
  paging/../paging/paging.hpp paging/../acpi/acpi.hpp \
  paging/../acpi/../lib/string.hpp paging/../acpi/../paging/paging.hpp \
- paging/../acpi/madt.hpp paging/../acpi/acpi.hpp paging/../acpi/lapic.hpp \
- paging/../acpi/../lib/memory.hpp paging/../lib/string.hpp \
- paging/hashtable.hpp
+ paging/../acpi/madt.hpp paging/../acpi/ioapic.hpp \
+ paging/../acpi/../lib/memory.hpp paging/../acpi/madt.hpp \
+ paging/../acpi/acpi.hpp paging/../acpi/lapic.hpp \
+ paging/../acpi/ioapic.hpp paging/../lib/string.hpp paging/hashtable.hpp

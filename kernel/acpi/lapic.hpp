@@ -27,5 +27,6 @@ extern void initLAPIC();
 extern void lapicWrite(uint32_t reg, uint32_t value);
 extern void lapicWrite(uint64_t reg, uint64_t value);
 extern uint32_t lapicRead(uint32_t reg);
+uint32_t lapicGetID();
 
 #endif

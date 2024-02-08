@@ -1,6 +1,5 @@
 #include "madt.hpp"
-
-madtInfo* madtInformationList[128] = {0};
+ioAPICInfo* madtInformationList[128] = {0};
 madtIso* madtISOList[128] = {0};
 madtInfo madtInformation{};
 
@@ -29,7 +28,7 @@ void initMADT(){
                 currentIndex++;
                 break;
             case 1:
-                madtInformationList[madtInformation.ioAPICLen++] =  (madtInfo*)entry;
+                madtInformationList[madtInformation.ioAPICLen++] = (ioAPICInfo*)(entry);
                 break;
             case 2:
                 madtISOList[madtInformation.madtISOLen++] = (madtIso*)entry;

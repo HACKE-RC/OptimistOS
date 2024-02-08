@@ -1,10 +1,12 @@
 #ifndef PAGING_CPP_ACPI_HPP
 #define PAGING_CPP_ACPI_HPP
 
-#include <stdint.h>
+#include <cstdint>
 #include "../boot.h"
 #include "../lib/string.hpp"
 #include "../paging/paging.hpp"
+// Forward declaration of ioAPICInfo
+
 
 struct rsdpInfo{
     char signature[8];
@@ -60,4 +62,5 @@ void *acpiFindTable(const char* name);
 extern xsdtInfo xsdtInformation;
 uintptr_t initACPI();
 extern RSDT *rootRSDT;
+
 #endif //PAGING_CPP_ACPI_HPP

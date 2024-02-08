@@ -1,8 +1,13 @@
 #ifndef PAGING_CPP_MADT_HPP
 #define PAGING_CPP_MADT_HPP
+
+// Forward declaration of ioAPICInfo
+struct ioAPICInfo;
+#include "ioapic.hpp"
 #include "acpi.hpp"
 
 extern void initMADT();
+
 struct MADT {
     char signature[4];
     uint32_t length;
@@ -24,7 +29,15 @@ struct MADT {
 struct madtEntry{
     uint8_t type;
     uint8_t length;
-} ;
+};
+
+struct ioAPICInfo{
+    madtEntry un;
+    uint8_t apicID;
+    uint8_t reserved;
+    uint32_t apicAddr;
+    uint32_t gsiBase;
+};
 
 struct madtInfo{
     uint32_t ioAPICLen = 0;
@@ -38,14 +51,6 @@ struct lapicAddr {
     uint64_t physLapic;
 };
 
-struct ioAPIC{
-    madtEntry un;
-    uint8_t apicID;
-    uint8_t resv;
-    uint32_t apicAddr;
-    uint32_t gsiBase;
-};
-
 struct madtIso{
     madtEntry un;
     uint8_t busSrc;
@@ -54,10 +59,8 @@ struct madtIso{
     uint16_t flags;
 } ;
 
-
-extern madtInfo* madtInformationList[128];
+extern ioAPICInfo* madtInformationList[];
 extern madtIso* madtISOList[128];
 extern madtInfo madtInformation;
-
 
 #endif
