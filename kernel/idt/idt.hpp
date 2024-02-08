@@ -18,6 +18,7 @@ typedef struct __attribute__((packed)) {
 } idtPtrStruct;
 
 void idtInit();
+void idtInitAgain();
 void setIDTGate(uint8_t gateNumber, uint64_t handlerAddr);
 
 extern idtEntry idtEntries[256]; // max entries supported are 256

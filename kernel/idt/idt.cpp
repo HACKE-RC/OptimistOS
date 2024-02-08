@@ -12,6 +12,17 @@ void idtInit(){
                     : "r"(&idtPtr));
 }
 
+
+void idtInitAgain(){
+    idtPtr.limit = (sizeof(idtEntry) * 256) - 1;
+    idtPtr.base = (uint64_t)idtEntries;
+
+    __asm__ volatile("lidt (%0)"
+            :
+            : "r"(&idtPtr));
+    __asm__ volatile ("sti");
+}
+
 void setIDTGate(uint8_t gateNumber, uint64_t gateAddr){
     uint16_t offsetLow = (uint16_t)(gateAddr & 0xFFFF);
     uint16_t offsetMiddle = (uint16_t)((gateAddr >> 16 ) & 0xFFFF);

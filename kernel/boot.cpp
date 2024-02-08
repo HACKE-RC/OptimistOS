@@ -24,6 +24,7 @@ volatile struct limine_smp_request smpRequest{
          .revision = 0
 };
 
+
 static volatile limine_module_request module_request = {
     .id = LIMINE_MODULE_REQUEST, .revision = 0};
 
