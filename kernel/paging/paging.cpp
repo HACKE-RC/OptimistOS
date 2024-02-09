@@ -37,20 +37,14 @@ void initPaging(){
     init();
     bootInformation = getBootInfo();
     hhdmOffset = hhdmRequest.response->offset;
-//  check if 4gb pages are usable using cpuid
-//    uint32_t a, b, c, d;
-//    bool pg = (id(0x80000001, 0, a, b, c, d) && ((d & 1 << 26) == 1 << 26));
-//    if (pg){
-//        e9_printf("4gb pages are usable!\n");
-//        __asm__ volatile ("hlt");
-//    }
+
 //     map the first 4gb
     for (uint64_t i = 0; i < (4 * _1GB); i += (2 * _1MB)){
         (map(i, (void*)(i), (pageTableFlag)(ReadWrite | Present | LargerPages), (2 * _1MB)));
         (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), (2 * _1MB)));
     }
 
-    e9_printf("first 4 gb mapping done!\n");
+//    e9_printf("first 4 gb mapping done!\n");
 
     for (size_t i = 0; i < memmapRequest.response->entry_count; i++){
         limine_memmap_entry *mmap = memmapRequest.response->entries[i];
@@ -64,7 +58,7 @@ void initPaging(){
 
         auto size = end - start;
         auto [pageSize, sizeFlags] = requiredSize(size);
-        e9_printf("\nend-start: %x\npageSize: %x : %d", size, pageSize, pageSize);
+//        e9_printf("\nend-start: %x\npageSize: %x : %d", size, pageSize, pageSize);
         auto roundedSize = roundDown(size, pageSize);
         auto difference = size - roundedSize;
 
@@ -75,7 +69,7 @@ void initPaging(){
             map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
         }
 
-        e9_printf("\nflags for memmap: %x\n", (pageTableFlag)(ReadWrite | Present | sizeFlags));
+//        e9_printf("\nflags for memmap: %x\n", (pageTableFlag)(ReadWrite | Present | sizeFlags));
 
         start += roundedSize;
 
@@ -88,7 +82,7 @@ void initPaging(){
 
     }
 
-    e9_printf("\nsecond memmap mapping done!\n");
+//    e9_printf("\nsecond memmap mapping done!\n");
     uint64_t physicalBase = kernelMemoryRequest.response->physical_base;
     uint64_t virtualBase = kernelMemoryRequest.response->virtual_base;
     for (auto i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundDown((uintptr_t )KERNEL_BLOB_BEGIN, _4KB) + roundUp((uintptr_t)KERNEL_BLOB_SIZE + (uintptr_t)(KERNEL_BLOB_BEGIN -
@@ -98,20 +92,20 @@ void initPaging(){
 
 //    e9_printf("\nflags for kernel: %x\n", (pageTableFlag)(ReadWrite | Present));
 
-    e9_printf("\nkernel mapping done!\n");
+//    e9_printf("\nkernel mapping done!\n");
 
     if (PML4 == nullptr){
-        e9_printf("pml4 empty");
+//        e9_printf("pml4 empty");
         asm volatile("hlt");
     }
 
-    e9_printf("PML4 addr: %x\n", PML4);
-    e9_printf("\nreg value: %x\n", readCr3());
+//    e9_printf("PML4 addr: %x\n", PML4);
+//    e9_printf("\nreg value: %x\n", readCr3());
 
     writeCrReg(3, (uint64_t)PML4);
 
-    e9_printf("\nLast call 2!\n");
-    e9_printf("\nPML4 setup complete\n");
+//    e9_printf("\nLast call 2!\n");
+//    e9_printf("\nPML4 setup complete\n");
 }
 
 uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr, size_t pageSize){

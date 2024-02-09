@@ -45,8 +45,7 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     initGDT();
     isrInstall(renderer);
     initLAPIC();
-
-    e9_printf("we test");
+//    initPaging();
 
     while (cpusStarted < smpInfo->lapic_id){
         __asm__ volatile("nop");
