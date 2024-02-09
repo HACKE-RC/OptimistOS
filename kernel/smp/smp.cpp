@@ -28,9 +28,9 @@ void initSMP(){
     e9_printf("Hello from CPU: %d\n", smpResponse->cpus[0]->lapic_id);
     for (uint64_t i = 1; i < (cpuCount); i++){
         e9_printf("i: %d\n", i);
-        smpResponse->cpus[i]->goto_address = printHello;
-        i++;
-        e9_printf("i: %d\n", i);
+//        check if every core is going to the address
+        smpResponse->cpus[i]->goto_address = initOtherCPUs;
+//        e9_printf("i: %d\n", i);
     }
 
     while (cpusStarted < cpuCount){
@@ -43,7 +43,7 @@ void initSMP(){
     __asm__ volatile("hlt");
 }
 
-void printHello(limine_smp_info *pInfo){
+void initOtherCPUs(limine_smp_info *pInfo){
     initGDT();
     idtInitAgain();
     initLAPIC();

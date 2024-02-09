@@ -22,5 +22,5 @@ extern int bspLAPICID;
 extern int cpuCount;
 extern int cpusStarted;
 extern cpuInfo* cpuInformation[];
-void printHello(limine_smp_info *pInfo);
+void initOtherCPUs(limine_smp_info *pInfo);
 #endif
