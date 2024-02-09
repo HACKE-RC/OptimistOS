@@ -23,33 +23,32 @@ extern "C"
     extern uint64_t KERNEL_DATA_SIZE[];
 }
 
-bool id(uint32_t leaf, uint32_t subleaf, uint32_t &eax, uint32_t &ebx, uint32_t &ecx, uint32_t &edx)
-{
-    uint32_t cpuid_max = 0;
-    asm volatile ("cpuid" : "=a"(cpuid_max) : "a"(leaf & 0x80000000) : "ebx", "ecx", "edx");
-    if (leaf > cpuid_max)
-        return false;
-    asm volatile ("cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "a"(leaf), "c"(subleaf));
-    return true;
-}
+//bool id(uint32_t leaf, uint32_t subleaf, uint32_t &eax, uint32_t &ebx, uint32_t &ecx, uint32_t &edx)
+//{
+//    uint32_t cpuid_max = 0;
+//    asm volatile ("cpuid" : "=a"(cpuid_max) : "a"(leaf & 0x80000000) : "ebx", "ecx", "edx");
+//    if (leaf > cpuid_max)
+//        return false;
+//    asm volatile ("cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "a"(leaf), "c"(subleaf));
+//    return true;
+//}
 
 void initPaging(){
     init();
     bootInformation = getBootInfo();
     hhdmOffset = hhdmRequest.response->offset;
 //  check if 4gb pages are usable using cpuid
-    uint32_t a, b, c, d;
-    bool pg = id(0x80000001, 0, a, b, c, d) && ((d & 1 << 26) == 1 << 26);
-    if (pg){
-        e9_printf("4gb pages are usable!\n");
-        __asm__ volatile ("hlt");
-    }
+//    uint32_t a, b, c, d;
+//    bool pg = (id(0x80000001, 0, a, b, c, d) && ((d & 1 << 26) == 1 << 26));
+//    if (pg){
+//        e9_printf("4gb pages are usable!\n");
+//        __asm__ volatile ("hlt");
+//    }
 //     map the first 4gb
-    for (uint64_t i = 0; i < (4 * _1GB); i += _1GB){
-        (map(i, (void*)(i), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
-        (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), _1GB));
+    for (uint64_t i = 0; i < (4 * _1GB); i += (2 * _1MB)){
+        (map(i, (void*)(i), (pageTableFlag)(ReadWrite | Present | LargerPages), (2 * _1MB)));
+        (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), (2 * _1MB)));
     }
-
 
     e9_printf("first 4 gb mapping done!\n");
 
@@ -164,13 +163,13 @@ PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTable
 
     PML4 = PML4x;
 
-    if (flags & LargerPages){
-        return &PML3->entries[pml3Entry];
-    }
-
     PML2 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML3->entries[pml3Entry], true, virtualAddr, pageSize));
     if (PML2 == nullptr){
         haltAndCatchFire(__FILE__, __LINE__);
+    }
+
+    if (flags & LargerPages){
+        return &PML2->entries[pml2Entry];
     }
 
     PML1 = (PageTable*)toVirtualAddr((void*)getNextLevelPointer(PML2->entries[pml2Entry], true, virtualAddr, pageSize));
@@ -208,7 +207,7 @@ bool isHigherHalf(uintptr_t addr) {
 
 std::pair<size_t, size_t> requiredSize(size_t size) {
     if (size >= _1GB){
-        return {_1GB, LargerPages};
+        return {(2 * _1MB), LargerPages};
     }
     if (size >= _4KB){
         return {_4KB, 0};
