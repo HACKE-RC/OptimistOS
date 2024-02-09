@@ -44,11 +44,13 @@ void initSMP(){
 }
 
 void initOtherCPUs(limine_smp_info *smpInfo){
-    GlobalRenderer->Print("hi\n -> \n");
+//    GlobalRenderer->Print("hi\n -> \n");
     initGDT();
     isrInstall(renderer);
     initLAPIC();
-//    e9_printf("we test");
+
+    e9_printf("we test");
+
     while (cpusStarted < smpInfo->lapic_id){
         __asm__ volatile("nop");
     }

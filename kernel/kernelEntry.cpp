@@ -4,6 +4,7 @@ BasicRenderer renderer = BasicRenderer(nullptr, nullptr);
 
 int setupOptimist(){
     bootInfo bootInformation = getBootInfo();
+
     renderer = BasicRenderer(&bootInformation.framebuffer, bootInformation.psf1Font);
     GlobalRenderer = &renderer;
     GlobalRenderer->Clear(col::black, true);
@@ -11,8 +12,9 @@ int setupOptimist(){
     initGDT();
     isrInstall(renderer);
     GlobalRenderer->Print("Memory Information: \n");
+    e9_printf("init paging\n");
     e9_printf("memory addr: %x", bootInformation.memory.freeMemStart);
-//    initPaging();
+    initPaging();
 
 //  root / eXtended system descriptor table
     uintptr_t SDT = initACPI();
