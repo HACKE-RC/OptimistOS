@@ -7,6 +7,7 @@ int cpusStarted = 1;
 cpuInfo* cpuInformation[256];
 
 void initSMP(){
+    GlobalRenderer = &renderer;
     struct limine_smp_response *smpResponse = (struct limine_smp_response *)smpRequest.response;
     struct limine_smp_info *smpInfo = (struct limine_smp_info*)smpRequest.response->cpus;
 
@@ -24,7 +25,6 @@ void initSMP(){
     cpu0Information->processPRCount = 0;
 
     cpuInformation[0] = cpu0Information;
-
     e9_printf("Hello from CPU: %d\n", smpResponse->cpus[0]->lapic_id);
     for (uint64_t i = 1; i < (cpuCount); i++){
         e9_printf("i: %d\n", i);
@@ -44,10 +44,11 @@ void initSMP(){
 }
 
 void initOtherCPUs(limine_smp_info *smpInfo){
+    GlobalRenderer->Print("hi\n -> \n");
     initGDT();
-    idtInitAgain();
+    isrInstall(renderer);
     initLAPIC();
-    e9_printf("test\n");
+//    e9_printf("we test");
     while (cpusStarted < smpInfo->lapic_id){
         __asm__ volatile("nop");
     }

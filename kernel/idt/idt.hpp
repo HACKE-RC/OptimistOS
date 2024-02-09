@@ -2,6 +2,8 @@
 #define OPTIMISTOS_IDT_HPP
 #include <cstdint>
 
+extern bool wasInit;
+
 typedef struct __attribute__((packed)){
    uint16_t offsetLow;
    uint16_t segmentSelector;

@@ -2,6 +2,7 @@
 
 idtEntry idtEntries[256];
 idtPtrStruct idtPtr;
+bool wasInit = false;
 
 void idtInit(){
     idtPtr.limit = (sizeof(idtEntry) * 256) - 1;
@@ -10,6 +11,7 @@ void idtInit(){
     __asm__ volatile("lidt (%0)"
                     :
                     : "r"(&idtPtr));
+    wasInit = true;
 }
 
 

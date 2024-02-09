@@ -58,7 +58,7 @@ void BasicRenderer::Print(const char *str)
     }
 }
 
-#include <limits.h>  // for LONG_MIN and LONG_MAX
+#include <climits>  // for LONG_MIN and LONG_MAX
 
 void BasicRenderer::PrintInt(int num)
 {

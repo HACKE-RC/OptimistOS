@@ -70,7 +70,13 @@ void isrInstall(BasicRenderer renderer){
     setIDTGate(29, (uint64_t)isr29);
     setIDTGate(30, (uint64_t)isr30);
     setIDTGate(31, (uint64_t)isr31);
-    idtInit();
+
+    if (!wasInit){
+        idtInit();
+    }
+    else{
+        idtInitAgain();
+    }
 
     __asm__ volatile("sti");
 }
