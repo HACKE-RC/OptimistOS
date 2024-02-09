@@ -1,5 +1,6 @@
 #include "gdt.hpp"
 //#include "gdt.asm"
+#include "kernelEntry.hpp"
 
 extern "C" void gdtFlush(void* addr_t);
 

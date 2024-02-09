@@ -2,6 +2,7 @@
 #define PAGING_CPP_SMP_HPP
 #include "../boot.h"
 #include "../process/process.hpp"
+#include "../kernelEntry.hpp"
 
 typedef struct{
    bool lock;
@@ -22,5 +23,5 @@ extern int bspLAPICID;
 extern int cpuCount;
 extern int cpusStarted;
 extern cpuInfo* cpuInformation[];
-void initOtherCPUs(limine_smp_info *pInfo);
+void initOtherCPUs(limine_smp_info *smpInfo);
 #endif

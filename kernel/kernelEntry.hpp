@@ -16,5 +16,5 @@
 #include "smp/smp.hpp"
 
 int setupOptimist();
-
+extern BasicRenderer renderer;
 #endif //OPTIMISTOS_KERNELENTRY_HPP

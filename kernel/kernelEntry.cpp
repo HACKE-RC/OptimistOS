@@ -1,6 +1,6 @@
 #include "kernelEntry.hpp"
 
-static BasicRenderer renderer = BasicRenderer(nullptr, nullptr);
+BasicRenderer renderer = BasicRenderer(nullptr, nullptr);
 
 int setupOptimist(){
     bootInfo bootInformation = getBootInfo();
@@ -29,6 +29,7 @@ int setupOptimist(){
     initLAPIC();
     initIOAPIC();
     initSMP();
+
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
     return 0;

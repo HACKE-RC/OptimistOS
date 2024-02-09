@@ -43,26 +43,29 @@ void initSMP(){
     __asm__ volatile("hlt");
 }
 
-void initOtherCPUs(limine_smp_info *pInfo){
+void initOtherCPUs(limine_smp_info *smpInfo){
     initGDT();
     idtInitAgain();
     initLAPIC();
-//    haltAndCatchFire(__FILE__, __LINE__);
-
-//    e9_printf("Hello from CPU: \n");
-//    __asm__ volatile("hlt");
-    //    if (pInfo == nullptr){
-//        haltAndCatchFire(__FILE__, __LINE__);
-//    }
-
-    while (cpusStarted < pInfo->lapic_id){
+    e9_printf("test\n");
+    while (cpusStarted < smpInfo->lapic_id){
         __asm__ volatile("nop");
-//        e9_printf("doing nothing");
     }
 
-//    __asm__ volatile("hlt");
+
+    cpuInfo *cpu = (cpuInfo *)allocateFrame(sizeof(cpuInfo));
+    cpu->lock = false;
+    cpu->processPRCount = 0;
+    cpu->totalTime = 0;
+    cpu->lastIdleTime = 0;
+    cpu->lapicID = smpInfo->lapic_id;
+    cpu->processSize = cpu->processIndex = 0;
+    cpu->processList = nullptr;
+    cpu->currentProcess = 0;
+
+    cpuInformation[cpu->lapicID] = cpu;
     cpusStarted++;
-//    e9_printf("entering sleep");
+
     while (true){
         ;;
     }

@@ -11,5 +11,6 @@ paging/pageFrameAllocator.o: paging/pageFrameAllocator.cpp \
  paging/../acpi/ioapic.hpp paging/../smp/smp.hpp \
  paging/../smp/../process/process.hpp \
  paging/../smp/../process/../idt/isr.hpp \
- paging/../smp/../process/../paging/paging.hpp paging/freeList.hpp \
+ paging/../smp/../process/../paging/paging.hpp \
+ paging/../smp/../kernelEntry.hpp paging/freeList.hpp \
  paging/../lib/string.hpp paging/hashtable.hpp
