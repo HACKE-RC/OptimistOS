@@ -2,11 +2,14 @@
 int bspLAPICID = 0;
 int cpuCount = 1;
 int cpusStarted = 1;
-
+uintptr_t  cr3Value = 0;
+int cr3Value2 = 0;
 
 cpuInfo* cpuInformation[256];
 
 void initSMP(){
+    cr3Value = (uintptr_t)PML4;
+    e9_printf("cr3 value: %x\n", cr3Value);
     GlobalRenderer = &renderer;
     struct limine_smp_response *smpResponse = (struct limine_smp_response *)smpRequest.response;
     struct limine_smp_info *smpInfo = (struct limine_smp_info*)smpRequest.response->cpus;
@@ -26,7 +29,6 @@ void initSMP(){
     cpuInformation[0] = cpu0Information;
 
     e9_printf("Hello from CPU: %d\n", smpResponse->cpus[0]->lapic_id);
-
     for (uint64_t i = 1; i < (cpuCount); i++){
         e9_printf("i: %d\n", i);
         smpResponse->cpus[i]->goto_address = initOtherCPUs;
@@ -36,8 +38,13 @@ void initSMP(){
         e9_printf("cpuStarted: %d\n", cpusStarted);
         e9_printf("doing nothing up\n");
     }
-
+    e9_printf("CR3 value 1: %x\n", readCr3());
+    e9_printf("CR3 value: %x\n", cr3Value2);
     e9_printf("SMP initialized\n");
+}
+
+inline void write_cr3(uint64_t val) {
+    __asm__ ("mov %0, %%cr3" : : "r"(val) : "memory");
 }
 
 void initOtherCPUs(limine_smp_info *smpInfo){
@@ -47,10 +54,14 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     initLAPIC();
 //    initPaging();
 
+//    write_cr3(cr3Value);
+
+    writeCrReg(3, PML4);
+    cr3Value2 = readCr3();
+
     while (cpusStarted < smpInfo->lapic_id){
         __asm__ volatile("nop");
     }
-
 
     cpuInfo *cpu = (cpuInfo *) toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
     cpu->lock = false;
