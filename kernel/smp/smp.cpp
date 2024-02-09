@@ -23,24 +23,21 @@ void initSMP(){
     cpu0Information->processIndex = cpu0Information->processSize = 0;
     cpu0Information->lastIdleTime = cpu0Information->totalTime = 0;
     cpu0Information->processPRCount = 0;
-
     cpuInformation[0] = cpu0Information;
+
     e9_printf("Hello from CPU: %d\n", smpResponse->cpus[0]->lapic_id);
+
     for (uint64_t i = 1; i < (cpuCount); i++){
         e9_printf("i: %d\n", i);
-//        check if every core is going to the address
         smpResponse->cpus[i]->goto_address = initOtherCPUs;
-//        e9_printf("i: %d\n", i);
     }
 
     while (cpusStarted < cpuCount){
         e9_printf("cpuStarted: %d\n", cpusStarted);
-//        __asm__ volatile("hlt");
         e9_printf("doing nothing up\n");
     }
 
     e9_printf("SMP initialized\n");
-    __asm__ volatile("hlt");
 }
 
 void initOtherCPUs(limine_smp_info *smpInfo){
