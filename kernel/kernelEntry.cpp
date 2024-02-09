@@ -20,7 +20,6 @@ int setupOptimist(){
     e9_printf("\nPAGING IS WORKING\n");
 //  root / eXtended system descriptor table
     uintptr_t SDT = initACPI();
-
     if (SDT != 0){
         e9_printf("ACPI initialized!\n");
         e9_printf("SDT addr: %x", SDT);

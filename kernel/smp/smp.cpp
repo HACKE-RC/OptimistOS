@@ -16,7 +16,7 @@ void initSMP(){
 
     e9_printf("num cpus: %d\n", cpuCount);
 
-    cpuInfo *cpu0Information = (cpuInfo *)allocateFrame(sizeof(cpuInfo));
+    cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
     cpu0Information->lock = false;
     cpu0Information->lapicID = 0;
     cpu0Information->currentProcess = 0;
@@ -56,7 +56,7 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     }
 
 
-    cpuInfo *cpu = (cpuInfo *)allocateFrame(sizeof(cpuInfo));
+    cpuInfo *cpu = (cpuInfo *) toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
     cpu->lock = false;
     cpu->processPRCount = 0;
     cpu->totalTime = 0;
