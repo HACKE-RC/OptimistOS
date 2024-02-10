@@ -1,11 +1,13 @@
 #ifndef PAGING_CPP_SMP_HPP
 #define PAGING_CPP_SMP_HPP
+
+#include <mutex>
 #include "../boot.h"
 #include "../process/process.hpp"
 #include "../kernelEntry.hpp"
 
 typedef struct{
-   bool lock;
+   std::mutex lock;
    uint32_t lapicID;
    process *currentProcess;
    process *processList;

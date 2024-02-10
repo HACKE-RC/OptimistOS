@@ -5,10 +5,11 @@ bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
 PageTable* PML4;
+std::mutex pageTableMutex;
+
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
-    // halt
-//    __asm__ volatile ("hlt");
+
 }
 
 extern "C"
@@ -24,6 +25,8 @@ extern "C"
 }
 
 void initPaging(){
+    std::lock_guard<std::mutex> lock(pageTableMutex);
+
     init();
     bootInformation = getBootInfo();
     hhdmOffset = hhdmRequest.response->offset;

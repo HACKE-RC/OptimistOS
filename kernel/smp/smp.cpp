@@ -20,7 +20,7 @@ void initSMP(){
     e9_printf("num cpus: %d\n", cpuCount);
 
     cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
-    cpu0Information->lock = false;
+    cpu0Information->lock.unlock();
     cpu0Information->lapicID = 0;
     cpu0Information->currentProcess = 0;
     cpu0Information->processIndex = cpu0Information->processSize = 0;
@@ -52,7 +52,7 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     initGDT();
     isrInstall(renderer);
     initLAPIC();
-//    initPaging();
+    initPaging();
 
 //    write_cr3(cr3Value);
 
@@ -64,7 +64,7 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     }
 
     cpuInfo *cpu = (cpuInfo *) toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
-    cpu->lock = false;
+    cpu->lock.unlock();
     cpu->processPRCount = 0;
     cpu->totalTime = 0;
     cpu->lastIdleTime = 0;

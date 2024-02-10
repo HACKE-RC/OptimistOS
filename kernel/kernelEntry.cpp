@@ -1,3 +1,4 @@
+#include <mutex>
 #include "kernelEntry.hpp"
 
 BasicRenderer renderer = BasicRenderer(nullptr, nullptr);
@@ -15,7 +16,7 @@ int setupOptimist(){
     e9_printf("init paging\n");
     e9_printf("memory addr: %x", bootInformation.memory.freeMemStart);
     initPaging();
-//    writeCrReg(3, PML4);
+    //    writeCrReg(3, PML4);
     e9_printf("cr3 write complete: %x", readCr3());
     e9_printf("\nPAGING IS WORKING\n");
 //  root / eXtended system descriptor table
