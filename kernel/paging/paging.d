@@ -13,4 +13,4 @@ paging/paging.o: paging/paging.cpp paging/paging.hpp paging/../boot.h \
  paging/../smp/../process/../paging/paging.hpp \
  paging/../smp/../kernelEntry.hpp paging/freeList.hpp \
  paging/../lib/string.hpp paging/hashtable.hpp \
- paging/../../limine/limine.h
+ paging/../../limine/limine.h paging/../lib/lock.hpp

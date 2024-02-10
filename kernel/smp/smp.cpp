@@ -1,4 +1,5 @@
 #include "smp.hpp"
+
 int bspLAPICID = 0;
 int cpuCount = 1;
 int cpusStarted = 1;
@@ -20,7 +21,7 @@ void initSMP(){
     e9_printf("num cpus: %d\n", cpuCount);
 
     cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
-    cpu0Information->lock.unlock();
+    cpu0Information->lock = 0;
     cpu0Information->lapicID = 0;
     cpu0Information->currentProcess = 0;
     cpu0Information->processIndex = cpu0Information->processSize = 0;
@@ -43,10 +44,6 @@ void initSMP(){
     e9_printf("SMP initialized\n");
 }
 
-inline void write_cr3(uint64_t val) {
-    __asm__ ("mov %0, %%cr3" : : "r"(val) : "memory");
-}
-
 void initOtherCPUs(limine_smp_info *smpInfo){
 //    GlobalRenderer->Print("hi\n -> \n");
     initGDT();
@@ -54,9 +51,6 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     initLAPIC();
     initPaging();
 
-//    write_cr3(cr3Value);
-
-    writeCrReg(3, PML4);
     cr3Value2 = readCr3();
 
     while (cpusStarted < smpInfo->lapic_id){
@@ -64,7 +58,7 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     }
 
     cpuInfo *cpu = (cpuInfo *) toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
-    cpu->lock.unlock();
+    cpu->lock = 0;
     cpu->processPRCount = 0;
     cpu->totalTime = 0;
     cpu->lastIdleTime = 0;

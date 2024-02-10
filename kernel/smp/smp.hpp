@@ -7,7 +7,7 @@
 #include "../kernelEntry.hpp"
 
 typedef struct{
-   std::mutex lock;
+   uint32_t lock;
    uint32_t lapicID;
    process *currentProcess;
    process *processList;

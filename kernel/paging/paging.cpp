@@ -1,19 +1,21 @@
 #include "paging.hpp"
 #include "../boot.h"
 #include "../../limine/limine.h"
+#include "../lib/lock.hpp"
+
 bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
 PageTable* PML4;
-std::mutex pageTableMutex;
+
+uint32_t mutex = 0;
 
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
 
 }
 
-extern "C"
-{
+extern "C" {
     extern char KERNEL_BLOB_BEGIN[];
     extern char KERNEL_BLOB_SIZE[];
     extern char KERNEL_TEXT_BEGIN[];
@@ -25,8 +27,7 @@ extern "C"
 }
 
 void initPaging(){
-    std::lock_guard<std::mutex> lock(pageTableMutex);
-
+    lock(mutex);
     init();
     bootInformation = getBootInfo();
     hhdmOffset = hhdmRequest.response->offset;
@@ -88,17 +89,13 @@ void initPaging(){
 //    e9_printf("\nkernel mapping done!\n");
 
     if (PML4 == nullptr){
-//        e9_printf("pml4 empty");
         asm volatile("hlt");
     }
 
-//    e9_printf("PML4 addr: %x\n", PML4);
-//    e9_printf("\nreg value: %x\n", readCr3());
 
     writeCrReg(3, (uint64_t)PML4);
 
-//    e9_printf("\nLast call 2!\n");
-//    e9_printf("\nPML4 setup complete\n");
+    unlock(mutex);
 }
 
 uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr, size_t pageSize){
