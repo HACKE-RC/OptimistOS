@@ -9,6 +9,8 @@ int cr3Value2 = 0;
 cpuInfo* cpuInformation[256];
 
 void initSMP(){
+    std::mutex m;
+    std::unique_lock <std::mutex> guard(m);
     cr3Value = (uintptr_t)PML4;
     e9_printf("cr3 value: %x\n", cr3Value);
     GlobalRenderer = &renderer;
@@ -31,25 +33,28 @@ void initSMP(){
 
     e9_printf("Hello from CPU: %d\n", smpResponse->cpus[0]->lapic_id);
     for (uint64_t i = 1; i < (cpuCount); i++){
-        e9_printf("i: %d\n", i);
+//        e9_printf("i: %d\n", i);
         smpResponse->cpus[i]->goto_address = initOtherCPUs;
     }
 
     while (cpusStarted < cpuCount){
-        e9_printf("cpuStarted: %d\n", cpusStarted);
-        e9_printf("doing nothing up\n");
+//        e9_printf("cpuStarted: %d\n", cpusStarted);
+//        e9_printf("doing nothing up\n");
     }
-    e9_printf("CR3 value 1: %x\n", readCr3());
-    e9_printf("CR3 value: %x\n", cr3Value2);
+//    e9_printf("CR3 value 1: %x\n", readCr3());
+//    e9_printf("CR3 value: %x\n", cr3Value2);
     e9_printf("SMP initialized\n");
 }
 
 void initOtherCPUs(limine_smp_info *smpInfo){
-//    GlobalRenderer->Print("hi\n -> \n");
     initGDT();
     isrInstall(renderer);
     initLAPIC();
     initPaging();
+
+    GlobalRenderer->Print("cr3 -> ");
+    GlobalRenderer->PrintInt(readCr3());
+    GlobalRenderer->Print("\n");
 
     cr3Value2 = readCr3();
 
