@@ -1,17 +1,16 @@
 #include "smp.hpp"
 #include <mutex>
 #include <memory/malloc.hpp>
-int bspLAPICID = 0;
+
 int cpuCount = 1;
+int cr3Value2 = 0;
+int bspLAPICID = 0;
 int cpusStarted = 1;
 uintptr_t  cr3Value = 0;
-int cr3Value2 = 0;
 
 cpuInfo* cpuInformation[256];
 
 void initSMP(){
-    std::mutex m;
-    std::unique_lock <std::mutex> guard(m);
     cr3Value = (uintptr_t)PML4;
     e9_printf("cr3 value: %x\n", cr3Value);
     GlobalRenderer = &renderer;
@@ -26,7 +25,7 @@ void initSMP(){
     cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
     cpu0Information->lock = 0;
     cpu0Information->lapicID = 0;
-    cpu0Information->currentProcess = 0;
+    cpu0Information->currentProcess = nullptr;
     cpu0Information->processIndex = cpu0Information->processSize = 0;
     cpu0Information->lastIdleTime = cpu0Information->totalTime = 0;
     cpu0Information->processPRCount = 0;
