@@ -38,8 +38,6 @@ void initPaging(){
         (map(i, (void*)(i + hhdmOffset), (pageTableFlag)(ReadWrite | Present | LargerPages), (2 * _1MB)));
     }
 
-//    e9_printf("first 4 gb mapping done!\n");
-
     for (size_t i = 0; i < memmapRequest.response->entry_count; i++){
         limine_memmap_entry *mmap = memmapRequest.response->entries[i];
 
@@ -52,7 +50,6 @@ void initPaging(){
 
         auto size = end - start;
         auto [pageSize, sizeFlags] = requiredSize(size);
-//        e9_printf("\nend-start: %x\npageSize: %x : %d", size, pageSize, pageSize);
         auto roundedSize = roundDown(size, pageSize);
         auto difference = size - roundedSize;
 
@@ -62,8 +59,6 @@ void initPaging(){
             }
             map(k, (void*)(k + hhdmOffset), (pageTableFlag)(ReadWrite | Present | sizeFlags), pageSize);
         }
-
-//        e9_printf("\nflags for memmap: %x\n", (pageTableFlag)(ReadWrite | Present | sizeFlags));
 
         start += roundedSize;
 
@@ -76,17 +71,12 @@ void initPaging(){
 
     }
 
-//    e9_printf("\nsecond memmap mapping done!\n");
     uint64_t physicalBase = kernelMemoryRequest.response->physical_base;
     uint64_t virtualBase = kernelMemoryRequest.response->virtual_base;
     for (auto i = (uintptr_t) roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB); i < (uintptr_t) roundDown((uintptr_t )KERNEL_BLOB_BEGIN, _4KB) + roundUp((uintptr_t)KERNEL_BLOB_SIZE + (uintptr_t)(KERNEL_BLOB_BEGIN -
             roundDown((uintptr_t)KERNEL_BLOB_BEGIN, _4KB)) , _4KB); i += (_4KB)) {
         map(i - virtualBase + physicalBase, (void*)(i), (pageTableFlag)(ReadWrite | Present), _4KB);
     }
-
-//    e9_printf("\nflags for kernel: %x\n", (pageTableFlag)(ReadWrite | Present));
-
-//    e9_printf("\nkernel mapping done!\n");
 
     if (PML4 == nullptr){
         asm volatile("hlt");
