@@ -1,7 +1,7 @@
 #ifndef PAGING_CPP_SMP_HPP
 #define PAGING_CPP_SMP_HPP
 
-#include <mutex>
+//#include <mutex>
 #include "../boot.h"
 #include "../process/process.hpp"
 #include "../kernelEntry.hpp"

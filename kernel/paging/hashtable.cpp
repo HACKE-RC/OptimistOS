@@ -1,4 +1,3 @@
-#include <string.h>
 #include "hashtable.hpp"
 //#define TABLE_SIZE 100
 
@@ -6,7 +5,7 @@
 
 // Hash function
 int hash(void* key) {
-    size_t hashValue = (size_t)key;
+    auto hashValue = (size_t)key;
 
     // Additional hashing algorithm for better distribution
     hashValue = ((hashValue >> 16) ^ hashValue) * 0x45d9f3b;

@@ -1,5 +1,5 @@
 #include "smp.hpp"
-
+#include <mutex>
 int bspLAPICID = 0;
 int cpuCount = 1;
 int cpusStarted = 1;

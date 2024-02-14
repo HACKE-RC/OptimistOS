@@ -1,4 +1,3 @@
-#include <mutex>
 #include "kernelEntry.hpp"
 
 BasicRenderer renderer = BasicRenderer(nullptr, nullptr);

@@ -58,8 +58,9 @@ void BasicRenderer::Print(const char *str)
     }
 }
 
-#include <climits>  // for LONG_MIN and LONG_MAX
-
+//#include <limits.h>  // for LONG_MIN and LONG_MAX
+#define LONG_MIN (-9223372036854775808)
+#define LONG_MAX 9223372036854775807
 void BasicRenderer::PrintInt(int num)
 {
     // Handle the case when the number is 0
