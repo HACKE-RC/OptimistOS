@@ -5,4 +5,5 @@
 
 extern void memoryset(void *start, uint8_t value, uint64_t num);
 bool memorycmp(const void *s1, const void *s2, size_t n);
+void memorycpy(void* destination, const void* source, uint64_t num);
 #endif //PAGING_CPP_STRING_HPP

@@ -19,3 +19,12 @@ bool memorycmp(const void *s1, const void *s2, size_t n){
     }
     return true;
 }
+
+void memorycpy(void* destination, const void* source, uint64_t num) {
+    uint8_t* dest = (uint8_t*)destination;
+    const uint8_t* src = (const uint8_t*)source;
+
+    for (uint64_t i = 0; i < num; i++) {
+        dest[i] = src[i];
+    }
+}
