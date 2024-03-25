@@ -1,5 +1,5 @@
-#include "malloc.hpp"
 #include <cstdint>
+#include "malloc.hpp"
 #include "../lib/string.hpp"
 #include "../boot.h"
 #include "../paging/pageFrameAllocator.hpp"

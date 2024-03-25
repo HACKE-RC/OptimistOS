@@ -30,6 +30,7 @@ void initSMP(){
     cpu0Information->processIndex = cpu0Information->processSize = 0;
     cpu0Information->lastIdleTime = cpu0Information->totalTime = 0;
     cpu0Information->processPRCount = 0;
+    cpu0Information->cpuNumber = 0;
     cpuInformation[0] = cpu0Information;
 
     e9_printf("Hello from CPU: %d\n", smpResponse->cpus[0]->lapic_id);
@@ -68,10 +69,18 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     cpu->processSize = cpu->processIndex = 0;
     cpu->processList = nullptr;
     cpu->currentProcess = nullptr;
+    cpu->cpuNumber = cpusStarted;
 
-    cpuInformation[cpu->lapicID] = cpu;
+    cpuInformation[cpu->cpuNumber] = cpu;
     cpusStarted++;
     while (true){
         ;;
     }
+}
+
+cpuInfo* getCPU(uint32_t cpuNumber){
+    if (cpuNumber > cpusStarted){
+        return nullptr;
+    }
+    return cpuInformation[cpuNumber];
 }

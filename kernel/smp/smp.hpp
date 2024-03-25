@@ -6,6 +6,8 @@
 #include "../process/process.hpp"
 #include "../kernelEntry.hpp"
 
+struct process;
+
 typedef struct{
    uint32_t lock;
    uint32_t lapicID;
@@ -16,6 +18,7 @@ typedef struct{
    uint64_t processPRCount;
    uint64_t lastIdleTime;
    uint64_t totalTime;
+   uint32_t cpuNumber;
 } __attribute__((packed)) cpuInfo;
 
 
@@ -25,5 +28,6 @@ extern int bspLAPICID;
 extern int cpuCount;
 extern int cpusStarted;
 extern cpuInfo* cpuInformation[];
+extern cpuInfo* getCPU(uint32_t cpuNumber);
 void initOtherCPUs(limine_smp_info *smpInfo);
 #endif
