@@ -12,5 +12,5 @@ paging/freeList.o: paging/freeList.cpp paging/freeList.hpp \
  paging/../smp/../process/process.hpp \
  paging/../smp/../process/../idt/isr.hpp \
  paging/../smp/../process/../paging/paging.hpp \
- paging/../smp/../kernelEntry.hpp paging/../lib/string.hpp \
- paging/hashtable.hpp
+ paging/../smp/../kernelEntry.hpp paging/../io/io.hpp \
+ paging/../lib/string.hpp paging/hashtable.hpp

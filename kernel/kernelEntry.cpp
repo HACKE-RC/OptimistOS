@@ -27,11 +27,14 @@ int setupOptimist(){
     else{
         haltAndCatchFire(__FILE__, __LINE__);
     }
-//
+
     initMADT();
     initLAPIC();
     initIOAPIC();
     initSMP();
+//  disabling PIC
+    outb(PIC1_DAT, 0xFF);
+    outb(PIC2_DAT, 0xFF);
 
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");

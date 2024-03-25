@@ -8,7 +8,7 @@ bootInfo bootInformation{};
 uint64_t hhdmOffset = 0;
 PageTable* PML4;
 
-uint32_t mutex = 0;
+static uint32_t mutex = 0;
 
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));

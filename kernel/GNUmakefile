@@ -119,7 +119,7 @@ $(KERNEL): $(OBJ)
 # Remove object files and the final executable.
 .PHONY: clean
 clean:
-	rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) *.d 
+	rm -rf $(KERNEL) $(OBJ) $(HEADER_DEPS) *.d */*.d
 
 .PHONY: distclean
 distclean: clean

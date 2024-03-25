@@ -14,7 +14,18 @@
 #include "acpi/lapic.hpp"
 #include "acpi/ioapic.hpp"
 #include "smp/smp.hpp"
+#include "io/io.hpp"
 
 int setupOptimist();
 extern BasicRenderer renderer;
+
+// PIC stuff
+#define PIC1         0x20		/* IO base address for master PIC */
+#define PIC2         0xA0		/* IO base address for slave PIC */
+#define PIC1_CMD     PIC1
+#define PIC1_DAT 	 (PIC1+1)
+#define PIC2_CMD     PIC2
+#define PIC2_DAT 	 (PIC2+1)
+
+
 #endif //OPTIMISTOS_KERNELENTRY_HPP
