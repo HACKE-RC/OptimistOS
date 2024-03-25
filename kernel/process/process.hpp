@@ -11,8 +11,8 @@ typedef struct{
     uint64_t processID;
     registers regs;
     PageTable *PML4;
-//    uint8_t priority;
-//    uint64_t state;
+    uint8_t priority;
+    uint64_t state;
     uint64_t cpuID;
     uint64_t stackAddress;
 } process;

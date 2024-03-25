@@ -5,6 +5,7 @@
 #include "../paging/pageFrameAllocator.hpp"
 
 head* freeList = nullptr;
+uint32_t mutex = 0;
 
 void initNodes(){
     bootInfo bootInformation = getBootInfo();
@@ -31,11 +32,13 @@ void initNodes(){
 }
 
 void* mallocx(size_t size) {
+    lock(mutex);
+
     if (freeList == nullptr) {
         initNodes();
     }
 
-    size = size +  sizeof(head);
+    size = size + sizeof(head);
 
     if (size < MINIMUM_ALLOCATION_SIZE) {
         size = MINIMUM_ALLOCATION_SIZE;
@@ -44,7 +47,6 @@ void* mallocx(size_t size) {
     size = roundUpToNextPower2(size);
 
     head* currentNode = freeList;
-
     while (true) {
         if (size > PAGE_SIZE) {
             if ((currentNode->level == 0) && (currentNode->status != allocated) && (currentNode->next != nullptr)) {
@@ -53,6 +55,7 @@ void* mallocx(size_t size) {
                 bool canCoalesce = true;
 
                 if (blocksToCoalesce > MAXIMUM_COALESCE_BLOCKS) {
+                    unlock(mutex);
                     return nullptr;
                 }
 
@@ -66,6 +69,7 @@ void* mallocx(size_t size) {
                 }
 
                 if (canCoalesce) {
+                    unlock(mutex);
                     return coalesceBlocks(currentNode, blocksToCoalesce);
                 }
             }
@@ -88,6 +92,7 @@ void* mallocx(size_t size) {
         }
 
         if (currentNode->size == size) {
+            unlock(mutex);
             break;
         }
 
@@ -108,6 +113,8 @@ void* mallocx(size_t size) {
     }
 
     currentNode->status = allocated;
+
+    unlock(mutex);
     return (void*)((uintptr_t)currentNode + sizeof(head));
 }
 

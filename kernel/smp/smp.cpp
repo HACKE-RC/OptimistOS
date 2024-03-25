@@ -22,7 +22,8 @@ void initSMP(){
 
     e9_printf("num cpus: %d\n", cpuCount);
 
-    cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
+//    cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
+    cpuInfo *cpu0Information = (cpuInfo *) mallocx(sizeof(cpuInfo));
     cpu0Information->lock = 0;
     cpu0Information->lapicID = 0;
     cpu0Information->currentProcess = nullptr;

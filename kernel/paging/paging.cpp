@@ -12,7 +12,6 @@ uint32_t mutex = 0;
 
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
-
 }
 
 extern "C" {

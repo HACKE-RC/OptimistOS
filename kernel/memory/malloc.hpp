@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cstddef>
+#include "../lib/lock.hpp"
 
 #define MIN 5
 #define LEVELS 7
@@ -14,7 +15,6 @@
 #define POOL_ARRAY_SIZE 3072
 #define MINIMUM_ALLOCATION_SIZE 32
 #define MAXIMUM_COALESCE_BLOCKS 4
-
 
 enum flag{
     unused,

@@ -5,7 +5,7 @@ xsdtInfo xsdtInformation{};
 
 void *acpiFindTable(const char* name){
     if (rootRSDT != nullptr){
-//           may need to convert to physaddr
+//      may need to convert to physaddr
         auto *rsdt = (RSDT*) toVirtualAddr(rootRSDT);
         uint32_t entries = (rsdt->systemDescriptorTable.length - sizeof(rsdt->systemDescriptorTable)) / 4;
 

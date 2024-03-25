@@ -254,7 +254,7 @@ extern "C" void _start(void) {
   for (size_t i = 0; i < memoryMapResponse->entry_count; i++) {
     limine_memmap_entry *e = memoryMapResponse->entries[i];
     if (e->type == LIMINE_MEMMAP_USABLE) {
-      //          use the largest free memory block
+//    use the largest free memory block
       if (e->length > freeMemSize) {
         freeMemStart = (void *)e->base;
         freeMemSize = e->length;
@@ -298,10 +298,12 @@ extern "C" void _start(void) {
 
     font.glyphBuffer = (void *)((uint64_t)file->address + sizeof(PSF1_HEADER));
   }
+
   if (hhdmRequest.response == NULL) {
     e9_printf("HHDM request wasn't fulfilled");
     done();
   }
+
   Memory memory{};
   {
     memory.freeMemStart = startRAMAddr;
@@ -322,6 +324,7 @@ extern "C" void _start(void) {
             (uint64_t)freeMemStart);
 
   e9_printf("> LIMINE_SUCCESS: ");
+
   terminal_request.response->write(terminal, "Completed Boot Init!\n", 23);
   bootInformation.framebuffer = fb;
   bootInformation.psf1Font = &font;
