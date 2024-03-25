@@ -119,6 +119,7 @@ void* mallocx(size_t size) {
 }
 
 void* coalesceBlocks(head* node, size_t n) {
+    lock(mutex);
     head* lastNode{};
 
     lastNode = node;
@@ -130,11 +131,13 @@ void* coalesceBlocks(head* node, size_t n) {
     node->size = PAGE_SIZE * n;
     node->status = allocated;
 
+    unlock(mutex);
     return (void*)((uintptr_t)node + sizeof(head));
 }
 
 
 void freex(void* block) {
+    lock(mutex);
     head* node = (head*)((uintptr_t)block - sizeof(head));
     node->status = unused;
     int usuableSize = ((uintptr_t)node->next - (uintptr_t)node - (sizeof(head) * 2));
@@ -145,6 +148,7 @@ void freex(void* block) {
         node->status = buddy->status = unused;
         node->isBuddyCoalesced = false;
         buddy->next = node->next;
+        unlock(mutex);
         return;
     }
 
@@ -170,18 +174,21 @@ void freex(void* block) {
     else {
         memoryset(block, 0, usuableSize);
     }
+    unlock(mutex);
 }
 
 void* reallocx(void *block, size_t size) {
     // increase the size of the current block
     // if the next block to which we want to expand is already allocated
     // copy all the data of this block and allocate a block of size and return it
+    lock(mutex);
     size_t roundedSize = roundUpToNextPower2(size);
 
     head* node = (head*)((uintptr_t)block - sizeof(head));
     head* buddyNode = (head*)((uintptr_t)node ^ node->size);
 
     if (roundedSize == node->size) {
+        unlock(mutex);
         return block;
     }
 
@@ -194,6 +201,7 @@ void* reallocx(void *block, size_t size) {
             newNodeData->status = node->status;
             newNodeData->size = roundedSize;
             freex(block);
+            unlock(mutex);
             return (void*)newNode;
         }
     }
@@ -201,6 +209,7 @@ void* reallocx(void *block, size_t size) {
     buddyNode->status = allocated;
     node->isBuddyCoalesced = true;
     node->size = node->size * 2;
+    unlock(mutex);
     return (void*)((uintptr_t)node - sizeof(head));
 }
 
