@@ -88,7 +88,7 @@ barebones.hdd: limine kernel
 
 .PHONY: clean
 clean:
-	rm -rf iso_root optimist.iso barebones.hdd
+	rm -rf iso_root optimist.iso barebones.hdd */*.d
 	$(MAKE) -C kernel clean
 
 .PHONY: distclean
