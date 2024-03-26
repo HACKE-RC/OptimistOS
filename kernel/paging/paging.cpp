@@ -6,13 +6,14 @@
 bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
-PageTable* PML4;
+PageTable* PML4 = nullptr;
 
 static uint32_t mutex = 0;
 
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
 }
+
 
 extern "C" {
     extern char KERNEL_BLOB_BEGIN[];
@@ -28,6 +29,7 @@ extern "C" {
 void initPaging(){
     lock(mutex);
     init();
+
     bootInformation = getBootInfo();
     hhdmOffset = hhdmRequest.response->offset;
 
@@ -66,7 +68,6 @@ void initPaging(){
                 haltAndCatchFire(__FILE__, __LINE__);
             }
         }
-
 
     }
 
@@ -195,4 +196,14 @@ uintptr_t toHigherHalf(uintptr_t addr) {
     else{
         return addr + hhdmOffset;
     };
+}
+
+PageTable* newPML4(){
+    PageTable* newPML4 = (struct PageTable*)(allocateFrame(0x1000));
+
+    for (int i = 256; i < 512; i++){
+        newPML4->entries[i] = PML4->entries[i];
+    }
+
+    return newPML4;
 }

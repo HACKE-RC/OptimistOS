@@ -23,9 +23,8 @@ typedef struct{
 
 
 extern void initSMP();
-// bootStrapProcessor LAPIC ID
-extern int bspLAPICID;
 extern int cpuCount;
+extern int bspLAPICID;
 extern int cpusStarted;
 extern cpuInfo* cpuInformation[];
 extern cpuInfo* getCPU(uint32_t cpuNumber);

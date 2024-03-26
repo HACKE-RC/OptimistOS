@@ -7,6 +7,7 @@
 head* freeList = nullptr;
 uint32_t mutex = 0;
 
+// to-do: create a way to use user-mode pages for malloc
 void initNodes(){
     bootInfo bootInformation = getBootInfo();
     void* memory = toVirtualAddr((void*)allocateFrame((12*1024*1024) + (sizeof(head) * POOL_ARRAY_SIZE)));
@@ -123,7 +124,7 @@ void* coalesceBlocks(head* node, size_t n) {
     head* lastNode{};
 
     lastNode = node;
-    for (int i = 0; i < n - 1; i ++) {
+    for (size_t i = 0; i < n - 1; i ++) {
         lastNode = lastNode->next;
     }
 

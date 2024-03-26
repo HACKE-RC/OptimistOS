@@ -7,18 +7,23 @@ static fBlock* head;
 //std::unordered_map<void*, size_t> addressSizeHT;
 
 fBlock* initFreeList(){
+    if (PML4 == nullptr){
+        e9_printf("PML4 found (not found)");
+        asm volatile("hlt");
+    }
     bootInfo bootInformation = getBootInfo();
     Memory availableMemory = bootInformation.memory;
+
     auto *freeBlock = (fBlock*)(availableMemory.freeMemStart);
-    e9_printf("\naddr physical: %x\n", freeBlock);
     freeBlock = (fBlock*)(toVirtualAddr((void *) freeBlock));
-    e9_printf("addr virtual: %x\n", freeBlock);
+
     //    not subtracting the size of the struct because we are going to zero it out
     //    anyway before returning it
     freeBlock->size = availableMemory.freeMemSize;
     freeBlock->next = nullptr;
     freeBlock->inUse = false;
     freeBlock->prevSize = 0;
+
     head = freeBlock;
 
     e9_printf("\nfreeList init: %x\n", freeBlock);

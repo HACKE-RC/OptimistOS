@@ -24,6 +24,12 @@ typedef enum {
     PRIORITY_HIGH
 } threadPriority;
 
+typedef enum {
+    THREAD_READY,
+    THREAD_RUNNING,
+    THREAD_SUSPENDED
+} threadState;
+
 struct thread{
     uint64_t threadID;
     registers regs;

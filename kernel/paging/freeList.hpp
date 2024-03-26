@@ -2,10 +2,12 @@
 #ifndef freelist
 #define freelist
 
+#include "paging.hpp"
 #include "../boot.h"
+#include "pageFrameAllocator.hpp"
 #include "../printutils/e9print.h"
 #include "../renderer/BasicRenderer.hpp"
-#include "pageFrameAllocator.hpp"
+
 #include <cstdint>
 #include <cstddef>
 

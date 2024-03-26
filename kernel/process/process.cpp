@@ -4,9 +4,20 @@ static uint32_t processMutex = 0;
 process* processHead;
 uint64_t processCount = 0;
 
-process* createThreadAsProcess(void (*entryPoint), threadPriority priority, uint64_t cpuID){
-    lock(processMutex);
+process* createEmptyProcess(){
     process* processInfo;
+
+    processInfo->next = nullptr;
+    processInfo->processID = 7 * (processCount);
+    processInfo->threadCount = 1;
+    processInfo->state = 0;
+    processInfo->PML4 = newPML4();
+
+    return processInfo;
+}
+
+thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID, uint64_t threadState){
+//    char* threadStack = (char*)malloc();
 
     cpuInfo* cpu = getCPU(cpuID);
     if (cpu == nullptr){
@@ -14,21 +25,24 @@ process* createThreadAsProcess(void (*entryPoint), threadPriority priority, uint
         return nullptr;
     }
 
-    processInfo->next = nullptr;
-    processInfo->processID = 7 * (processCount);
-    processInfo->threadCount = 0;
-    processInfo->state = 0;
-
     thread currentThread = {
-        .threadID = processInfo->threadCount,
+            .threadID = 0,
+            .regs = {},
+//            .threadID = processInfo->threadCount,
 //        .regs = ,
-        .priority = PRIORITY_HIGH,
+            .priority = PRIORITY_HIGH,
 //        .stackAddress =
-        .cpuID = cpu->cpuNumber,
+            .cpuID = cpu->cpuNumber,
     };
 
-    processInfo->threads[currentThread.threadID] = currentThread;
+}
 
+process* createThreadAsProcess(void (*entryPoint), threadPriority priority, uint64_t cpuID, threadState state){
+    lock(processMutex);
+    process* processInfo = createEmptyProcess();
+    thread* threadInfo = createThread(entryPoint, priority, cpuID, state);
+
+    processInfo->threads[threadInfo->threadID] = *threadInfo;
 
     unlock(processMutex);
     return processInfo;

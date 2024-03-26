@@ -84,13 +84,15 @@ struct PageTable{
     PageDirectoryEntry entries[512];
 };
 
+extern PageTable* PML4;
+
+PageTable* newPML4();
 extern void initPaging();
 extern uint64_t readCr3();
 extern bool isHigherHalf(uintptr_t addr);
+extern std::pair<size_t, size_t> requiredSize(size_t size);
 extern bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize = _4KB);
 extern PageDirectoryEntry *virtualAddrToPTE(void* virtualAddr, bool allocate, pageTableFlag flags, size_t pageSize = _4KB);
 extern uintptr_t getNextLevelPointer(PageDirectoryEntry& entry, bool allocate, void* virtualAddr= nullptr, size_t pageSize = _4KB);
-extern std::pair<size_t, size_t> requiredSize(size_t size);
-extern PageTable* PML4;
 
 #endif
