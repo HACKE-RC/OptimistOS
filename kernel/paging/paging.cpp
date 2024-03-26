@@ -84,7 +84,6 @@ void initPaging(){
 
 
     writeCrReg(3, (uint64_t)PML4);
-
     unlock(mutex);
 }
 

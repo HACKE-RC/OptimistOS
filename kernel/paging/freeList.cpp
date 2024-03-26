@@ -7,13 +7,8 @@ static fBlock* head;
 //std::unordered_map<void*, size_t> addressSizeHT;
 
 fBlock* initFreeList(){
-    if (PML4 == nullptr){
-        e9_printf("PML4 found (not found)");
-        asm volatile("hlt");
-    }
     bootInfo bootInformation = getBootInfo();
     Memory availableMemory = bootInformation.memory;
-
     auto *freeBlock = (fBlock*)(availableMemory.freeMemStart);
     freeBlock = (fBlock*)(toVirtualAddr((void *) freeBlock));
 
@@ -25,7 +20,19 @@ fBlock* initFreeList(){
     freeBlock->prevSize = 0;
 
     head = freeBlock;
-
-    e9_printf("\nfreeList init: %x\n", freeBlock);
     return head;
 }
+
+//fBlock* initFreeListProcess(){
+//    uint64_t currentPML4 = readCr3();
+//    auto *freeBlock = (fBlock*) toVirtualAddr((void*)currentPML4);
+////    freeBlock->size = availableMemory.freeMemSize;
+//    freeBlock->next = nullptr;
+//    freeBlock->inUse = false;
+//    freeBlock->prevSize = 0;
+//
+//    head = freeBlock;
+//
+//    e9_printf("\nfreeList init: %x\n", freeBlock);
+//    return head;
+//}

@@ -66,7 +66,7 @@ extern volatile limine_hhdm_request hhdmRequest;
 extern volatile limine_rsdp_request rsdpRequest;
 extern volatile limine_smp_request smpRequest;
 
-
+extern void idle();
 void setBootInfo(bootInfo bootInfo);
 bootInfo getBootInfo();
 #endif

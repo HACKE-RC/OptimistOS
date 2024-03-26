@@ -333,3 +333,9 @@ extern "C" void _start(void) {
   setupOptimist();
   done();
 }
+
+void idle(){
+    while (true){
+        ;;
+    }
+}

@@ -9,6 +9,7 @@
 #include "../paging/pageFrameAllocator.hpp"
 #include "../lib/lock.hpp"
 #include "../smp/smp.hpp"
+#include "../memory/malloc.hpp"
 
 #define PROCESS_MAX_THREADS 64
 extern uint64_t processCount;
@@ -34,22 +35,28 @@ struct thread{
     uint64_t threadID;
     registers regs;
     threadPriority priority;
-    uint64_t stackAddress;
+    uintptr_t stackAddress;
     uint64_t cpuID;
+    void (*entryPoint)();
 };
 
 struct process{
     uint64_t processID;
     PageTable *PML4;
-    uint64_t state;
     struct thread threads[PROCESS_MAX_THREADS];
     uint32_t threadCount;
-    process* next;
 };
 
 
-extern process* processHead;
-extern process* createThreadAsProcess(void (*entryPoint), threadPriority priority, uint64_t cpuID);
-extern process* getProcess(uint64_t processID);
+typedef struct processLinkedList{
+    process* processInfo;
+    processLinkedList* next;
+} ;
 
+extern process* processHead;
+processLinkedList* initProcesses();
+process* createEmptyProcess();
+extern process* getProcess(uint64_t processID);
+extern process* createThreadAsProcess(void (*entryPoint), threadPriority priority, uint64_t cpuID);
+thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID, uint64_t threadState);
 #endif
