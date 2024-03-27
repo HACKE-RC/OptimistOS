@@ -15,6 +15,7 @@
 #include "acpi/ioapic.hpp"
 #include "smp/smp.hpp"
 #include "io/io.hpp"
+#include "process/process.hpp"
 
 int setupOptimist();
 extern BasicRenderer renderer;

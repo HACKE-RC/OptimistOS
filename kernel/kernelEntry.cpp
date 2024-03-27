@@ -38,6 +38,6 @@ int setupOptimist(){
 
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
-
+    createProcessFromRoutine(idle, PRIORITY_HIGH, 0, THREAD_READY, false);
     return 0;
 }

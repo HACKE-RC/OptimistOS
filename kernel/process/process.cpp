@@ -143,6 +143,7 @@ process* processInternalToProcess(processInternal* processIn, process* processOu
     }
 
     processOut->PML4 = processIn->PML4;
+    return processOut;
 }
 
 void registerProcess(processInternal* process){
