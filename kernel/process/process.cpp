@@ -81,21 +81,22 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
 }
 
 process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
+    lock(processMutex);
+
     if (processHead == nullptr){
         processHead = initProcesses();
     }
 
-    lock(processMutex);
     process* processInfo = (process*)mallocx(sizeof(process));
     thread* threadInfo;
     processInternal* process = setupProcessInfo();
 
-//    if (processInfo == nullptr){
-//        return nullptr;
-//    }
-//    else if (threadInfo == nullptr){
-//        return nullptr;
-//    }
+    if (processInfo == nullptr){
+        return nullptr;
+    }
+    else if (threadInfo == nullptr){
+        return nullptr;
+    }
 
     threadInfo = createThreadInternal(entryPoint, priority, cpuID, state, user);
     threadInfo->threadID = process->threadCount + 1;
