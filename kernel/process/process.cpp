@@ -5,6 +5,10 @@ process* processHead;
 uint64_t processCount = 0;
 processLinkedList* processListHead = nullptr;
 
+// also find a way to make sure that this runs only once
+// multiple processes running this piece of code will break stuff
+// maybe just use it like initPaging and call only once.
+
 processLinkedList* initProcesses(){
     processLinkedList* head = (processLinkedList *)(mallocx(sizeof(processLinkedList)));
     process* processInfo;

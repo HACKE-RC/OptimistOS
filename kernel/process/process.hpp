@@ -51,7 +51,7 @@ struct process{
 typedef struct processLinkedList{
     process* processInfo;
     processLinkedList* next;
-} ;
+} processLinkedList;
 
 extern process* processHead;
 processLinkedList* initProcesses();
