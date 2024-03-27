@@ -1,5 +1,4 @@
 #include "gdt.hpp"
-//#include "gdt.asm"
 #include "kernelEntry.hpp"
 
 extern "C" void gdtFlush(void* addr_t);
@@ -31,7 +30,7 @@ void initGDT(){
 //    setGDTGate(2, 0, 0xFFFFFFFF, 0x92, 0xF2);
 //    setGDTGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
 //    setGDTGate(4, 0, 0xFFFFFFFF, 0xFA, 0x20);
-    gdtFlush(&gdtPtr);
+//    gdtFlush(&gdtPtr);
 }
 
 void setGDTGate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran){

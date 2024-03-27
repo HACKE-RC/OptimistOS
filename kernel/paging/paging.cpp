@@ -7,13 +7,16 @@ bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
 PageTable* PML4 = nullptr;
+PageTable* kernelPML4 = nullptr;
 
 static uint32_t mutex = 0;
 
 void init(){
     PML4 = (struct PageTable*)(allocateFrame(0x1000));
+    if (kernelPML4 == nullptr){
+        kernelPML4 = PML4;
+    }
 }
-
 
 extern "C" {
     extern char KERNEL_BLOB_BEGIN[];

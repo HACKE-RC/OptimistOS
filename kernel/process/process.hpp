@@ -40,6 +40,15 @@ struct thread{
     void (*entryPoint)();
 };
 
+struct processInternal{
+    uint64_t processID;
+    PageTable *PML4;
+    struct thread threads[PROCESS_MAX_THREADS];
+    uint32_t threadCount;
+    processInternal* next;
+    bool userProcess;
+};
+
 struct process{
     uint64_t processID;
     PageTable *PML4;
@@ -47,16 +56,11 @@ struct process{
     uint32_t threadCount;
 };
 
-
-typedef struct processLinkedList{
-    process* processInfo;
-    processLinkedList* next;
-} processLinkedList;
-
-extern process* processHead;
-processLinkedList* initProcesses();
-process* createEmptyProcess();
+processInternal* processHead;
+inline PageTable* getPageMap(bool user);
+extern process* createEmptyProcess();
+extern processInternal* initProcesses();
 extern process* getProcess(uint64_t processID);
-extern process* createThreadAsProcess(void (*entryPoint), threadPriority priority, uint64_t cpuID);
-thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID, uint64_t threadState);
+extern thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID, uint64_t threadState);
+extern process* createProcessFromRoutine(void (*entryPoint), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 #endif
