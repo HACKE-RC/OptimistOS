@@ -10,6 +10,7 @@
 #include "../lib/lock.hpp"
 #include "../smp/smp.hpp"
 #include "../memory/malloc.hpp"
+#include "../lib/string.hpp"
 
 #define PROCESS_MAX_THREADS 64
 #define THREAD_STACK_SIZE 20480

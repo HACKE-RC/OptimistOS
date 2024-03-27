@@ -116,6 +116,7 @@ void* mallocx(size_t size) {
     currentNode->status = allocated;
 
     unlock(mutex);
+
     return (void*)((uintptr_t)currentNode + sizeof(head));
 }
 

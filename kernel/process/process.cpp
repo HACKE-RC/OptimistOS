@@ -11,6 +11,7 @@ static processInternal* currentProcessInternal = nullptr;
 
 processInternal* initProcesses(){
     processHead = (processInternal*)(mallocx(sizeof(processInternal)));
+    memoryset((void*)processHead, 0, sizeof(processHead));
     // make: create initial process and add to the head
     return processHead;
 }
@@ -75,7 +76,6 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
     thread->priority = priority;
     thread->cpuID = cpuID;
 
-
     processCount++;
     return thread;
 }
@@ -88,7 +88,6 @@ process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority,
     lock(processMutex);
     process* processInfo = (process*)mallocx(sizeof(process));
     thread* threadInfo;
-
     processInternal* process = setupProcessInfo();
 
 //    if (processInfo == nullptr){
@@ -99,6 +98,7 @@ process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority,
 //    }
 
     threadInfo = createThreadInternal(entryPoint, priority, cpuID, state, user);
+    threadInfo->threadID = process->threadCount + 1;
     process->PML4 = getPageMap(user);
     process->threads[0] = *threadInfo;
 
