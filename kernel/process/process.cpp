@@ -2,7 +2,7 @@
 static uint32_t processMutex = 0;
 
 uint64_t processCount = 0;
-processInternal* processHead = nullptr;
+static processInternal* processHead = nullptr;
 
 // also find a way to make sure that this runs only once
 // multiple processes running this piece of code will break stuff
@@ -10,50 +10,58 @@ processInternal* processHead = nullptr;
 
 processInternal* initProcesses(){
     processHead = (processInternal*)(mallocx(sizeof(processInternal)));
-    processInternal* processInfo;
-    thread* threadInfo;
-
-    // 20 kb stack
-    char* stack = (char*)(toVirtualAddr((void*)allocateFrame(20480)));
-
-//    processInfo->processID = 0;
-//    processInfo->PML4 = PML4;
-//    processInfo->threadCount = 1;
-//    threadInfo->threadID = 1;
-//    threadInfo->cpuID = 0;
-//    threadInfo->priority = PRIORITY_HIGH;
-//    threadInfo->entryPoint = idle;
-//    threadInfo->stackAddress = (uintptr_t)stack;
-//    threadInfo->regs = {
-//            .rsp = (uint64_t)((uintptr_t)stack + 32768)
-//    };
-//    processInfo->threads[0] = *threadInfo;
-
-//    head->processInfo = processInfo;
-//    head->next = nullptr;
-    return head;
+    // make: create initial process and add to the head
+    return processHead;
 }
 
-process* createEmptyProcess(){
-    process* processInfo;
+processInternal* setupProcessInfo(){
+    processInternal* process = (processInternal*)mallocx(sizeof(processInternal));
 
-    if (processListHead == nullptr){
-        processListHead = initProcesses();
+    process->processID = 7 * (processCount);
+    process->threadCount = 1;
+    process->next = nullptr;
+
+    return process;
+}
+
+void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadState state){
+    uintptr_t stack = (uintptr_t)toVirtualAddr((void*)allocateFrame(THREAD_STACK_SIZE));
+
+    thread->regs.rip = (uint64_t)entryPoint;
+    thread->entryPoint = entryPoint;
+    thread->stackAddress = stack;
+    thread->kernelStack = (uintptr_t)mallocx(THREAD_STACK_SIZE);
+    thread->kernelStack += THREAD_STACK_SIZE;
+
+    if (user){
+        thread->regs = {
+                .cs = 0x23,
+                .ss = 0x1b
+        };
+        for (uintptr_t i = 0; i < (THREAD_STACK_SIZE); (i += 2 * _1MB)){
+            map(toPhysicalAddr((void*)(stack)) + i, (void*)(((uintptr_t)THREAD_STACK_ADDR - (uintptr_t)THREAD_STACK_SIZE) + i), (pageTableFlag)(ReadWrite | Present | LargerPages), 2 * _1MB);
+        }
+        thread->regs.rsp = THREAD_STACK_ADDR;
+    }
+    else{
+        thread->regs = {
+                .rsp = thread->kernelStack,
+                .cs = 0x08,
+                .ss = 0x10
+        };
+
+        thread->stackAddress = thread->kernelStack;
     }
 
-    processInfo->processID = 7 * (processCount);
-    processInfo->threadCount = 1;
-    processInfo->PML4 = newPML4();
-
-    return processInfo;
+    thread->regs.eFlags = 0x202;
 }
 
+thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
+    thread* thread;
+//    processInternal* process = ;
 
-
-thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID, uint64_t threadState){
-//    char* threadStack = (char*)malloc();
-    if (processListHead == nullptr){
-        processListHead = initProcesses();
+    if (processHead == nullptr){
+        processHead = initProcesses();
     }
 
     cpuInfo* cpu = getCPU(cpuID);
@@ -62,26 +70,22 @@ thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID
         return nullptr;
     }
 
-    thread currentThread = {
-            .threadID = 0,
-            .regs = {},
-//            .threadID = processInfo->threadCount,
-//        .regs = ,
-            .priority = PRIORITY_HIGH,
-//        .stackAddress =
-            .cpuID = cpu->cpuNumber,
-    };
-
+    setupThreadContext(thread, entrypoint, user, state);
+    thread->priority = priority;
+    thread->cpuID = cpuID;
+    return thread;
 }
 
-process* createProcessFromRoutine(void (*entryPoint), threadPriority priority, uint64_t cpuID, threadState state, bool user){
-    if (processListHead == nullptr){
-        processListHead = initProcesses();
+process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
+    if (processHead == nullptr){
+        processHead = initProcesses();
     }
 
     lock(processMutex);
-    process* processInfo = (process*) mallocx(sizeof(processInfo));
-    thread* threadInfo = (process*) mallocx(sizeof(threadInfo));
+    process* processInfo = (process*)mallocx(sizeof(process));
+    thread* threadInfo;
+
+    processInternal* process = setupProcessInfo();
 
 //    if (processInfo == nullptr){
 //        return nullptr;
@@ -90,21 +94,24 @@ process* createProcessFromRoutine(void (*entryPoint), threadPriority priority, u
 //        return nullptr;
 //    }
 
+    threadInfo = createThreadInternal(entryPoint, priority, cpuID, state, user);
+    process->PML4 = getPageMap(user);
+    process->threads[0] = *threadInfo;
 
-    processInfo->PML4 = ;
-
-
+    processInternalToProcess(process, processInfo);
     unlock(processMutex);
     return processInfo;
 }
 
 
 extern process* getProcess(uint64_t processID){
-    processLinkedList* pHead = processListHead;
+    processInternal* pHead = processHead;
+    process* processOut;
 
     while (pHead != nullptr){
-        if (pHead->processInfo->processID == processID){
-            return pHead->processInfo;
+        if (pHead->processID == processID){
+            processOut = (process*)(mallocx(sizeof(process)));
+            return processInternalToProcess(pHead, processOut);
         }
         pHead = pHead->next;
     }
@@ -113,5 +120,19 @@ extern process* getProcess(uint64_t processID){
 }
 
 inline PageTable* getPageMap(bool user){
-    return
+    if (!user){
+        return kernelPML4;
+    }
+    return newPML4();
+}
+
+process* processInternalToProcess(processInternal* processIn, process* processOut){
+    processOut->processID = processIn->processID;
+    processOut->threadCount = processIn->threadCount;
+
+    for (uint32_t i = 0; i < processIn->threadCount; i++){
+        processOut->threads[i] = processIn->threads[i];
+    }
+
+    processOut->PML4 = processIn->PML4;
 }

@@ -12,8 +12,10 @@
 #include "../memory/malloc.hpp"
 
 #define PROCESS_MAX_THREADS 64
-extern uint64_t processCount;
+#define THREAD_STACK_SIZE 20480
+#define THREAD_STACK_ADDR 0x70000000000
 
+extern uint64_t processCount;
 struct PageTable;
 struct thread;
 struct process;
@@ -37,6 +39,7 @@ struct thread{
     threadPriority priority;
     uintptr_t stackAddress;
     uint64_t cpuID;
+    uintptr_t kernelStack;
     void (*entryPoint)();
 };
 
@@ -56,11 +59,12 @@ struct process{
     uint32_t threadCount;
 };
 
-processInternal* processHead;
+void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadState state);
 inline PageTable* getPageMap(bool user);
-extern process* createEmptyProcess();
+extern processInternal* setupProcessInfo();
 extern processInternal* initProcesses();
 extern process* getProcess(uint64_t processID);
-extern thread* createThread(void (*entrypoint), threadPriority priority, uint64_t cpuID, uint64_t threadState);
+thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 extern process* createProcessFromRoutine(void (*entryPoint), threadPriority priority, uint64_t cpuID, threadState state, bool user);
+process* processInternalToProcess(processInternal* processIn, process* processOut);
 #endif

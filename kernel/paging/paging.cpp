@@ -6,6 +6,7 @@
 bootInfo bootInformation{};
 
 uint64_t hhdmOffset = 0;
+
 PageTable* PML4 = nullptr;
 PageTable* kernelPML4 = nullptr;
 

@@ -85,6 +85,7 @@ struct PageTable{
 };
 
 extern PageTable* PML4;
+extern PageTable* kernelPML4;
 
 PageTable* newPML4();
 extern void initPaging();
