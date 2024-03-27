@@ -3,6 +3,7 @@ static uint32_t processMutex = 0;
 
 uint64_t processCount = 0;
 static processInternal* processHead = nullptr;
+static processInternal* currentProcessInternal = nullptr;
 
 // also find a way to make sure that this runs only once
 // multiple processes running this piece of code will break stuff
@@ -73,6 +74,9 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
     setupThreadContext(thread, entrypoint, user, state);
     thread->priority = priority;
     thread->cpuID = cpuID;
+
+
+    processCount++;
     return thread;
 }
 
@@ -98,8 +102,12 @@ process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority,
     process->PML4 = getPageMap(user);
     process->threads[0] = *threadInfo;
 
+    currentProcessInternal = process;
+
     processInternalToProcess(process, processInfo);
+    registerProcess(currentProcessInternal);
     unlock(processMutex);
+
     return processInfo;
 }
 
@@ -135,4 +143,23 @@ process* processInternalToProcess(processInternal* processIn, process* processOu
     }
 
     processOut->PML4 = processIn->PML4;
+}
+
+void registerProcess(processInternal* process){
+    if (processCount == 0){
+        processHead = process;
+        process->next = nullptr;
+        processCount++;
+        return;
+    }
+    else{
+        processInternal* pHead = processHead;
+        while(pHead->next != nullptr){
+            pHead = pHead->next;
+        }
+        pHead->next = process;
+        process->next = nullptr;
+        processCount++;
+        return;
+    }
 }

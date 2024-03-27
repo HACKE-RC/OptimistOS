@@ -64,6 +64,7 @@ inline PageTable* getPageMap(bool user);
 extern processInternal* setupProcessInfo();
 extern processInternal* initProcesses();
 extern process* getProcess(uint64_t processID);
+void registerProcess(processInternal* process);
 thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 extern process* createProcessFromRoutine(void (*entryPoint), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 process* processInternalToProcess(processInternal* processIn, process* processOut);
