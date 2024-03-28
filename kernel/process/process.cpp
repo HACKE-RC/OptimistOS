@@ -5,10 +5,6 @@ uint64_t processCount = 0;
 static processInternal* processHead = nullptr;
 static processInternal* currentProcessInternal = nullptr;
 
-// also find a way to make sure that this runs only once
-// multiple processes running this piece of code will break stuff
-// maybe just use it like initPaging and call only once.
-
 processInternal* initProcesses(){
     processHead = (processInternal*)(mallocx(sizeof(processInternal)));
     memoryset((void*)processHead, 0, sizeof(processHead));
@@ -60,7 +56,6 @@ void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadS
 
 thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
     thread* thread;
-//    processInternal* process = ;
 
     if (processHead == nullptr){
         processHead = initProcesses();
