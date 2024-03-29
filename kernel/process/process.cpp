@@ -5,6 +5,23 @@ uint64_t processCount = 0;
 static processInternal* processHead = nullptr;
 static processInternal* currentProcessInternal = nullptr;
 
+bool removeProcessFromList(processInternal* process){
+    processInternal* pHead = processHead;
+
+    for (int i = 0; i <= processCount; i++){
+        if (pHead->next == process){
+            pHead->next = pHead->next->next;
+            return true;
+        }
+        pHead = pHead->next;
+    }
+    return false;
+}
+
+extern int getPid(process* process){
+    return process->processID;
+}
+
 processInternal* initProcesses(){
     processHead = (processInternal*)(mallocx(sizeof(processInternal)));
     memoryset((void*)processHead, 0, sizeof(processHead));
@@ -107,8 +124,7 @@ process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority,
     return processInfo;
 }
 
-
-extern process* getProcess(uint64_t processID){
+extern process* getProcessInfo(uint64_t processID){
     processInternal* pHead = processHead;
     process* processOut;
 

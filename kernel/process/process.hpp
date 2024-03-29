@@ -64,9 +64,11 @@ void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadS
 inline PageTable* getPageMap(bool user);
 extern processInternal* setupProcessInfo();
 extern processInternal* initProcesses();
-extern process* getProcess(uint64_t processID);
+extern process* getProcessInfo(uint64_t processID);
+bool removeProcessFromList(processInternal* process);
 void registerProcess(processInternal* process);
 thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 extern process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 process* processInternalToProcess(processInternal* processIn, process* processOut);
+extern int getPid(process* process);
 #endif
