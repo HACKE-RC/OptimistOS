@@ -27,22 +27,10 @@ void initGDT() {
     gdtEntries[6].limit = 0;
     gdtEntries[6].flags = 0x00;
 
-    // 16-bit code descriptor. Base = 0, limit = 0xffff. Readable.
-//    setGDTGate(1, 0, 0xFFFF, 0x9A, 0x00);
-
-    // 16-bit data descriptor. Base = 0, limit = 0xffff. Writable.
-//    setGDTGate(2, 0, 0xFFFF, 0x92, 0x00);
-
-    // 32-bit code descriptor. Base = 0, limit = 0xffffffff. Readable.
-
-    // 32-bit data descriptor. Base = 0, limit = 0xffffffff. Writable.
-
-    // 64-bit code descriptor. Base and limit irrelevant. Readable.
-
-    // 64-bit data descriptor. Base and limit irrelevant. Writable.
     gdtPtr.limit = (sizeof(struct gdtEntry) * 7) - 1;
     gdtPtr.base = gdtEntries;
     asm volatile ("lgdt %0" : : "m"(gdtPtr) : "memory");
+    e9_printf("done");
 }
 
 void setGDTGate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran){
