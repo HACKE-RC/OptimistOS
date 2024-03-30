@@ -332,10 +332,14 @@ extern "C" void _start(void) {
     bootInformation.memory = memory;
     setBootInfo(bootInformation);
     setupOptimist();
-    done();
+    idle();
+//    while (true){
+//        ;;
+//    }
 }
 
 void idle(){
+    e9_printf("idle\n");
     while (true){
         ;;
     }

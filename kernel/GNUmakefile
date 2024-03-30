@@ -22,7 +22,7 @@ CC = g++
 $(eval $(call DEFAULT_VAR,LD,ld))
 
 # User controllable CFLAGS.
-CFLAGS ?= -g -I include/ -O0 -pipe -Wextra -Wno-unused-parameter -ffreestanding -lstdc++
+CFLAGS ?= -g -I include/ -O2 -pipe -Wextra -Wno-unused-parameter -ffreestanding -lstdc++
 
 # User controllable preprocessor flags. We set none by default.
 PRECFLAGS ?=
@@ -51,8 +51,8 @@ override CFLAGS +=       \
     -mno-red-zone        \
     -mcmodel=kernel      \
     -MMD                 \
-    -I.
-    
+    -I.									 \
+		-O0
 CFLAGS2 = -ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions
 #-ffreestanding -fshort-wchar -mno-red-zone -fno-omit-frame-pointer -fno-exceptions -fcommon
 

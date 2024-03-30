@@ -86,3 +86,29 @@ void isrHandler(registers regs){
     e9_printf("interrupt no. : %d", regs.int_no);
     asm("hlt");
 }
+
+void isr8()
+{
+    e9_printf("interrupt 8");
+}
+
+void isr9(){
+    e9_printf("interrupt 9");
+}
+void isr6(){
+    e9_printf("invalid opcode!");
+    asm volatile("hlt");
+}
+void isr13(){
+    e9_printf("general protection fault!\n");
+//    asm volatile("hlt");
+}
+
+void isr14(){
+    e9_printf("page fault!\n");
+    asm volatile("hlt");
+}
+void isr0(){
+    e9_printf("hello chigga");
+    pitTicks += 1;
+}
