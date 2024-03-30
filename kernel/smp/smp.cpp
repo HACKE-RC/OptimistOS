@@ -46,7 +46,7 @@ void initSMP(){
 
 void initOtherCPUs(limine_smp_info *smpInfo){
     initGDT();
-    isrInstall(renderer);
+//    isrInstall(renderer);
     initLAPIC();
     initPaging();
 

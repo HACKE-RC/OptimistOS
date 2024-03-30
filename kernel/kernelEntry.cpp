@@ -10,6 +10,7 @@ int setupOptimist(){
     GlobalRenderer->Clear(col::black, true);
     GlobalRenderer->Print("this is working!\n");
     initGDT();
+
     isrInstall(renderer);
     GlobalRenderer->Print("Memory Information: \n");
     e9_printf("init paging\n");

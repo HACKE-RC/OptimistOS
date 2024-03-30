@@ -45,7 +45,9 @@ static void isr8(){
     e9_printf("hello world");
 }
 
-extern "C" void isr9();
+static void isr9(){
+    e9_printf("hello world");
+}
 extern "C" void isr10();
 extern "C" void isr11();
 extern "C" void isr12();

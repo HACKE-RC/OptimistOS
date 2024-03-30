@@ -3,55 +3,41 @@
 
 extern "C" void gdtFlush(void* addr_t);
 
-//struct gdtEntry gdtEntries[10];
-//struct gdtPtrStruct gdtPtr;
-extern "C" void tssFlush();
+struct gdtEntry gdtEntries[7];
+struct gdtPtrStruct gdtPtr;
 
-static tss_t tss;
-static gdt_desc_t gdt[10];
-static gdtr_t gdtr;
+void initGDT() {
+    // Null descriptor
+    setGDTGate(0, 0, 0, 0, 0);
 
-void initGDT(void)
-{
-    gdt_set_entry(0, 0, 0, 0, 0);
-    gdt_set_entry(1, 0, 0, 0x9A, 0xA0);
-    gdt_set_entry(2, 0, 0, 0x92, 0xA0);
-    gdt_set_entry(3, 0, 0, 0, 0);
-    gdt_set_entry(4, 0, 0, 0x92, 0xA0);
-    gdt_set_entry(5, 0, 0, 0x9A, 0xA0);
-    gdt_set_entry(6, 0, 0, 0x92, 0xA0);
-    gdt_set_entry(7, 0, 0, 0x9A, 0xA0);
-    gdt_set_entry(8, 0, 0, 0x89, 0xA0);
-    gdt_set_entry(9, 0, 0, 0, 0);
+    // 16-bit code descriptor. Base = 0, limit = 0xffff. Readable.
+    setGDTGate(1, 0, 0xFFFF, 0x9A, 0x00);
 
-    for (uint64_t i = 0; i < sizeof(tss); i++)
-        ((uint8_t *)(void *)&tss)[i] = 0;
+    // 16-bit data descriptor. Base = 0, limit = 0xffff. Writable.
+    setGDTGate(2, 0, 0xFFFF, 0x92, 0x00);
 
-    uint64_t tss_base = ((uint64_t)&tss);
+    // 32-bit code descriptor. Base = 0, limit = 0xffffffff. Readable.
+    setGDTGate(3, 0, 0xFFFF, 0x9A, 0xCF);
 
-    gdt[8].base_lo = tss_base & 0xFFFF;
-    gdt[8].base_mid = (tss_base >> 16) & 0xFF;
-    gdt[8].base_hi = (tss_base >> 24) & 0xFF;
-    gdt[8].limit = sizeof(tss);
-    gdt[9].limit = (tss_base >> 32) & 0xFFFF;
-    gdt[9].base_lo = (tss_base >> 48) & 0xFFFF;
+    // 32-bit data descriptor. Base = 0, limit = 0xffffffff. Writable.
+    setGDTGate(4, 0, 0xFFFF, 0x92, 0xCF);
 
-    gdtr.size = sizeof(gdt) - 1;
-    gdtr.offset = (uint64_t)&gdt;
+    // 64-bit code descriptor. Base and limit irrelevant. Readable.
+    setGDTGate(5, 0, 0, 0x9A, 0x20);
 
-    gdtFlush(&gdtr);
-
+    // 64-bit data descriptor. Base and limit irrelevant. Writable.
+    setGDTGate(6, 0, 0, 0x92, 0xA0);
+    gdtPtr.limit = (sizeof(struct gdtEntry) * 7) - 1;
+    gdtPtr.base = gdtEntries;
+    asm volatile ("lgdt %0" : : "m"(gdtPtr) : "memory");
 }
 
-void gdt_set_entry(int entry, uint16_t limit, uint32_t base, uint8_t type,
-                   uint8_t flags)
-{
-    gdt[entry].limit = limit;
-
-    gdt[entry].base_lo = (base >> 8) & 0xFF;
-    gdt[entry].base_mid = (base >> 16) & 0xFF;
-    gdt[entry].base_hi = (base >> 24) & 0xFF;
-
-    gdt[entry].type = type;
-    gdt[entry].flags = flags;
+void setGDTGate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran){
+    gdtEntries[num].baseLow = (base & 0xFFFF);
+    gdtEntries[num].baseMiddle = (base >> 16) & 0xFF;
+    gdtEntries[num].baseHigh = (base >> 24) & 0xFF;
+    gdtEntries[num].limit = (limit & 0xFFFF);
+    gdtEntries[num].flags = (limit >> 16) & 0x0F;
+    gdtEntries[num].flags |= (gran & 0xF0);
+    gdtEntries[num].access = access;
 }

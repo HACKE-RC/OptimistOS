@@ -1,12 +1,9 @@
-[bits 64]
-
+extern gdtPtr
 global gdtFlush
 
 gdtFlush:
-    lgdt [rdi]
-    mov ax, 0x40
-    ltr ax
-    mov ax,	0x10
+    lgdt[rdi]
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax

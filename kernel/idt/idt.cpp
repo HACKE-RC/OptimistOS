@@ -32,7 +32,7 @@ void setIDTGate(uint8_t gateNumber, uint64_t gateAddr){
 
     idtEntry entry = {
         .offsetLow = offsetLow,
-        .segmentSelector = 0x08,
+        .segmentSelector = 0x28,
         .reserved = 0,
         .attributes = 0x8E,
         .offsetMiddle = offsetMiddle,

@@ -8,8 +8,6 @@
 // the compiler does not optimise them away, so, usually, they should
 // be made volatile or equivalent.
 
-static volatile struct limine_terminal_request terminal_request = {
-    .id = LIMINE_TERMINAL_REQUEST, .revision = 0};
 
 static volatile struct limine_framebuffer_request framebuffer_request = {
     .id = LIMINE_FRAMEBUFFER_REQUEST, .revision = 0};
@@ -117,11 +115,6 @@ static const char *get_memmap_type(uint64_t type) {
   }
 }
 
-static void write_shim(const char *s, uint64_t l) {
-  struct limine_terminal *terminal = terminal_request.response->terminals[0];
-
-  terminal_request.response->write(terminal, s, l);
-}
 
 static void *startRAMAddr = nullptr;
 static void *quickMalloc(uint64_t size) {
@@ -182,29 +175,14 @@ bootInfo getBootInfo() { return globalBootInfo; }
 // The following will be our kernel's entry point.
 extern "C" void _start(void) {
   bootInfo bootInformation;
-  // Ensure we got a terminal
-  if (terminal_request.response == nullptr ||
-      terminal_request.response->terminal_count < 1) {
-    done();
-  }
-
-  limine_print = write_shim;
-
-  // we should now be able to call the limine terminal to print out
-  // a simple "hello world" to screen.
-  struct limine_terminal *terminal = terminal_request.response->terminals[0];
-
-  terminal_request.response->write(terminal, "Starting Boot init...\n\n", 24);
 
   if (framebuffer_request.response == NULL ||
       framebuffer_request.response->framebuffer_count < 1) {
     e9_printf("LIMINE_ERROR: ");
-    terminal_request.response->write(terminal, "Framebuffer is NULL!\n", 22);
 
     done();
   } else {
     e9_printf("> LIMINE_SUCCESS: ");
-    terminal_request.response->write(terminal, "Framebuffer loaded!\n", 21);
   }
 
   Framebuffer fb{};
@@ -325,7 +303,6 @@ extern "C" void _start(void) {
 
   e9_printf("> LIMINE_SUCCESS: ");
 
-  terminal_request.response->write(terminal, "Completed Boot Init!\n", 23);
   bootInformation.framebuffer = fb;
   bootInformation.psf1Font = &font;
   bootInformation.memory = memory;
