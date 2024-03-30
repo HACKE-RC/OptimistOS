@@ -15,6 +15,7 @@ bool removeProcessFromList(processInternal* process){
         }
         pHead = pHead->next;
     }
+
     return false;
 }
 
@@ -175,4 +176,14 @@ void registerProcess(processInternal* process){
         processCount++;
         return;
     }
+}
+
+void pitInit()
+{
+    uint16_t divisor = 1193182 / 1000;
+    outb(PIT_CMD, PIT_BINARY | PIT_MODE3 | PIT_RW_BOTH | PIT_COUNTER0);
+    outb(PIT_COUNTER0, divisor);
+    outb(PIT_COUNTER0, divisor >> 8);
+
+    setIDTGate(0, (uint64_t)isr0);
 }

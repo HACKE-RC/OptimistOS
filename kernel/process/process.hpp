@@ -21,6 +21,17 @@ struct PageTable;
 struct thread;
 struct process;
 
+#define PIT_COUNTER0 0x40
+#define PIT_CMD 0x43
+#define PIT_BINARY 0x00
+#define PIT_MODE3 0x04
+#define PIT_RW_BOTH 0x30
+
+static const uint64_t baseFrequency = 1193182;
+extern uint64_t frequency;
+static const uint16_t divisor = 65535;
+static uint64_t timeSinceBoot = 0;
+
 typedef enum {
     PRIORITY_IDLE,
     PRIORITY_NORMAL,
@@ -71,4 +82,5 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
 extern process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 process* processInternalToProcess(processInternal* processIn, process* processOut);
 extern int getPid(process* process);
+extern void pitInit();
 #endif

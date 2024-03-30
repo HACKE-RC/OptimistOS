@@ -3,42 +3,55 @@
 
 extern "C" void gdtFlush(void* addr_t);
 
-struct gdtEntry gdtEntries[5];
-struct gdtPtrStruct gdtPtr;
+//struct gdtEntry gdtEntries[10];
+//struct gdtPtrStruct gdtPtr;
+extern "C" void tssFlush();
 
-void initGDT(){
+static tss_t tss;
+static gdt_desc_t gdt[10];
+static gdtr_t gdtr;
 
-    gdtEntries[1].access = 0b10011010;
-    gdtEntries[1].flags = 0b00100000;
+void initGDT(void)
+{
+    gdt_set_entry(0, 0, 0, 0, 0);
+    gdt_set_entry(1, 0, 0, 0x9A, 0xA0);
+    gdt_set_entry(2, 0, 0, 0x92, 0xA0);
+    gdt_set_entry(3, 0, 0, 0, 0);
+    gdt_set_entry(4, 0, 0, 0x92, 0xA0);
+    gdt_set_entry(5, 0, 0, 0x9A, 0xA0);
+    gdt_set_entry(6, 0, 0, 0x92, 0xA0);
+    gdt_set_entry(7, 0, 0, 0x9A, 0xA0);
+    gdt_set_entry(8, 0, 0, 0x89, 0xA0);
+    gdt_set_entry(9, 0, 0, 0, 0);
 
-    // Kernel data
-    gdtEntries[2].access = 0b10010010;
+    for (uint64_t i = 0; i < sizeof(tss); i++)
+        ((uint8_t *)(void *)&tss)[i] = 0;
 
-    // User data
-    gdtEntries[3].access = 0b11110010;
+    uint64_t tss_base = ((uint64_t)&tss);
 
-    // User code
-    gdtEntries[4].access = 0b11111010;
-    gdtEntries[4].flags = 0b00100000;
+    gdt[8].base_lo = tss_base & 0xFFFF;
+    gdt[8].base_mid = (tss_base >> 16) & 0xFF;
+    gdt[8].base_hi = (tss_base >> 24) & 0xFF;
+    gdt[8].limit = sizeof(tss);
+    gdt[9].limit = (tss_base >> 32) & 0xFFFF;
+    gdt[9].base_lo = (tss_base >> 48) & 0xFFFF;
 
-    gdtPtr.limit = (sizeof(struct gdtEntry) * 5) - 1;
-    gdtPtr.base = gdtEntries;
+    gdtr.size = sizeof(gdt) - 1;
+    gdtr.offset = (uint64_t)&gdt;
 
+    gdtFlush(&gdtr);
 
-//    setGDTGate(0, 0, 0, 0, 0); // NULL gate
-//    setGDTGate(1, 0, 0xFFFFFFFF, 0x9A, 0x20);
-//    setGDTGate(2, 0, 0xFFFFFFFF, 0x92, 0xF2);
-//    setGDTGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
-//    setGDTGate(4, 0, 0xFFFFFFFF, 0xFA, 0x20);
-//    gdtFlush(&gdtPtr);
 }
 
-void setGDTGate(uint32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran){
-    gdtEntries[num].baseLow = (base & 0xFFFF);
-    gdtEntries[num].baseMiddle = (base >> 16) & 0xFF;
-    gdtEntries[num].baseHigh = (base >> 24) & 0xFF;
-    gdtEntries[num].limit = (limit & 0xFFFF);
-    gdtEntries[num].flags = (limit >> 16) & 0x0F;
-    gdtEntries[num].flags |= (gran & 0xF0);
-    gdtEntries[num].access = access;
+void gdt_set_entry(int entry, uint16_t limit, uint32_t base, uint8_t type,
+                   uint8_t flags)
+{
+    gdt[entry].limit = limit;
+
+    gdt[entry].base_lo = (base >> 8) & 0xFF;
+    gdt[entry].base_mid = (base >> 16) & 0xFF;
+    gdt[entry].base_hi = (base >> 24) & 0xFF;
+
+    gdt[entry].type = type;
+    gdt[entry].flags = flags;
 }

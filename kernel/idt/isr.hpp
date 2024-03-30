@@ -11,12 +11,17 @@ typedef struct{
     uint64_t rip, cs, ds , eFlags, userEsp, ss;
 } __attribute__((packed)) registers;
 
-extern "C" void isr0();
 extern "C" void isr1();
 extern "C" void isr2();
 extern "C" void isr3();
 extern "C" void isr4();
 extern "C" void isr5();
+static uint8_t pitTicks = 0;
+
+static void isr0(){
+    e9_printf("hello chigga");
+    pitTicks += 1;
+}
 
 static void isr6(){
     e9_printf("invalid opcode!");
@@ -35,7 +40,11 @@ static void isr6(){
     asm volatile("hlt");
 }
 extern "C" void isr7();
-extern "C" void isr8();
+
+static void isr8(){
+    e9_printf("hello world");
+}
+
 extern "C" void isr9();
 extern "C" void isr10();
 extern "C" void isr11();
