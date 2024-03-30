@@ -35,14 +35,32 @@ int setupOptimist(){
     initSMP();
     GlobalRenderer->Print("smp done: \n");
 //  disabling PIC
-    outb(PIC1_DAT, 0xFF);
-    outb(PIC2_DAT, 0xFF);
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+    outb(0x21, 0x20);
+    outb(0xA1, 0x28);
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+    outb(0x21, 0x00);
+    outb(0xA1, 0x00);
 
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
     GlobalRenderer->Print(" before prco done: \n");
     createProcessFromRoutine(idle, PRIORITY_HIGH, 0, THREAD_READY, false);
+    GlobalRenderer->Print("after proc done: \n");
     pitInit();
     GlobalRenderer->Print("after pit done: \n");
+    print("hi ");
     return 0;
+}
+
+void print(char* string){
+    bootInfo bootInformation = getBootInfo();
+
+    renderer = BasicRenderer(&bootInformation.framebuffer, bootInformation.psf1Font);
+    GlobalRenderer = &renderer;
+    GlobalRenderer->Print(string);
 }

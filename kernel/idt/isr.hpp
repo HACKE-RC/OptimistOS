@@ -42,42 +42,21 @@ static void isr6(){
 extern "C" void isr7();
 
 static void isr8(){
-    e9_printf("hello world");
+    e9_printf("interrupt 8");
 }
 
 static void isr9(){
-    e9_printf("hello world");
+    e9_printf("interrupt 9");
 }
 extern "C" void isr10();
 extern "C" void isr11();
 extern "C" void isr12();
 static void isr13(){
     e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
-    e9_printf("general protection fault!");
     asm volatile("hlt");
 }
 
 static void isr14(){
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
-    e9_printf("page fault!");
     e9_printf("page fault!");
     asm volatile("hlt");
 }
