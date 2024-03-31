@@ -1,6 +1,7 @@
 #include "isr.hpp"
 #include "idt.hpp"
 #include "../printutils/e9print.h"
+#include "../acpi/ioapic.hpp"
 
 char *exception_messages[] = {
         "Division by Zero",
@@ -121,6 +122,8 @@ void pitHandler(){
     e9_printf("incrementing count!");
     ++pitTicks;
     outb(0x20, 0x20);
-//    outb(0xA0, 0x20);
+    writeEOI();
+    idtInit();
+    //    outb(0xA0, 0x20);
 
 }

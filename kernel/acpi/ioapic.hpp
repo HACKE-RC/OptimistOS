@@ -13,9 +13,9 @@
 #define IOAPIC_ARB    0x02
 #define IOAPIC_REDTBL 0x10
 
-void initIOAPIC();
-uint32_t ioAPICRead(ioAPICInfo* entry, int reg);
-void ioAPICWrite(ioAPICInfo* entry, int reg, uint32_t value);
-
+extern void initIOAPIC();
+extern uint32_t ioAPICRead(ioAPICInfo* entry, int reg);
+extern void ioAPICWrite(ioAPICInfo* entry, int reg, uint32_t value);
+extern void writeEOI();
 
 #endif

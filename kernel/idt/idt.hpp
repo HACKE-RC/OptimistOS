@@ -19,7 +19,7 @@ typedef struct __attribute__((packed)) {
     uint64_t base;
 } idtPtrStruct;
 
-void idtInit();
+extern void idtInit();
 void idtInitAgain();
 void setIDTGate(uint8_t gateNumber, uintptr_t gateAddr);
 

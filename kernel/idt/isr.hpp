@@ -4,6 +4,7 @@
 #include "../renderer/BasicRenderer.hpp"
 #include "../io/io.hpp"
 #include "../printutils/e9print.h"
+//#include "../acpi/ioapic.hpp"
 
 typedef struct {
     uint64_t r15;
