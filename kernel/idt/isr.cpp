@@ -72,6 +72,7 @@ void isrInstall(){
     setIDTGate(29, (uint64_t)isr29);
     setIDTGate(30, (uint64_t)isr30);
     setIDTGate(31, (uint64_t)isr31);
+    setIDTGate(32, (uint64_t)pitHandler);
 
     if (!wasInit){
         idtInit();
@@ -122,9 +123,8 @@ void pitHandler(){
     asm volatile("cli");
     e9_printf("incrementing count!");
     ++pitTicks;
-    outb(0x20, 0x20);
+//    outb(0x20, 0x20);
     writeEOI();
-    idtInit();
     //    outb(0xA0, 0x20);
     asm volatile("sti");
     asm volatile("iretq");

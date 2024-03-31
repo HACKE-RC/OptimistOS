@@ -185,7 +185,8 @@ void pitInit(uint8_t hertz)
 //    outb(0x43, 0x36);
     outb(0x40, (uint8_t)(divisor & 0x00ff));
     outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
-    setIDTGate(0x20, (uintptr_t)pitHandler);
+//    setIDTGate(0x20, (uintptr_t)pitHandler);
+//    idtInit();
 }
 
 void sleep(int seconds){
