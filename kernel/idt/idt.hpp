@@ -26,12 +26,4 @@ void setIDTGate(uint8_t gateNumber, uintptr_t gateAddr);
 
 extern idtEntry idtEntries[256]; // max entries supported are 256
 extern idtPtrStruct idtPtr;
-void load_idt(uint64_t);
-void trigger_interupt(uint64_t a);
-void set_idt_gate(int num, uint64_t base, uint16_t sel, uint8_t flags);
-void init_idt();
-void irq_register(uint8_t irq, void *handler);
-void irq_deregister(uint8_t irq);
-extern void i8259_SendEndOfInterrupt(int irq);
-extern "C" void excp_handler(cpuRegisters frame);
 #endif //OPTIMISTOS_IDT_HPP
