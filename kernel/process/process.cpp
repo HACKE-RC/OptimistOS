@@ -5,6 +5,7 @@ uint64_t processCount = 0;
 static processInternal* processHead = nullptr;
 static processInternal* currentProcessInternal = nullptr;
 
+
 bool removeProcessFromList(processInternal* process){
     processInternal* pHead = processHead;
 
@@ -61,8 +62,8 @@ void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadS
     }
     else{
         thread->regs = {
-                .rsp = thread->kernelStack,
                 .cs = 0x08,
+                .rsp = thread->kernelStack,
                 .ss = 0x10
         };
 
@@ -181,11 +182,11 @@ void registerProcess(processInternal* process){
 void pitInit(uint8_t hertz)
 {
     unsigned int divisor = (unsigned int )1193180 / (unsigned int)1000;
+//    outb(0x43, 0x36);
     outb(0x40, (uint8_t)(divisor & 0x00ff));
-    ioWait();
     outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
-    setIDTGate(0, (uintptr_t)pitHandler);
     setIDTGate(0x20, (uintptr_t)pitHandler);
+    e9_printf("\ncount: %d\n", getPITCount());
 }
 
 void sleep(int seconds){

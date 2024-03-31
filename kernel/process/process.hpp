@@ -47,7 +47,7 @@ typedef enum {
 
 struct thread{
     uint64_t threadID;
-    registers regs;
+    cpuRegisters regs;
     threadPriority priority;
     uintptr_t stackAddress;
     uint64_t cpuID;

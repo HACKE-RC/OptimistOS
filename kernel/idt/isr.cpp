@@ -36,8 +36,9 @@ char *exception_messages[] = {
         "Reserved"
 };
 
+uint8_t pitTicks = 0;
 
-void isrInstall(BasicRenderer renderer){
+void isrInstall(){
     setIDTGate(0, (uint64_t)isr0);
     setIDTGate(1, (uint64_t)isr1);
     setIDTGate(2, (uint64_t)isr2);
@@ -81,9 +82,11 @@ void isrInstall(BasicRenderer renderer){
     __asm__ volatile("sti");
 }
 
-void isrHandler(registers regs){
-    e9_printf("\nRIP: \n", regs.rip);
-    e9_printf("interrupt no. : %d", regs.int_no);
+void isrHandler(uint64_t rsp){
+    cpuRegisters *regs = (cpuRegisters*)rsp;
+    e9_printf("\nfucked up\n");
+    e9_printf("\nRIP: %d\n", regs->rip);
+    e9_printf("interrupt no. : %d", regs->int_no);
     asm("hlt");
 }
 
@@ -116,5 +119,8 @@ void isr0(){
 
 void pitHandler(){
     e9_printf("incrementing count!");
-    pitTicks++;
+    ++pitTicks;
+    outb(0x20, 0x20);
+    outb(0xA0, 0x20);
+
 }

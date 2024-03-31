@@ -2,21 +2,43 @@
 #define OPTIMISTOS_ISR_HPP
 #include <cstdint>
 #include "../renderer/BasicRenderer.hpp"
+#include "../io/io.hpp"
 #include "../printutils/e9print.h"
 
-typedef struct{
-    uint64_t rax, rbx, rcx, rdx, rbp, rsp, rsi, rdi;
-    uint64_t r8, r9, r10, r11, r12, r13, r14, r15;
-    uint64_t int_no, error_code;
-    uint64_t rip, cs, ds , eFlags, userEsp, ss;
-} __attribute__((packed)) registers;
+typedef struct {
+    uint64_t r15;
+    uint64_t r14;
+    uint64_t r13;
+    uint64_t r12;
+    uint64_t r11;
+    uint64_t r10;
+    uint64_t r9;
+    uint64_t r8;
+    uint64_t rbp;
+    uint64_t rdi;
+    uint64_t rsi;
+    uint64_t rdx;
+    uint64_t rcx;
+    uint64_t rbx;
+    uint64_t rax;
+
+    uint64_t int_no;
+    uint64_t err;
+
+    uint64_t rip;
+    uint64_t cs;
+    uint64_t eFlags;
+    uint64_t rsp;
+    uint64_t ss;
+} cpuRegisters;
+
 
 extern "C" void isr1();
 extern "C" void isr2();
 extern "C" void isr3();
 extern "C" void isr4();
 extern "C" void isr5();
-static uint8_t pitTicks = 0;
+extern uint8_t pitTicks;
 
 extern void isr0();
 extern void isr6();
@@ -50,7 +72,7 @@ extern "C" void isr29();
 extern "C" void isr30();
 extern "C" void isr31();
 
-extern "C" void isrInstall(BasicRenderer renderer);
-extern "C" void isrHandler(registers regs);
+extern "C" void isrInstall();
+extern "C" void isrHandler(uint64_t rsp);
 
 #endif //OPTIMISTOS_ISR_HPP

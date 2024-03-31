@@ -23,44 +23,23 @@
 [extern isrHandler]
 
 isrCommon:
+    cld
     PUSHALL
 
-    mov ax, ds
-    push rax
-
-    mov ax, 0x10
-    mov dx, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    ; Save the RIP value
-    mov rax, [rsp + 8]
-    push rax
-
+   mov rdi, rsp
     ; Call isrHandler
     call isrHandler
-
+    mov rsp, rax
     ; Restore the RIP value
-    pop rax
-    mov [rsp + 8], rax
-
-    pop rax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
     POPALL
 
-    add rsp, 8
-    sti
+    add rsp, 16
     iretq
 
 
 %macro ISR_NOERRCODE 1
     global isr%1
     isr%1:
-        cli
         push byte 0
         push byte %1
         jmp isrCommon
@@ -69,7 +48,6 @@ isrCommon:
 %macro ISR_ERRCODE 1
     global isr%1
     isr%1:
-        cli
         push byte %1
         jmp isrCommon
 %endmacro
@@ -106,3 +84,4 @@ ISR_NOERRCODE 28
 ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
+ISR_NOERRCODE 32

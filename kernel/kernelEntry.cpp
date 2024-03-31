@@ -11,7 +11,7 @@ int setupOptimist(){
     GlobalRenderer->Print("this is working!\n");
     initGDT();
 
-    isrInstall(renderer);
+    isrInstall();
     GlobalRenderer->Print("Memory Information: \n");
     e9_printf("init paging\n");
     e9_printf("memory addr: %x", bootInformation.memory.freeMemStart);
