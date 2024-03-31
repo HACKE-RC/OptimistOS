@@ -22,6 +22,7 @@ extern void isr0();
 extern void isr6();
 extern "C" void isr7();
 
+extern void pitHandler();
 extern void isr8();
 
 extern void isr9();

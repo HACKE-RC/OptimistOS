@@ -12,7 +12,7 @@ typedef struct __attribute__((packed)){
    uint16_t offsetMiddle;
    uint32_t offsetHigh;
    uint32_t reserved2;
-} idtEntry;
+} __attribute__((packed)) idtEntry;
 
 typedef struct __attribute__((packed)) {
     uint16_t limit;
@@ -21,7 +21,7 @@ typedef struct __attribute__((packed)) {
 
 void idtInit();
 void idtInitAgain();
-void setIDTGate(uint8_t gateNumber, uint64_t handlerAddr);
+void setIDTGate(uint8_t gateNumber, uintptr_t gateAddr);
 
 extern idtEntry idtEntries[256]; // max entries supported are 256
 extern idtPtrStruct idtPtr;

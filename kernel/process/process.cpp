@@ -178,12 +178,23 @@ void registerProcess(processInternal* process){
     }
 }
 
-void pitInit()
+void pitInit(uint8_t hertz)
 {
-    uint16_t divisor = 1193182 / 1000;
-    outb(PIT_CMD, PIT_BINARY | PIT_MODE3 | PIT_RW_BOTH | PIT_COUNTER0);
-    outb(PIT_COUNTER0, divisor);
-    outb(PIT_COUNTER0, divisor >> 8);
+    unsigned int divisor = (unsigned int )1193180 / (unsigned int)100;
+    outb(0x40, (uint8_t)(divisor & 0x00ff));
+    ioWait();
+    outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
+    setIDTGate(0, (uintptr_t)pitHandler);
+    setIDTGate(0x20, (uintptr_t)pitHandler);
+}
 
-    setIDTGate(0, (uint64_t)isr0);
+void sleep(int seconds){
+    int startTime = getPITCount();
+    while (getPITCount() < startTime + seconds){
+        asm("hlt");
+    }
+}
+
+int getPITCount(){
+    return pitTicks;
 }

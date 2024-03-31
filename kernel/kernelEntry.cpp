@@ -51,9 +51,15 @@ int setupOptimist(){
     GlobalRenderer->Print(" before prco done: \n");
     createProcessFromRoutine(idle, PRIORITY_HIGH, 0, THREAD_READY, false);
     GlobalRenderer->Print("after proc done: \n");
-    pitInit();
+    pitInit(25);
     GlobalRenderer->Print("after pit done: \n");
-    print("hi ");
+
+    for (int i = 0; i < 10; i++){
+        ;;
+    }
+
+    e9_printf("\ncount: %d\n", getPITCount());
+
     return 0;
 }
 

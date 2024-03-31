@@ -101,14 +101,20 @@ void isr6(){
 }
 void isr13(){
     e9_printf("general protection fault!\n");
-//    asm volatile("hlt");
+    asm volatile("hlt");
 }
 
 void isr14(){
     e9_printf("page fault!\n");
     asm volatile("hlt");
 }
+
 void isr0(){
-    e9_printf("hello chigga");
-    pitTicks += 1;
+    e9_printf("divide by zero");
+    asm volatile("hlt");
+}
+
+void pitHandler(){
+    e9_printf("incrementing count!");
+    pitTicks++;
 }

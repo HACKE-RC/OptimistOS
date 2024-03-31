@@ -82,5 +82,7 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
 extern process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user);
 process* processInternalToProcess(processInternal* processIn, process* processOut);
 extern int getPid(process* process);
-extern void pitInit();
+extern void pitInit(uint8_t hertz);
+extern int getPITCount();
+extern void sleep(int seconds);
 #endif
