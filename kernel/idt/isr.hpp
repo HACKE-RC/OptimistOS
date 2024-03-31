@@ -5,6 +5,7 @@
 #include "../io/io.hpp"
 #include "../printutils/e9print.h"
 //#include "../acpi/ioapic.hpp"
+extern char *exception_messages[32];
 
 typedef struct {
     uint64_t r15;
