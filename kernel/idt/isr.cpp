@@ -121,6 +121,6 @@ void pitHandler(){
     e9_printf("incrementing count!");
     ++pitTicks;
     outb(0x20, 0x20);
-    outb(0xA0, 0x20);
+//    outb(0xA0, 0x20);
 
 }
