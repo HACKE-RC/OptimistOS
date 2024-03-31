@@ -180,7 +180,7 @@ void registerProcess(processInternal* process){
 
 void pitInit(uint8_t hertz)
 {
-    unsigned int divisor = (unsigned int )1193180 / (unsigned int)100;
+    unsigned int divisor = (unsigned int )1193180 / (unsigned int)1000;
     outb(0x40, (uint8_t)(divisor & 0x00ff));
     ioWait();
     outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
