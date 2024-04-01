@@ -1,7 +1,4 @@
 #include "isr.hpp"
-#include "idt.hpp"
-#include "../printutils/e9print.h"
-#include "../acpi/ioapic.hpp"
 
 char *exception_messages[32] = {
         "Division by Zero",
@@ -85,7 +82,7 @@ void isrInstall(){
 }
 
 void isrHandler(uint64_t rsp){
-    cpuRegisters *regs = (cpuRegisters*)rsp;
+    auto *regs = (cpuRegisters*)rsp;
     e9_printf("\nfucked up\n");
     e9_printf("\nRIP: %d\n", regs->rip);
     e9_printf("interrupt no. : %d", regs->int_no);
@@ -97,9 +94,7 @@ void isr8()
     e9_printf("interrupt 8");
 }
 
-void isr9(){
-    e9_printf("interrupt 9");
-}
+void isr9(){ e9_printf("interrupt 9"); }
 void isr6(){
     e9_printf("invalid opcode!");
     asm volatile("hlt");
@@ -120,12 +115,7 @@ void isr0(){
 }
 
 void pitHandler(){
-    asm volatile("cli");
     e9_printf("incrementing count!");
     ++pitTicks;
-//    outb(0x20, 0x20);
     writeEOI();
-    //    outb(0xA0, 0x20);
-    asm volatile("sti");
-    asm volatile("iretq");
 }

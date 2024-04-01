@@ -4,7 +4,9 @@
 #include "../renderer/BasicRenderer.hpp"
 #include "../io/io.hpp"
 #include "../printutils/e9print.h"
-//#include "../acpi/ioapic.hpp"
+#include "../acpi/ioapic.hpp"
+#include "idt.hpp"
+
 extern char *exception_messages[32];
 
 typedef struct {
@@ -33,7 +35,6 @@ typedef struct {
     uint64_t rsp;
     uint64_t ss;
 } cpuRegisters;
-
 
 extern "C" void isr1();
 extern "C" void isr2();

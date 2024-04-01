@@ -23,7 +23,7 @@
 [extern isrHandler]
 
 isrCommon:
-    cld
+    ; cld
     PUSHALL
 
    mov rdi, rsp
