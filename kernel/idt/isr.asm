@@ -30,7 +30,6 @@ isrCommon:
     ; Call isrHandler
     call isrHandler
     mov rsp, rax
-    ; Restore the RIP value
     POPALL
 
     add rsp, 16
