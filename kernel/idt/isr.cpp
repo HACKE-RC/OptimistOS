@@ -64,7 +64,12 @@ extern "C" void isrHandler(uint64_t rsp){
         e9_printf("RIP: 0x%x\n", regs->rip);
     }
     //    e9_printf("\nRIP: 0x%x\n", regs->rip);
-    ((void (*)())handlers[regs->int_no])();
+    {
+    if (handlers[regs->int_no] != nullptr){
+        (handlers[regs->int_no])();
+    }
+    }
+
 }
 
 extern "C" void isr8()

@@ -8,7 +8,7 @@
 #include "idt.hpp"
 extern "C" void *int_table[];
 extern char *exception_messages[32];
-static void (*handlers[256])();
+inline void (*handlers[256])();
 typedef struct {
     uint64_t r15;
     uint64_t r14;

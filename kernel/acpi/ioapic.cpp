@@ -35,8 +35,9 @@ void ioAPICWrite(ioAPICInfo* entry, int reg, uint32_t value){
     mmioWrite(toVirtualAddr((void*)(entry->apicAddr + IOAPIC_IOWIN)), value);
 }
 void writeEOI() {
-    ioAPICInfo* APIC = madtInformationList[0];
-    ioAPICWrite(APIC, 0xB0, 0);
+    outb(0x20, 0x20);
+//    ioAPICInfo* APIC = madtInformationList[0];
+//    ioAPICWrite(APIC, 0xB0, 0);
 //    uint32_t* eoiRegister = (uint32_t*)(madtInformationList[0]->apicAddr + 0xB0);
 //    ioAPICWrite(madtInformationList[0], 0xB0, 0);
 //    *eoiRegister = 0;
