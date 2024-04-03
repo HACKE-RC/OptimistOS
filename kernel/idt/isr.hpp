@@ -6,7 +6,7 @@
 #include "../printutils/e9print.h"
 #include "../acpi/ioapic.hpp"
 #include "idt.hpp"
-
+extern "C" void *int_table[];
 extern char *exception_messages[32];
 
 typedef struct {
@@ -41,22 +41,22 @@ extern "C" void isr2();
 extern "C" void isr3();
 extern "C" void isr4();
 extern "C" void isr5();
-extern uint8_t pitTicks;
+extern "C" uint64_t pitTicks;
 
-extern void isr0();
-extern void isr6();
+extern "C" void isr0();
+extern "C" void isr6();
 extern "C" void isr7();
 
-extern void pitHandler();
-extern void isr8();
+extern "C" void pitHandler();
+extern "C" void isr8();
 
-extern void isr9();
+extern "C" void isr9();
 extern "C" void isr10();
 extern "C" void isr11();
 extern "C" void isr12();
 
-extern void isr13();
-extern void isr14();
+extern "C" void isr13();
+extern "C" void isr14();
 extern "C" void isr15();
 extern "C" void isr16();
 extern "C" void isr17();

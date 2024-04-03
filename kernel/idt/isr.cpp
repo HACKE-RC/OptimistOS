@@ -34,42 +34,12 @@ char *exception_messages[32] = {
         "Reserved"
 };
 
-uint8_t pitTicks = 0;
+uint64_t pitTicks = 0;
 
 void isrInstall(){
-    setIDTGate(0, (uint64_t)isr0);
-    setIDTGate(1, (uint64_t)isr1);
-    setIDTGate(2, (uint64_t)isr2);
-    setIDTGate(3, (uint64_t)isr3);
-    setIDTGate(4, (uint64_t)isr4);
-    setIDTGate(5, (uint64_t)isr5);
-    setIDTGate(6, (uint64_t)isr6);
-    setIDTGate(7, (uint64_t)isr7);
-    setIDTGate(8, (uint64_t)isr8);
-    setIDTGate(9, (uint64_t)isr9);
-    setIDTGate(10, (uint64_t)isr10);
-    setIDTGate(11, (uint64_t)isr11);
-    setIDTGate(12, (uint64_t)isr12);
-    setIDTGate(13, (uint64_t)isr13);
-    setIDTGate(14, (uint64_t)isr14);
-    setIDTGate(15, (uint64_t)isr15);
-    setIDTGate(16, (uint64_t)isr16);
-    setIDTGate(17, (uint64_t)isr17);
-    setIDTGate(18, (uint64_t)isr18);
-    setIDTGate(19, (uint64_t)isr19);
-    setIDTGate(20, (uint64_t)isr20);
-    setIDTGate(21, (uint64_t)isr21);
-    setIDTGate(22, (uint64_t)isr22);
-    setIDTGate(23, (uint64_t)isr23);
-    setIDTGate(24, (uint64_t)isr24);
-    setIDTGate(25, (uint64_t)isr25);
-    setIDTGate(26, (uint64_t)isr26);
-    setIDTGate(27, (uint64_t)isr27);
-    setIDTGate(28, (uint64_t)isr28);
-    setIDTGate(29, (uint64_t)isr29);
-    setIDTGate(30, (uint64_t)isr30);
-    setIDTGate(31, (uint64_t)isr31);
-    setIDTGate(32, (uint64_t)pitHandler);
+    int_table[32] = (void*)pitHandler;
+    for (int i = 0; i < 256; i++)
+        setIDTGate(i, (uintptr_t)int_table[i]);
 
     if (!wasInit){
         idtInit();
@@ -81,15 +51,21 @@ void isrInstall(){
     __asm__ volatile("sti");
 }
 
-void isrHandler(uint64_t rsp){
+extern "C" void isrHandler(uint64_t rsp){
     auto *regs = (cpuRegisters*)rsp;
-    e9_printf("\nfucked up\n");
-    e9_printf("\nRIP: %d\n", regs->rip);
-    e9_printf("interrupt no. : %d", regs->int_no);
-    asm("hlt");
+    if (regs->int_no < 32){
+        e9_printf("Exception: %s\n", exception_messages[regs->int_no]);
+    }
+    else{
+        e9_printf("Interrupt: %d\n", regs->int_no);
+        e9_printf("val: %d\n", pitTicks);
+        e9_printf("RIP: 0x%x\n", regs->rip);
+    }
+    //    e9_printf("\nRIP: 0x%x\n", regs->rip);
+    ((void (*)())int_table[regs->int_no])();
 }
 
-void isr8()
+extern "C" void isr8()
 {
     e9_printf("interrupt 8");
 }
@@ -99,7 +75,7 @@ void isr6(){
     e9_printf("invalid opcode!");
     asm volatile("hlt");
 }
-void isr13(){
+extern "C" void isr13(){
     e9_printf("general protection fault!\n");
     asm volatile("hlt");
 }
