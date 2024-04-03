@@ -38,9 +38,11 @@ uint64_t pitTicks = 0;
 
 void isrInstall(){
     int_table[32] = (void*)pitHandler;
+    handlers[32] = pitHandler;
     for (int i = 0; i < 256; i++)
+    {
         setIDTGate(i, (uintptr_t)int_table[i]);
-
+    }
     if (!wasInit){
         idtInit();
     }
@@ -62,7 +64,7 @@ extern "C" void isrHandler(uint64_t rsp){
         e9_printf("RIP: 0x%x\n", regs->rip);
     }
     //    e9_printf("\nRIP: 0x%x\n", regs->rip);
-    ((void (*)())int_table[regs->int_no])();
+    ((void (*)())handlers[regs->int_no])();
 }
 
 extern "C" void isr8()
@@ -94,4 +96,5 @@ void pitHandler(){
     e9_printf("incrementing count!");
     ++pitTicks;
     writeEOI();
+
 }
