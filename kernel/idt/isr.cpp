@@ -37,7 +37,7 @@ char *exception_messages[32] = {
 uint64_t pitTicks = 0;
 
 void isrInstall(){
-    int_table[32] = (void*)pitHandler;
+//    int_table[32] = (void*)pitHandler;
     handlers[32] = pitHandler;
     for (int i = 0; i < 256; i++)
     {
