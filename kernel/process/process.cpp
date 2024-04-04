@@ -55,9 +55,11 @@ void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadS
                 .cs = 0x23,
                 .ss = 0x1b
         };
+
         for (uintptr_t i = 0; i < (THREAD_STACK_SIZE); (i += 2 * _1MB)){
             map(toPhysicalAddr((void*)(stack)) + i, (void*)(((uintptr_t)THREAD_STACK_ADDR - (uintptr_t)THREAD_STACK_SIZE) + i), (pageTableFlag)(ReadWrite | Present | LargerPages), 2 * _1MB);
         }
+
         thread->regs.rsp = THREAD_STACK_ADDR;
     }
     else{
@@ -73,12 +75,30 @@ void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadS
     thread->regs.eFlags = 0x202;
 }
 
+void addThreadToList(thread* thread){
+    if (threadHead == nullptr){
+        threadHead = (threadList*)mallocx(sizeof(threadList));
+        threadHead->threadInfo = thread;
+        threadHead->next = nullptr;
+    }
+    threadList *tHead = threadHead->next;
+
+    while (tHead->next != nullptr) {
+        tHead = tHead->next;
+    }
+
+    tHead->next = (threadList*) mallocx(sizeof(threadList));
+    tHead->next->threadInfo = thread;
+    tHead->next->next = nullptr;
+}
+
 thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
     thread* thread;
 
     if (processHead == nullptr){
         processHead = initProcesses();
     }
+
 
     cpuInfo* cpu = getCPU(cpuID);
     if (cpu == nullptr){
@@ -87,8 +107,11 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
     }
 
     setupThreadContext(thread, entrypoint, user, state);
+
     thread->priority = priority;
     thread->cpuID = cpuID;
+
+    addThreadToList(thread);
 
     processCount++;
     return thread;

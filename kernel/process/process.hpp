@@ -84,6 +84,11 @@ struct thread{
     void (*entryPoint)();
 };
 
+struct threadList{
+    thread* threadInfo;
+    threadList* next;
+};
+
 struct processInternal{
     uint64_t processID;
     PageTable *PML4;
@@ -114,4 +119,7 @@ extern int getPid(process* process);
 extern void pitInit(uint8_t hertz);
 extern int getPITCount();
 extern void sleep(int seconds);
+static void addThreadToList(thread* thread);
+static threadList* threadHead = nullptr;
+
 #endif

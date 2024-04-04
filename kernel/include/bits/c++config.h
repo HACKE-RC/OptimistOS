@@ -943,7 +943,7 @@ namespace __gnu_cxx
    <cmath> in namespace std for C++11. */
 #define _GLIBCXX_HAVE_C99_FLT_EVAL_TYPES 1
 
-/* Define to 1 if the target assembler supports thread-local storage. */
+/* Define to 1 if the target assembler supports threadInfo-local storage. */
 /* #undef _GLIBCXX_HAVE_CC_TLS */
 
 /* Define to 1 if you have the `ceilf' function. */
@@ -1387,7 +1387,7 @@ namespace __gnu_cxx
 /* Define to 1 if you have the `timespec_get' function. */
 #define _GLIBCXX_HAVE_TIMESPEC_GET 1
 
-/* Define to 1 if the target supports thread-local storage. */
+/* Define to 1 if the target supports threadInfo-local storage. */
 /* #undef _GLIBCXX_HAVE_TLS */
 
 /* Define if truncate is available in <unistd.h>. */

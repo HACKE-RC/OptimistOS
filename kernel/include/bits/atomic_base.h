@@ -1039,10 +1039,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 	    // differences in padding bits. This loop should run no more than
 	    // three times, because the worst case scenario is:
 	    // First CAS fails because the actual value has non-zero padding.
-	    // Second CAS fails because another thread stored the same value,
+	    // Second CAS fails because another threadInfo stored the same value,
 	    // but now with padding cleared. Third CAS succeeds.
 	    // We will never need to loop a fourth time, because any value
-	    // written by another thread (whether via store, exchange or
+	    // written by another threadInfo (whether via store, exchange or
 	    // compare_exchange) will have had its padding cleared.
 	    while (true)
 	      {
