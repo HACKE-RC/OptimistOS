@@ -30,7 +30,7 @@ struct process;
 
 static const uint64_t baseFrequency = 1193182;
 extern uint64_t frequency;
-static const uint16_t divisor = 65535;
+// static const uint16_t divisor = 65535;
 static uint64_t timeSinceBoot = 0;
 
 

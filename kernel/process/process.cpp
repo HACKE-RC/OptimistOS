@@ -187,7 +187,7 @@ void pitInit(uint8_t hertz)
     outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
 //    setIDTGate(0x20, (uintptr_t)pitHandler);
 //    idtInit();
-}
+
 
 void sleep(int seconds){
     int startTime = getPITCount();
