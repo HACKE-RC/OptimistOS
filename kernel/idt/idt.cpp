@@ -9,9 +9,7 @@ void idtInit(){
     idtPtr.limit = ((uint16_t)sizeof(idtEntry) * 256) - 1;
     idtPtr.base = (uint64_t)&idtEntries;
 
-    __asm__ volatile("lidt (%0)"
-                    :
-                    : "r"(&idtPtr));
+    asm volatile ("lidt %0" :: "memory"(idtPtr));
     wasInit = true;
     __asm__ volatile ("sti");
 }

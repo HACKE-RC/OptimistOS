@@ -43,7 +43,6 @@ isrCommon:
    mov rdi, rsp
     ; Call isrHandler
     call isrHandler
-    mov rsp, rax
     POPALL
 
     add rsp, 16
