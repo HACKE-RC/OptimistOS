@@ -37,11 +37,10 @@ pop rax
 [extern isrHandler]
 
 isrCommon:
-    ; cld
     PUSHALL
+    cld
 
-   mov rdi, rsp
-    ; Call isrHandler
+    mov rdi, rsp
     call isrHandler
     POPALL
 
@@ -53,6 +52,7 @@ isr_%1:
 %if !(%1 == 8 || (%1 >= 10 && %1 <= 14) || %1 == 17 || %1 == 21 || %1 == 29 || %1 == 30)
     push 0
 %endif
+    cli
     push %1
     jmp isrCommon
 %endmacro
