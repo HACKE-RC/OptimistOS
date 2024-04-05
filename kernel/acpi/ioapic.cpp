@@ -18,11 +18,9 @@ void initIOAPIC(){
         ioAPICWrite(IOAPIC, IOAPIC_REDTBL + 2 * i, 0x00010000 | (32 + i));
         ioAPICWrite(IOAPIC, IOAPIC_REDTBL + 2 * i + 1, 0);
     }
-    return;
 }
 
 
-//
 uint32_t ioAPICRead(ioAPICInfo* entry, int reg){
 //  selects and then reads the register
     mmioWrite(toVirtualAddr((void*)(entry->apicAddr + IOAPIC_REGSEL)), (uint32_t)reg);
@@ -33,12 +31,4 @@ void ioAPICWrite(ioAPICInfo* entry, int reg, uint32_t value){
 //  selects and then reads the register
     mmioWrite(toVirtualAddr((void*)(entry->apicAddr + IOAPIC_REGSEL)), (uint32_t)reg);
     mmioWrite(toVirtualAddr((void*)(entry->apicAddr + IOAPIC_IOWIN)), value);
-}
-void writeEOI() {
-    outb(0x20, 0x20);
-//    ioAPICInfo* APIC = madtInformationList[0];
-//    ioAPICWrite(APIC, 0xB0, 0);
-//    uint32_t* eoiRegister = (uint32_t*)(madtInformationList[0]->apicAddr + 0xB0);
-//    ioAPICWrite(madtInformationList[0], 0xB0, 0);
-//    *eoiRegister = 0;
 }

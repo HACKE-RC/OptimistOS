@@ -64,13 +64,16 @@ extern "C" void isrHandler(uint64_t rsp){
         e9_printf("val: %d\n", pitTicks);
         e9_printf("RIP: 0x%x\n", regs->rip);
     }
-    //    e9_printf("\nRIP: 0x%x\n", regs->rip);
+        e9_printf("\nRIP: 0x%x\n", regs->rip);
     {
     if (handlers[regs->int_no] != nullptr){
         (handlers[regs->int_no])();
     }
     }
 
+    if (regs->int_no >= 0x20){
+        outb(0x20, 0x20);
+    }
 }
 
 extern "C" void isr8()
@@ -97,10 +100,9 @@ void isr0(){
     e9_printf("divide by zero");
     asm volatile("hlt");
 }
-
+uint32_t lockx = 0;
 void pitHandler(){
-    e9_printf("incrementing count!");
+    lock(lockx);
     ++pitTicks;
-    writeEOI();
-
+    unlock(lockx);
 }

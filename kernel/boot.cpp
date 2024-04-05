@@ -333,9 +333,6 @@ extern "C" void _start(void) {
     setBootInfo(bootInformation);
     setupOptimist();
     idle();
-//    while (true){
-//        ;;
-//    }
 }
 
 void idle(){
