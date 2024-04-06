@@ -38,6 +38,9 @@ uint64_t pitTicks = 0;
 
 void isrInstall(){
 //    int_table[32] = (void*)pitHandler;
+    asm volatile("cli");
+
+
     handlers[32] = pitHandler;
     handlers[0xd] = isr13;
     for (int i = 0; i < 256; i++)

@@ -205,9 +205,13 @@ void registerProcess(processInternal* process){
 void pitInit(uint8_t hertz)
 {
     unsigned int divisor = (unsigned int )1193180 / (unsigned int)1000;
+//    outb(0x21, 0xFA);
+//    outb(0xA1, 0xFF);
+//    uint8_t mask = inb(PIC1 + 1) & 0xFE;
+//    outb(PIC1 + 1, mask);
     outb(0x43, 0x36);
     outb(0x40, (uint8_t)(divisor & 0x00ff));
-    outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
+//    outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
 //    setIDTGate(0x20, (uintptr_t)pitHandler);
 //    idtInit();
 }

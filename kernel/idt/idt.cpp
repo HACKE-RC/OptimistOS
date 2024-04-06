@@ -5,13 +5,13 @@ idtPtrStruct idtPtr;
 bool wasInit = false;
 
 void idtInit(){
-    __asm__ volatile ("cli");
+//    __asm__ volatile ("cli");
     idtPtr.limit = ((uint16_t)sizeof(idtEntry) * 256) - 1;
     idtPtr.base = (uint64_t)&idtEntries;
 
     asm volatile ("lidt %0" :: "memory"(idtPtr));
     wasInit = true;
-    __asm__ volatile ("sti");
+//    __asm__ volatile ("sti");
 }
 
 void idtInitAgain(){
