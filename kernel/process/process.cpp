@@ -204,16 +204,15 @@ void registerProcess(processInternal* process){
 
 void pitInit(uint8_t hertz)
 {
-    unsigned int divisor = (unsigned int )1193180 / (unsigned int)1000;
-//    outb(0x21, 0xFA);
-//    outb(0xA1, 0xFF);
-//    uint8_t mask = inb(PIC1 + 1) & 0xFE;
-//    outb(PIC1 + 1, mask);
+    unsigned int divisor = (unsigned int )1193180 / (unsigned int)100;
+    asm volatile("sti");
     outb(0x43, 0x36);
-    outb(0x40, (uint8_t)(divisor & 0x00ff));
-//    outb(0x40, (uint8_t)((divisor & 0xff00) >> 8));
-//    setIDTGate(0x20, (uintptr_t)pitHandler);
-//    idtInit();
+    uint8_t l = (uint8_t)(divisor & 0xFF);
+    uint8_t h = (uint8_t)((divisor>>8) & 0xFF);
+
+    // Send the frequency divisor.
+    outb(0x40, l);
+    outb(0x40, h);
 }
 
 void sleep(int seconds){
