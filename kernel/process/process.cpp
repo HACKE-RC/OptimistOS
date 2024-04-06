@@ -206,7 +206,7 @@ void pitInit(uint8_t hertz)
 {
     unsigned int divisor = (unsigned int )1193180 / (unsigned int)100;
     asm volatile("sti");
-    outb(0x43, 0x36);
+    outb(0x43, 0x34);
     uint8_t l = (uint8_t)(divisor & 0xFF);
     uint8_t h = (uint8_t)((divisor>>8) & 0xFF);
 
