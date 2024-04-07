@@ -31,8 +31,8 @@ threadList* prioritySort(threadList* tList){
 void runThreads(){
     lock(threadMutex);
     int processorCount = getProcessorCount();
-    auto *execThreadList = new thread*[processorCount];
-
+//    auto *execThreadList = new thread*[processorCount];
+    thread** execThreadList = (thread**)mallocx(processorCount * sizeof(thread*));
     int threadsScheduled = 0;
 
     threadList* sortedList = prioritySort(threadHead);
@@ -47,7 +47,7 @@ void runThreads(){
 
         for (int i = 0; i < processorCount; i++){
             if (execThreadList[i] != nullptr && sortedList2->threadInfo != nullptr){
-                execute(execThreadList[i], i, getQuanta(execThreadList[i]->threadPriority));
+                execute(execThreadList[i], i, getQuanta(execThreadList[i]->priority));
                 execThreadList[i]->priority = changePriority(execThreadList[i]->priority);
                 sortedList2->threadInfo->priority = execThreadList[i]->priority;
                 sortedList2 = sortedList2->next;
@@ -56,8 +56,9 @@ void runThreads(){
         }
     }
 
-    delete[] execThreadList;
+    freex(execThreadList);
     threadHead = sortedList3;
+    asm volatile("hlt");
     unlock(threadMutex);
 }
 
