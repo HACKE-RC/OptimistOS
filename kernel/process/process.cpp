@@ -1,15 +1,16 @@
 #include "process.hpp"
-static uint32_t processMutex = 0;
-
+uint32_t processMutex = 0;
 uint64_t processCount = 0;
+
 static processInternal* processHead = nullptr;
 static processInternal* currentProcessInternal = nullptr;
 
+threadList *threadHead = nullptr;
 
 bool removeProcessFromList(processInternal* process){
     processInternal* pHead = processHead;
 
-    for (int i = 0; i <= processCount; i++){
+    for (uint64_t i = 0; i <= processCount; i++){
         if (pHead->next == process){
             pHead->next = pHead->next->next;
             return true;
@@ -32,7 +33,7 @@ processInternal* initProcesses(){
 }
 
 processInternal* setupProcessInfo(){
-    processInternal* process = (processInternal*)mallocx(sizeof(processInternal));
+    auto* process = (processInternal*)mallocx(sizeof(processInternal));
 
     process->processID = 7 * (processCount);
     process->threadCount = 1;
@@ -42,7 +43,7 @@ processInternal* setupProcessInfo(){
 }
 
 void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadState state){
-    uintptr_t stack = (uintptr_t)toVirtualAddr((void*)allocateFrame(THREAD_STACK_SIZE));
+    auto stack = (uintptr_t)toVirtualAddr((void*)allocateFrame(THREAD_STACK_SIZE));
 
     thread->regs.rip = (uint64_t)entryPoint;
     thread->entryPoint = entryPoint;
@@ -76,13 +77,15 @@ void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadS
 }
 
 void addThreadToList(thread* thread){
+    lock(threadMutex);
+
     if (threadHead == nullptr){
         threadHead = (threadList*)mallocx(sizeof(threadList));
         threadHead->threadInfo = thread;
         threadHead->next = nullptr;
     }
-    threadList *tHead = threadHead->next;
 
+    threadList *tHead = threadHead->next;
     while (tHead->next != nullptr) {
         tHead = tHead->next;
     }
@@ -90,6 +93,8 @@ void addThreadToList(thread* thread){
     tHead->next = (threadList*) mallocx(sizeof(threadList));
     tHead->next->threadInfo = thread;
     tHead->next->next = nullptr;
+
+    lock(threadMutex);
 }
 
 thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
@@ -98,7 +103,6 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
     if (processHead == nullptr){
         processHead = initProcesses();
     }
-
 
     cpuInfo* cpu = getCPU(cpuID);
     if (cpu == nullptr){
@@ -124,7 +128,7 @@ process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority,
         processHead = initProcesses();
     }
 
-    process* processInfo = (process*)mallocx(sizeof(process));
+    auto* processInfo = (process*)mallocx(sizeof(process));
     thread* threadInfo;
     processInternal* process = setupProcessInfo();
 
@@ -207,8 +211,8 @@ void pitInit(uint8_t hertz)
     unsigned int divisor = (unsigned int )1193180 / (unsigned int)100;
     asm volatile("sti");
     outb(0x43, 0x34);
-    uint8_t l = (uint8_t)(divisor & 0xFF);
-    uint8_t h = (uint8_t)((divisor>>8) & 0xFF);
+    auto l = (uint8_t)(divisor & 0xFF);
+    auto h = (uint8_t)((divisor>>8) & 0xFF);
 
     // Send the frequency divisor.
     outb(0x40, l);
@@ -216,12 +220,15 @@ void pitInit(uint8_t hertz)
 }
 
 void sleep(int seconds){
-    int startTime = getPITCount();
-    while (getPITCount() < startTime + seconds){
+    uint64_t startTime = getPITCount();
+    uint64_t targetTicks = seconds * 100; // since tick 100 times per second
+    e9_printf("timer start!!");
+    while (getPITCount() - startTime < targetTicks){
         asm("hlt");
     }
+    e9_printf("timer end!!");
 }
 
-int getPITCount(){
+uint64_t getPITCount(){
     return pitTicks;
 }

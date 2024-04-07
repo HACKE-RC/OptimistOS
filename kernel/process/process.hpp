@@ -62,8 +62,7 @@ typedef struct {
 } cpuRegs;
 
 typedef enum {
-    PRIORITY_IDLE,
-    PRIORITY_NORMAL,
+    PRIORITY_LOW,
     PRIORITY_MEDIUM,
     PRIORITY_HIGH
 } threadPriority;
@@ -117,9 +116,10 @@ extern process* createProcessFromRoutine(void (*entryPoint)(), threadPriority pr
 process* processInternalToProcess(processInternal* processIn, process* processOut);
 extern int getPid(process* process);
 extern void pitInit(uint8_t hertz);
-extern int getPITCount();
+extern uint64_t getPITCount();
 extern void sleep(int seconds);
 static void addThreadToList(thread* thread);
-static threadList* threadHead = nullptr;
-
+extern threadList* threadHead;
+extern uint32_t processMutex;
+extern uint32_t threadMutex;
 #endif

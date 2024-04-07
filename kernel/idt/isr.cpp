@@ -63,15 +63,11 @@ extern "C" void isrHandler(uint64_t rsp){
         e9_printf("Exception: %s\n", exception_messages[regs->int_no]);
     }
     else{
-        e9_printf("Interrupt: %d\n", regs->int_no);
-        e9_printf("val: %d\n", pitTicks);
-        e9_printf("RIP: 0x%x\n", regs->rip);
     }
-        e9_printf("\nRIP: 0x%x\n", regs->rip);
     {
-    if (handlers[regs->int_no] != nullptr){
-        (handlers[regs->int_no])();
-    }
+        if (handlers[regs->int_no] != nullptr){
+            (handlers[regs->int_no])();
+        }
     }
 
     if (regs->int_no >= 0x20){

@@ -59,7 +59,6 @@ int setupOptimist(){
     }
 
     e9_printf("\ncount: %d\n", getPITCount());
-
     return 0;
 }
 
