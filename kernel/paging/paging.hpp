@@ -90,6 +90,7 @@ extern PageTable* kernelPML4;
 PageTable* newPML4();
 extern void initPaging();
 extern uint64_t readCr3();
+extern void setCr3(uint64_t value);
 extern bool isHigherHalf(uintptr_t addr);
 extern std::pair<size_t, size_t> requiredSize(size_t size);
 extern bool map(uintptr_t physicalAddr, void* virtualAddr, pageTableFlag flags, size_t pageSize = _4KB);

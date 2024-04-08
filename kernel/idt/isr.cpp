@@ -99,6 +99,7 @@ void isr0(){
     e9_printf("divide by zero");
     asm volatile("hlt");
 }
+
 uint32_t lockx = 0;
 void pitHandler(){
     lock(lockx);

@@ -2,6 +2,8 @@
 uint32_t threadMutex = 0;
 thread* runningThread = nullptr;
 
+extern "C" void contextSwitch(cpuRegs* regs);
+
 threadList* prioritySort(threadList* tList){
     if (tList == nullptr || tList->next == nullptr){
         return tList;
@@ -37,18 +39,20 @@ void runThread(cpuRegs* regs){
     if (runningThread == nullptr || threadHead != nullptr){
        runningThread = tList->threadInfo;
     }
+    else{
+        runningThread->regs = *regs;
+        runningThread->state = THREAD_READY;
+        runningThread = getNextThread(runningThread);
 
-    runningThread->regs = *regs;
-    runningThread->state = THREAD_READY;
-
-    runningThread = getNextThread(runningThread);
-
-    if (runningThread == nullptr){
-        return;
+        if (runningThread == nullptr){
+            runThread(regs);
+        }
     }
 
+    setCr3((uint64_t)runningThread->parentProcess->PML4);
+    setCr3((uint64_t)runningThread->parentProcess->PML4);
 
-
+    contextSwitch(&runningThread->regs);
     unlock(threadMutex);
 }
 

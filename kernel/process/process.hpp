@@ -82,6 +82,7 @@ struct thread{
     uintptr_t kernelStack;
     uintptr_t entryPoint;
     threadState state;
+    process* parentProcess;
 };
 
 struct threadList{

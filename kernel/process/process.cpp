@@ -139,12 +139,15 @@ process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority,
 
     threadInfo = createThreadInternal(entryPoint, priority, cpuID, state, user);
     threadInfo->threadID = process->threadCount + 1;
+
     process->PML4 = getPageMap(user);
     process->threads[0] = *threadInfo;
 
     currentProcessInternal = process;
 
     processInternalToProcess(process, processInfo);
+    threadInfo->parentProcess = processInfo;
+
     registerProcess(currentProcessInternal);
     unlock(processMutex);
 
