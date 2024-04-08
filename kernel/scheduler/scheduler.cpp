@@ -68,7 +68,6 @@ int getProcessorCount(){
 void execute(thread* threadInfo, int processorNo, uint8_t quanta){
     cpuInfo* cpu = getCPUInfo(processorNo);
     smpInfo* cpuInfo = getSMPInfo(processorNo);
-    saveContext(&threadInfo->regs);
 }
 
 
