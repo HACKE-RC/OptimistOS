@@ -151,7 +151,7 @@ process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority,
     return processInfo;
 }
 
-extern process* getProcessInfo(uint64_t processID){
+process* getProcessInfo(uint64_t processID){
     processInternal* pHead = processHead;
     process* processOut;
 
@@ -163,6 +163,18 @@ extern process* getProcessInfo(uint64_t processID){
         pHead = pHead->next;
     }
 
+    return nullptr;
+}
+
+thread* getThreadInfo(uint64_t threadID){
+    threadList* tList = threadHead;
+
+    while(tList != nullptr){
+        if (tList->threadInfo->threadID == threadID){
+            return tList->threadInfo;
+        }
+        tList = tList->next;
+    }
     return nullptr;
 }
 

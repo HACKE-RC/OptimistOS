@@ -81,6 +81,7 @@ struct thread{
     uint64_t cpuID;
     uintptr_t kernelStack;
     uintptr_t entryPoint;
+    threadState state;
 };
 
 struct threadList{
@@ -104,22 +105,23 @@ struct process{
     uint32_t threadCount;
 };
 
-void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadState state);
-inline PageTable* getPageMap(bool user);
-extern processInternal* setupProcessInfo();
-extern processInternal* initProcesses();
-extern process* getProcessInfo(uint64_t processID);
-bool removeProcessFromList(processInternal* process);
-void registerProcess(processInternal* process);
-thread* createThreadInternal(uintptr_t entrypoint, threadPriority priority, uint64_t cpuID, threadState state, bool user);
-extern process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority, uint64_t cpuID, threadState state, bool user);
-process* processInternalToProcess(processInternal* processIn, process* processOut);
-extern int getPid(process* process);
-extern void pitInit(uint8_t hertz);
 extern uint64_t getPITCount();
 extern void sleep(int seconds);
-static void addThreadToList(thread* thread);
 extern threadList* threadHead;
 extern uint32_t processMutex;
 extern uint32_t threadMutex;
+extern int getPid(process* process);
+extern void pitInit(uint8_t hertz);
+inline PageTable* getPageMap(bool user);
+extern processInternal* initProcesses();
+extern processInternal* setupProcessInfo();
+static void addThreadToList(thread* thread);
+void registerProcess(processInternal* process);
+extern thread* getThreadInfo(uint64_t threadID);
+extern process* getProcessInfo(uint64_t processID);
+bool removeProcessFromList(processInternal* process);
+process* processInternalToProcess(processInternal* processIn, process* processOut);
+void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadState state);
+thread* createThreadInternal(uintptr_t entrypoint, threadPriority priority, uint64_t cpuID, threadState state, bool user);
+extern process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority, uint64_t cpuID, threadState state, bool user);
 #endif

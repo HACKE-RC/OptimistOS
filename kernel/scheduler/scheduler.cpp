@@ -1,5 +1,6 @@
 #include "scheduler.hpp"
 uint32_t threadMutex = 0;
+thread* runningThread = nullptr;
 
 threadList* prioritySort(threadList* tList){
     if (tList == nullptr || tList->next == nullptr){
@@ -28,36 +29,21 @@ threadList* prioritySort(threadList* tList){
     return tList;
 }
 
-void runThreads(){
+void runThread(cpuRegs* regs){
     lock(threadMutex);
-    int processorCount = getProcessorCount();
-    thread** execThreadList = (thread**)mallocx(processorCount * sizeof(thread*));
-    int threadsScheduled = 0;
+    asm volatile("cli");
+    threadList* tList = threadHead;
 
-    threadList* sortedList = prioritySort(threadHead);
-    threadList* sortedList2 = sortedList;
-    threadList* sortedList3 = sortedList;
-
-    while(sortedList->threadInfo != nullptr && sortedList->next != nullptr){
-        for (int i = 0; i < processorCount && sortedList->threadInfo != nullptr; i++){
-            execThreadList[i] = sortedList->threadInfo;
-            sortedList = sortedList->next;
-        }
-
-        for (int i = 0; i < processorCount; i++){
-            if (execThreadList[i] != nullptr && sortedList2->threadInfo != nullptr){
-                execute(execThreadList[i], i, getQuanta(execThreadList[i]->priority));
-                execThreadList[i]->priority = changePriority(execThreadList[i]->priority);
-                sortedList2->threadInfo->priority = execThreadList[i]->priority;
-                sortedList2 = sortedList2->next;
-                threadsScheduled++;
-            }
-        }
+    if (runningThread == nullptr || threadHead != nullptr){
+       runningThread = tList->threadInfo;
     }
 
-    freex(execThreadList);
-    threadHead = sortedList3;
-    asm volatile("hlt");
+    runningThread->regs = *regs;
+    runningThread->state = THREAD_READY;
+    getProcessInfo()
+    if (runningThread->threadID)
+
+
     unlock(threadMutex);
 }
 
