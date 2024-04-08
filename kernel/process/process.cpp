@@ -173,10 +173,24 @@ thread* getThreadInfo(uint64_t threadID){
         if (tList->threadInfo->threadID == threadID){
             return tList->threadInfo;
         }
-        tList = tList->next;
     }
     return nullptr;
 }
+
+threadList* getThreadList(uint64_t threadID, bool next){
+    threadList* tList = threadHead;
+
+    while(tList != nullptr){
+        if (tList->threadInfo->threadID == threadID){
+            return tList;
+        }
+        else{
+            return tList->next;
+        }
+    }
+    return nullptr;
+}
+
 
 inline PageTable* getPageMap(bool user){
     if (!user){

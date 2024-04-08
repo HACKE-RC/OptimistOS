@@ -118,6 +118,7 @@ extern processInternal* setupProcessInfo();
 static void addThreadToList(thread* thread);
 void registerProcess(processInternal* process);
 extern thread* getThreadInfo(uint64_t threadID);
+extern threadList* getThreadList(uint64_t threadID, bool next);
 extern process* getProcessInfo(uint64_t processID);
 bool removeProcessFromList(processInternal* process);
 process* processInternalToProcess(processInternal* processIn, process* processOut);
