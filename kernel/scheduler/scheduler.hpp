@@ -9,4 +9,6 @@ void runThreads();
 void execute(thread* threadInfo, int processorNo, uint8_t quanta);
 int getQuanta(threadPriority threadPriority);
 threadPriority changePriority(threadPriority currentPriority);
+extern "C" void saveContext(cpuRegs* context);
+extern "C" void loadContext(cpuRegs* context);
 #endif

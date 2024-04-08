@@ -21,12 +21,14 @@ typedef struct{
    uint32_t cpuNumber;
 } __attribute__((packed)) cpuInfo;
 
-
+typedef limine_smp_info smpInfo;
+extern limine_smp_response* smpResponse;
+extern limine_smp_info* getSMPInfo(uint32_t cpuNumber);
 extern void initSMP();
-extern int cpuCount;
-extern int bspLAPICID;
-extern int cpusStarted;
+extern uint32_t cpuCount;
+extern uint32_t bspLAPICID;
+extern uint32_t cpusStarted;
 extern cpuInfo* cpuInformation[];
-extern cpuInfo* getCPU(uint32_t cpuNumber);
+extern cpuInfo* getCPUInfo(uint32_t cpuNumber);
 void initOtherCPUs(limine_smp_info *smpInfo);
 #endif

@@ -80,7 +80,7 @@ struct thread{
     uintptr_t stackAddress;
     uint64_t cpuID;
     uintptr_t kernelStack;
-    void (*entryPoint)();
+    uintptr_t entryPoint;
 };
 
 struct threadList{
@@ -104,7 +104,7 @@ struct process{
     uint32_t threadCount;
 };
 
-void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadState state);
+void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadState state);
 inline PageTable* getPageMap(bool user);
 extern processInternal* setupProcessInfo();
 extern processInternal* initProcesses();

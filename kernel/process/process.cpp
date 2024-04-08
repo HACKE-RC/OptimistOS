@@ -42,11 +42,11 @@ processInternal* setupProcessInfo(){
     return process;
 }
 
-void setupThreadContext(thread* thread, void (*entryPoint)(), bool user, threadState state){
+void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadState state){
     auto stack = (uintptr_t)toVirtualAddr((void*)allocateFrame(THREAD_STACK_SIZE));
 
     thread->regs.rip = (uint64_t)entryPoint;
-    thread->entryPoint = entryPoint;
+    thread->entryPoint = (uintptr_t)entryPoint;
     thread->stackAddress = stack;
     thread->kernelStack = (uintptr_t)mallocx(THREAD_STACK_SIZE);
     thread->kernelStack += THREAD_STACK_SIZE;
@@ -104,17 +104,15 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
         processHead = initProcesses();
     }
 
-    cpuInfo* cpu = getCPU(cpuID);
+    cpuInfo* cpu = getCPUInfo(cpuID);
     if (cpu == nullptr){
         haltAndCatchFire(__FILE__, __LINE__, "Invalid CPU Requested!!");
         return nullptr;
     }
 
     setupThreadContext(thread, entrypoint, user, state);
-
     thread->priority = priority;
     thread->cpuID = cpuID;
-
     addThreadToList(thread);
 
     processCount++;
@@ -222,11 +220,13 @@ void pitInit(uint8_t hertz)
 void sleep(int seconds){
     uint64_t startTime = getPITCount();
     uint64_t targetTicks = seconds * 100; // since tick 100 times per second
-    e9_printf("timer start!!");
+    e9_printf("timer start!!\n");
+
     while (getPITCount() - startTime < targetTicks){
         asm("hlt");
     }
-    e9_printf("timer end!!");
+
+    e9_printf("timer end!!\n");
 }
 
 uint64_t getPITCount(){

@@ -29,12 +29,12 @@ int setupOptimist(){
         haltAndCatchFire(__FILE__, __LINE__);
     }
 
-//    initMADT();
-//    initLAPIC();
-//    initIOAPIC();
+    initMADT();
+    initLAPIC();
+    initIOAPIC();
     initSMP();
     GlobalRenderer->Print("smp done: \n");
-//  disabling PIC
+//  enabling PIC
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);

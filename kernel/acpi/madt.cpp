@@ -2,6 +2,7 @@
 ioAPICInfo* madtInformationList[128] = {0};
 madtIso* madtISOList[128] = {0};
 madtInfo madtInformation{};
+uint32_t madtISOLen;
 
 void initMADT(){
     MADT* madt = (MADT*)acpiFindTable("APIC");

@@ -62,5 +62,5 @@ struct madtIso{
 extern ioAPICInfo* madtInformationList[];
 extern madtIso* madtISOList[128];
 extern madtInfo madtInformation;
-
+extern uint32_t madtISOLen;
 #endif

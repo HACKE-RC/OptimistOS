@@ -2,19 +2,19 @@
 #include <mutex>
 #include <memory/malloc.hpp>
 
-int cpuCount = 1;
+uint32_t cpuCount = 1;
 int cr3Value2 = 0;
-int bspLAPICID = 0;
-int cpusStarted = 1;
-uintptr_t  cr3Value = 0;
-
+uint32_t bspLAPICID = 0;
+uint32_t cpusStarted = 1;
+uintptr_t cr3Value = 0;
+limine_smp_response* smpResponse;
 cpuInfo* cpuInformation[256];
 
 void initSMP(){
     cr3Value = (uintptr_t)PML4;
     e9_printf("cr3 value: %x\n", cr3Value);
     GlobalRenderer = &renderer;
-    auto *smpResponse = (struct limine_smp_response *)smpRequest.response;
+    smpResponse = (struct limine_smp_response *)smpRequest.response;
     auto *smpInfo = (struct limine_smp_info*)smpRequest.response->cpus;
 
     cpuCount = smpResponse->cpu_count;
@@ -23,7 +23,7 @@ void initSMP(){
     e9_printf("num cpus: %d\n", cpuCount);
 
 //    cpuInfo *cpu0Information = (cpuInfo *)toVirtualAddr((void*)allocateFrame(sizeof(cpuInfo)));
-    cpuInfo *cpu0Information = (cpuInfo *) mallocx(sizeof(cpuInfo));
+    auto *cpu0Information = (cpuInfo *) mallocx(sizeof(cpuInfo));
     cpu0Information->lock = 0;
     cpu0Information->lapicID = 0;
     cpu0Information->currentProcess = nullptr;
@@ -43,6 +43,7 @@ void initSMP(){
 
     e9_printf("SMP initialized\n");
 }
+
 
 void initOtherCPUs(limine_smp_info *smpInfo){
     initGDT();
@@ -78,9 +79,14 @@ void initOtherCPUs(limine_smp_info *smpInfo){
     }
 }
 
-cpuInfo* getCPU(uint32_t cpuNumber){
+cpuInfo* getCPUInfo(uint32_t cpuNumber){
     if (cpuNumber > cpusStarted){
         return nullptr;
     }
+
     return cpuInformation[cpuNumber];
+}
+
+smpInfo* getSMPInfo(uint32_t cpuNumber){
+    return smpResponse->cpus[cpuNumber];
 }
