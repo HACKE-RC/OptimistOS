@@ -192,6 +192,10 @@ threadList* getThreadList(uint64_t threadID, bool next){
 }
 
 
+inline thread* getNextThread(thread* currentThread){
+    return getThreadList(currentThread->threadID, true)->threadInfo;
+}
+
 inline PageTable* getPageMap(bool user){
     if (!user){
         return kernelPML4;

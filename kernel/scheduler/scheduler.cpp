@@ -41,12 +41,16 @@ void runThread(cpuRegs* regs){
     runningThread->regs = *regs;
     runningThread->state = THREAD_READY;
 
-    if (getThreadList(runningThread->threadID, true)->threadInfo)
+    runningThread = getNextThread(runningThread);
+
+    if (runningThread == nullptr){
+        return;
+    }
+
 
 
     unlock(threadMutex);
 }
-
 
 
 int getProcessorCount(){
