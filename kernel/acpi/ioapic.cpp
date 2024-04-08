@@ -20,26 +20,26 @@ void initIOAPIC(){
     }
 }
 
-void ioapic_set_entry(ioAPICInfo* ioapic, uint8_t idx, uint64_t data) {
+void setEntry(ioAPICInfo* ioapic, uint8_t idx, uint64_t data) {
     ioapic_write(ioapic, (uint8_t (IOAPIC_REDTBL + idx * 2), (uint32_t)data);
     ioapic_write(ioapic, (uint8_t (IOAPIC_REDTBL + idx * 2 + 1), (uint32_t)(data >> 32));
 }
 
-uint64_t ioapic_gsi_count(ioAPICInfo* ioapic) {
+uint64_t getGSICount(ioAPICInfo* ioapic) {
     return (ioAPICRead(ioapic, 1) & 0xff0000) >> 16;
 }
 
-ioAPICInfo* ioapic_get_gsi(uint32_t gsi) {
+ioAPICInfo* getGSI(uint32_t gsi) {
     for (uint64_t i = 0; i < madtInformation.ioAPICLen; i++) {
         ioAPICInfo* ioapic = madtInformationList[i];
-        if (ioapic->gsiBase <= gsi && ioapic->gsiBase + ioapic_gsi_count(ioapic) > gsi)
+        if (ioapic->gsiBase <= gsi && ioapic->gsiBase + getGSICount(ioapic) > gsi)
             return ioapic;
     }
     return NULL;
 }
 
-void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi, uint16_t flags, bool mask) {
-    ioAPICInfo* ioapic = ioapic_get_gsi(gsi);
+void redirectGSI(uint32_t lapicID, uint8_t vec, uint32_t gsi, uint16_t flags, bool mask) {
+    ioAPICInfo* ioapic = getGSI(gsi);
 
     uint64_t redirect = vec;
 
@@ -54,27 +54,27 @@ void ioapic_redirect_gsi(uint32_t lapic_id, uint8_t vec, uint32_t gsi, uint16_t 
     if (mask) redirect |= (1 << 16);
     else redirect &= ~(1 << 16);
 
-    redirect |= (uint64_t)lapic_id << 56;
+    redirect |= (uint64_t)lapicID << 56;
 
     uint32_t redir_table = (gsi - ioapic->gsiBase) * 2 + 16;
     ioAPICWrite(ioapic, redir_table, (uint32_t)redirect);
     ioAPICWrite(ioapic, redir_table + 1, (uint32_t)(redirect >> 32));
 }
 
-void ioapic_redirect_irq(uint32_t lapic_id, uint8_t vec, uint8_t irq, bool mask) {
+void ioapic_redirect_irq(uint32_t lapicID, uint8_t vec, uint8_t irq, bool mask) {
     uint8_t idx = 0;
     madtIso* iso;
 
     while (idx < madtInformation.madtISOLen) {
         iso = madtISOList[idx];
         if (iso->irqSrc == irq) {
-            ioapic_redirect_gsi(lapic_id, vec, iso->gsi, iso->flags, mask);
+            redirectGSI(lapicID, vec, iso->gsi, iso->flags, mask);
             return;
         }
         idx++;
     }
 
-    ioapic_redirect_gsi(lapic_id, vec, irq, 0, mask);
+    redirectGSI(lapicID, vec, irq, 0, mask);
 }
 
 

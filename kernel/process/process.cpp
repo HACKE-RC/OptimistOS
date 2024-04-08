@@ -97,7 +97,7 @@ void addThreadToList(thread* thread){
     lock(threadMutex);
 }
 
-thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
+thread* createThreadInternal(uintptr_t entrypoint, threadPriority priority, uint64_t cpuID, threadState state, bool user){
     thread* thread;
 
     if (processHead == nullptr){
@@ -119,7 +119,7 @@ thread* createThreadInternal(void (*entrypoint)(), threadPriority priority, uint
     return thread;
 }
 
-process* createProcessFromRoutine(void (*entryPoint)(), threadPriority priority, uint64_t cpuID, threadState state, bool user){
+process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority, uint64_t cpuID, threadState state, bool user){
     lock(processMutex);
 
     if (processHead == nullptr){
