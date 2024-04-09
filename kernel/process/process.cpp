@@ -195,7 +195,7 @@ threadList* getThreadList(uint64_t threadID, bool next){
 }
 
 
-inline thread* getNextThread(thread* currentThread){
+thread* getNextThread(thread* currentThread){
     return getThreadList(currentThread->threadID, true)->threadInfo;
 }
 
@@ -262,14 +262,15 @@ void sleep(int seconds){
     e9_printf("timer end!!\n");
 }
 
-void sleepMS(uint64_t milliseconds){
+void sleepMS(int milliseconds){
     uint64_t startTime = getPITCount();
-    uint64_t targetTicks = milliseconds * 0.1; // since tick 100 times per second
+    uint64_t targetTicks = milliseconds * 10; // since tick 100 times per second
 
     e9_printf("timer start!!\n");
 
     while (getPITCount() - startTime < targetTicks){
-        asm("hlt");
+        // Busy-wait loop
+        for (volatile int i = 0; i < 1000; ++i) {}
     }
 
     e9_printf("timer end!!\n");

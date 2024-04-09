@@ -3,10 +3,10 @@
 #include "../lib/lock.hpp"
 #include "../process/process.hpp"
 extern thread* runningThread;
-threadList* prioritySort(threadList* tList);
-int getProcessorCount();
-void runThread(cpuRegs* regs);
-void execute(thread* threadInfo, int processorNo, uint8_t quanta);
-int getQuanta(threadPriority threadPriority);
-threadPriority changePriority(threadPriority currentPriority);
+extern threadList* prioritySort(threadList* tList);
+extern int getProcessorCount();
+extern void runThread(cpuRegs* regs);
+extern void execute(thread* threadInfo, int processorNo, uint8_t quanta);
+extern int getQuanta(threadPriority threadPriority);
+extern threadPriority changePriority(threadPriority currentPriority);
 #endif

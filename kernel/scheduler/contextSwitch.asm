@@ -1,4 +1,4 @@
-globalcontextSwitch
+global contextSwitch
 
 contextSwitch:
 	mov rsp, rdi
