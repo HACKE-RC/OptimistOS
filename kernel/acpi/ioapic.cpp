@@ -21,8 +21,8 @@ void initIOAPIC(){
 }
 
 void setEntry(ioAPICInfo* ioapic, uint8_t idx, uint64_t data) {
-    ioapic_write(ioapic, (uint8_t (IOAPIC_REDTBL + idx * 2), (uint32_t)data);
-    ioapic_write(ioapic, (uint8_t (IOAPIC_REDTBL + idx * 2 + 1), (uint32_t)(data >> 32));
+    ioAPICWrite(ioapic, (uint8_t (IOAPIC_REDTBL + idx * 2)), (uint32_t)data);
+    ioAPICWrite(ioapic, (uint8_t (IOAPIC_REDTBL + idx * 2 + 1)), (uint32_t)(data >> 32));
 }
 
 uint64_t getGSICount(ioAPICInfo* ioapic) {
