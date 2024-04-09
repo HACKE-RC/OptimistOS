@@ -262,6 +262,19 @@ void sleep(int seconds){
     e9_printf("timer end!!\n");
 }
 
+void sleepMS(uint64_t milliseconds){
+    uint64_t startTime = getPITCount();
+    uint64_t targetTicks = milliseconds * 0.1; // since tick 100 times per second
+
+    e9_printf("timer start!!\n");
+
+    while (getPITCount() - startTime < targetTicks){
+        asm("hlt");
+    }
+
+    e9_printf("timer end!!\n");
+}
+
 uint64_t getPITCount(){
     return pitTicks;
 }

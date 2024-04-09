@@ -59,6 +59,7 @@ struct madtIso{
     uint16_t flags;
 } ;
 
+
 extern ioAPICInfo* madtInformationList[];
 extern madtIso* madtISOList[128];
 extern madtInfo madtInformation;

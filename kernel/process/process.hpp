@@ -115,6 +115,7 @@ extern int getPid(process* process);
 extern void pitInit(uint8_t hertz);
 inline PageTable* getPageMap(bool user);
 extern processInternal* initProcesses();
+extern void sleepMS(uint64_t milliseconds);
 extern processInternal* setupProcessInfo();
 static void addThreadToList(thread* thread);
 void registerProcess(processInternal* process);

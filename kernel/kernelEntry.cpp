@@ -34,7 +34,11 @@ int setupOptimist(){
     initIOAPIC();
     initSMP();
     GlobalRenderer->Print("smp done: \n");
-//  enabling PIC
+//  disable PIC
+//    outb(PIC1_DAT, 0xff);
+//    outb(PIC2_DAT, 0xff);
+
+// keeping it on'
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);

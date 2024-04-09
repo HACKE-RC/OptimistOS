@@ -4,7 +4,7 @@
 
 #include "isr.hpp"
 extern bool wasInit;
-
+typedef void (*handlerFunction)();
 typedef struct __attribute__((packed)){
    uint16_t offsetLow;
    uint16_t segmentSelector;

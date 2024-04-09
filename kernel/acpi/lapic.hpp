@@ -23,7 +23,7 @@
 #define LAPIC_ICRAES 0x000c0000
 
 extern void initLAPIC();
-
+extern void lapicEOI();
 extern void lapicWrite(uint32_t reg, uint32_t value);
 extern void lapicWrite(uint64_t reg, uint64_t value);
 extern uint32_t lapicRead(uint32_t reg);
