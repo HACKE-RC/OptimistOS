@@ -87,6 +87,7 @@ void isr6(){
 }
 extern "C" void isr13(cpuRegs* reg){
     e9_printf("general protection fault!\n");
+    e9_printf("RIP %x\n", reg->rip);
     asm volatile("hlt");
 }
 
@@ -106,7 +107,7 @@ void pitHandler(cpuRegs* regs){
     lock(lockx);
     ++pitTicks;
 
-//    runThread(regs);
+    runThread(regs);
 
     unlock(lockx);
 }

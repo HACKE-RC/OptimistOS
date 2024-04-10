@@ -33,10 +33,17 @@ threadList* prioritySort(threadList* tList){
 
 void runThread(cpuRegs* regs){
     lock(threadMutex);
-    asm volatile("cli");
+//    asm volatile("cli");
+
+    if (processHead == nullptr){
+        unlock(threadMutex);
+        return;
+    }
+    e9_printf("workie");
+
     threadList* tList = threadHead;
 
-    if (runningThread == nullptr || threadHead != nullptr){
+    if (runningThread == nullptr ){
        runningThread = tList->threadInfo;
     }
     else{

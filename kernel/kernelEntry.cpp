@@ -32,7 +32,7 @@ int setupOptimist(){
     initMADT();
     initLAPIC();
     initIOAPIC();
-    initSMP();
+//    initSMP();
     GlobalRenderer->Print("smp done: \n");
 //  disable PIC
 //    outb(PIC1_DAT, 0xff);
@@ -53,7 +53,7 @@ int setupOptimist(){
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
     GlobalRenderer->Print(" before prco done: \n");
-//    createProcessFromRoutine(idle, PRIORITY_HIGH, 0, THREAD_READY, false);
+    createProcessFromRoutine((uintptr_t)idle, PRIORITY_HIGH, 0, THREAD_READY, false);
     GlobalRenderer->Print("after proc done: \n");
     pitInit(25);
     GlobalRenderer->Print("after pit done: \n");

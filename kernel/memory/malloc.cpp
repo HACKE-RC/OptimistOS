@@ -174,7 +174,7 @@ void freex(void* block) {
         }
     }
     else {
-        memoryset(block, 0, usuableSize);
+//        memoryset(block, 0, usuableSize);
     }
     unlock(mutex);
 }

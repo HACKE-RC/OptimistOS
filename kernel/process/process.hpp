@@ -32,7 +32,7 @@ extern uint64_t frequency;
 // static const uint16_t divisor = 65535;
 static uint64_t timeSinceBoot = 0;
 
-
+extern processInternal* processHead;
 extern uint32_t threadMutex;
 extern uint32_t processMutex;
 extern threadList* threadHead;

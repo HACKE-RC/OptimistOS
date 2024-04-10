@@ -4,7 +4,7 @@ uint32_t processMutex = 0;
 uint64_t processCount = 0;
 uint64_t threadCount = 0;
 
-static processInternal* processHead = nullptr;
+processInternal* processHead = nullptr;
 static processInternal* currentProcessInternal = nullptr;
 
 threadList *threadHead = nullptr;
@@ -43,8 +43,9 @@ extern int getPid(process* process){
 }
 
 processInternal* initProcesses(){
-    processHead = (processInternal*)(mallocx(sizeof(processInternal)));
-    memoryset((void*)processHead, 0, sizeof(processHead));
+    void* test = mallocx(200);
+    processHead = (processInternal*)(toVirtualAddr((void*)allocateFrame(sizeof(processHead))));
+//    memoryset((void*)processHead, 0, sizeof(processHead));
     // make: create initial process and add to the head
     return processHead;
 }
@@ -99,7 +100,7 @@ void addThreadToList(thread* thread){
     lock(threadMutex);
 
     if (threadHead == nullptr){
-        threadHead = (threadList*)mallocx(sizeof(threadList));
+        threadHead = (threadList*)toVirtualAddr((void*)allocateFrame(sizeof(threadList)));
         threadHead->threadInfo = thread;
         threadHead->next = nullptr;
     }
