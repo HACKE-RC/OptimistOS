@@ -61,10 +61,10 @@ void redirectGSI(uint32_t lapicID, uint8_t vec, uint32_t gsi, uint16_t flags, bo
     ioAPICWrite(ioapic, redir_table + 1, (uint32_t)(redirect >> 32));
 }
 
-void registerIRQ(uint8_t vec, void* handler) {
-    redirectIRQ(bspLAPICID, vec + 32, vec, false);
-    handlers[vec] = reinterpret_cast<handlerFunction>(handler);
-}
+//void registerIRQ(uint8_t vec, void* handler) {
+//    redirectIRQ(bspLAPICID, vec + 32, vec, false);
+//    handlers[vec] = reinterpret_cast<handlerFunction>(handler);
+//}
 
 void unregisterIRQ(uint8_t vec){
    handlers[vec] = nullptr;

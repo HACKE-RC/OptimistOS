@@ -7,6 +7,7 @@
 #include "../io/io.hpp"
 #include "../printutils/e9print.h"
 #include "../scheduler/scheduler.hpp"
+#include "../scheduler/schedulerDecls.hpp"
 #include "../acpi/ioapic.hpp"
 #include "idt.hpp"
 
