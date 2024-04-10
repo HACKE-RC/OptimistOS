@@ -61,6 +61,8 @@ extern "C" void isrHandler(uint64_t rsp){
     auto *regs = (cpuRegs*)rsp;
     if (regs->int_no < 32){
         e9_printf("Exception: %s\n", exception_messages[regs->int_no]);
+        e9_printf("RIP: %x\n", regs->rip);
+        reportError();
     }
     else{
     }

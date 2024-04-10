@@ -55,8 +55,9 @@ void runThread(cpuRegs* regs){
         }
     }
 
-    setCr3((uint64_t)runningThread->parentProcess->PML4);
-    setCr3((uint64_t)runningThread->parentProcess->PML4);
+//    (3, (uint64_t)PML4);
+    writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
+    writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
 
 //    if (runningThread->startTime == 0){
 //        runningThread->startTime = getPITCount();

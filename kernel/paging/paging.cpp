@@ -202,10 +202,10 @@ uintptr_t toHigherHalf(uintptr_t addr) {
 }
 
 PageTable* newPML4(){
-    auto* newPML4 = (struct PageTable*)(allocateFrame(0x1000));
-
+    auto* newPML4 = (struct PageTable*)toVirtualAddr((void*)allocateFrame(0x1000));
+    auto* pml4 = (struct PageTable*)toVirtualAddr(PML4);
     for (int i = 256; i < 512; i++){
-        newPML4->entries[i] = PML4->entries[i];
+        newPML4->entries[i] = pml4->entries[i];
     }
 
     return newPML4;

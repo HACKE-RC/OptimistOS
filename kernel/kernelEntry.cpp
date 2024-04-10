@@ -53,7 +53,7 @@ int setupOptimist(){
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
     GlobalRenderer->Print(" before prco done: \n");
-    createProcessFromRoutine((uintptr_t)idle, PRIORITY_HIGH, 0, THREAD_READY, false);
+    createProcessFromRoutine((uintptr_t)idle, PRIORITY_HIGH, 0, THREAD_READY, true);
     GlobalRenderer->Print("after proc done: \n");
     pitInit(25);
     GlobalRenderer->Print("after pit done: \n");
