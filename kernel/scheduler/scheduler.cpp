@@ -32,9 +32,9 @@ threadList* prioritySort(threadList* tList){
 }
 
 void runThread(cpuRegs* regs){
-
+    lock(processMutex);
     if (processHead == nullptr){
-        unlock(threadMutex);
+        unlock(processMutex);
         return;
     }
 
@@ -55,8 +55,8 @@ void runThread(cpuRegs* regs){
     lock(runningThread->lock);
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
-
     runningThread->state = THREAD_RUNNING;
+    unlock(processMutex);
     contextSwitch(&runningThread->regs);
     auto (*function)() = reinterpret_cast<void(*)()>(runningThread->entryPoint);
     function();
