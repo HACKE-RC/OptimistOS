@@ -4,14 +4,12 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "../idt/isr.hpp"
-#include "../idt/idt.hpp"
 #include "../paging/paging.hpp"
 #include "../paging/pageFrameAllocator.hpp"
 #include "../lib/lock.hpp"
-#include "../smp/smp.hpp"
 #include "../memory/malloc.hpp"
 #include "../lib/string.hpp"
+#include "../smp/smp.hpp"
 
 #define PROCESS_MAX_THREADS 64
 #define THREAD_STACK_SIZE 20480

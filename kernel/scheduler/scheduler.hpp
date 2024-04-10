@@ -1,6 +1,8 @@
 #ifndef MLFQ_SCHEDULER_HPP
 #define MLFQ_SCHEDULER_HPP
+
 #include "../lib/lock.hpp"
+
 #include "../process/process.hpp"
 extern thread* runningThread;
 extern threadList* prioritySort(threadList* tList);

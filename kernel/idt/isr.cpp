@@ -58,7 +58,7 @@ void isrInstall(){
 }
 
 extern "C" void isrHandler(uint64_t rsp){
-    auto *regs = (cpuRegisters*)rsp;
+    auto *regs = (cpuRegs*)rsp;
     if (regs->int_no < 32){
         e9_printf("Exception: %s\n", exception_messages[regs->int_no]);
     }
@@ -66,7 +66,7 @@ extern "C" void isrHandler(uint64_t rsp){
     }
     {
         if (handlers[regs->int_no] != nullptr){
-            (handlers[regs->int_no])();
+            (handlers[regs->int_no])(regs);
         }
     }
 
@@ -85,7 +85,7 @@ void isr6(){
     e9_printf("invalid opcode!");
     asm volatile("hlt");
 }
-extern "C" void isr13(){
+extern "C" void isr13(cpuRegs* reg){
     e9_printf("general protection fault!\n");
     asm volatile("hlt");
 }
@@ -101,8 +101,12 @@ void isr0(){
 }
 
 uint32_t lockx = 0;
-void pitHandler(){
+
+void pitHandler(cpuRegs* regs){
     lock(lockx);
     ++pitTicks;
+
+    runThread(regs);
+
     unlock(lockx);
 }

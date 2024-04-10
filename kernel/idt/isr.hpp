@@ -1,14 +1,19 @@
 #ifndef OPTIMISTOS_ISR_HPP
 #define OPTIMISTOS_ISR_HPP
 #include <cstdint>
+
+
 #include "../renderer/BasicRenderer.hpp"
 #include "../io/io.hpp"
 #include "../printutils/e9print.h"
+#include "../scheduler/scheduler.hpp"
 #include "../acpi/ioapic.hpp"
 #include "idt.hpp"
+
 extern "C" void *int_table[];
 extern char *exception_messages[32];
-inline void (*handlers[256])();
+
+inline void (*handlers[256])(cpuRegs*);
 typedef struct {
     uint64_t r15;
     uint64_t r14;
@@ -47,7 +52,7 @@ extern "C" void isr0();
 extern "C" void isr6();
 extern "C" void isr7();
 
-extern "C" void pitHandler();
+extern "C" void pitHandler(cpuRegs* regs);
 extern "C" void isr8();
 
 extern "C" void isr9();
@@ -55,7 +60,7 @@ extern "C" void isr10();
 extern "C" void isr11();
 extern "C" void isr12();
 
-extern "C" void isr13();
+extern "C" void isr13(cpuRegs* regs);
 extern "C" void isr14();
 extern "C" void isr15();
 extern "C" void isr16();
