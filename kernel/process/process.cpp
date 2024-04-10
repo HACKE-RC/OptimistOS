@@ -1,6 +1,7 @@
 #include "process.hpp"
 uint32_t processMutex = 0;
 uint64_t processCount = 0;
+uint64_t threadCount = 0;
 
 static processInternal* processHead = nullptr;
 static processInternal* currentProcessInternal = nullptr;
@@ -20,6 +21,21 @@ bool removeProcessFromList(processInternal* process){
 
     return false;
 }
+
+bool removeThreadFromList(thread* threadToRemove){
+    threadList* tHead = threadHead;
+
+    for (uint64_t i = 0; i <= threadToRemove->threadID; i++){
+        if (tHead->next->threadInfo == threadToRemove){
+            tHead->next->threadInfo = tHead->next->next->threadInfo;
+            return true;
+        }
+        tHead = tHead->next;
+    }
+
+    return false;
+}
+
 
 extern int getPid(process* process){
     return process->processID;
@@ -50,6 +66,7 @@ void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadS
     thread->stackAddress = stack;
     thread->kernelStack = (uintptr_t)mallocx(THREAD_STACK_SIZE);
     thread->kernelStack += THREAD_STACK_SIZE;
+    thread->state = THREAD_READY;
 
     if (user){
         thread->regs = {
@@ -74,6 +91,7 @@ void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadS
     }
 
     thread->regs.eFlags = 0x202;
+    threadCount++;
 }
 
 void addThreadToList(thread* thread){

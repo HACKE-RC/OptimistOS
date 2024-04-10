@@ -103,7 +103,6 @@ void isr0(){
 uint32_t lockx = 0;
 void pitHandler(){
     lock(lockx);
-    e9_printf("hi");
     ++pitTicks;
     unlock(lockx);
 }

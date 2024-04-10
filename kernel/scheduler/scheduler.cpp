@@ -52,12 +52,30 @@ void runThread(cpuRegs* regs){
     setCr3((uint64_t)runningThread->parentProcess->PML4);
     setCr3((uint64_t)runningThread->parentProcess->PML4);
 
+//    if (runningThread->startTime == 0){
+//        runningThread->startTime = getPITCount();
+//        runningThread->quanta = pitTicks + getQuanta(runningThread->priority);
+//    }
+
+    runningThread->state = THREAD_RUNNING;
     contextSwitch(&runningThread->regs);
+    auto (*function)() = reinterpret_cast<void(*)()>(runningThread->entryPoint);
+    function();
+
+    threadCount--;
+    runningThread->state = THREAD_SUSPENDED;
+
+//    if (getPITCount() >= runningThread->quanta){
+//        runningThread->startTime = 0;
+//        runningThread->quanta = 0;
+//        removeThreadFromList(runningThread);
+//    }
+
     unlock(threadMutex);
 }
 
 
-int getProcessorCount(){
+uint32_t getProcessorCount(){
     return cpusStarted;
 }
 

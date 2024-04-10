@@ -18,6 +18,7 @@
 #define THREAD_STACK_ADDR 0x70000000000
 
 extern uint64_t processCount;
+extern uint64_t threadCount;
 struct PageTable;
 struct thread;
 struct process;
@@ -83,6 +84,8 @@ struct thread{
     uintptr_t entryPoint;
     threadState state;
     process* parentProcess;
+    uint64_t startTime;
+    uint64_t quanta;
 };
 
 struct threadList{
@@ -128,4 +131,5 @@ process* processInternalToProcess(processInternal* processIn, process* processOu
 void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadState state);
 thread* createThreadInternal(uintptr_t entrypoint, threadPriority priority, uint64_t cpuID, threadState state, bool user);
 extern process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority, uint64_t cpuID, threadState state, bool user);
+extern bool removeThreadFromList(thread* threadToRemove);
 #endif
