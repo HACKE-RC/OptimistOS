@@ -20,7 +20,6 @@
 int setupOptimist();
 extern BasicRenderer renderer;
 
-void print(char* string);
 // PIC stuff
 #define PIC1         0x20		/* IO base address for master PIC */
 #define PIC2         0xA0		/* IO base address for slave PIC */
@@ -28,6 +27,6 @@ void print(char* string);
 #define PIC1_DAT 	 (PIC1+1)
 #define PIC2_CMD     PIC2
 #define PIC2_DAT 	 (PIC2+1)
-
+extern void printNumbers();
 
 #endif //OPTIMISTOS_KERNELENTRY_HPP

@@ -58,8 +58,7 @@ struct thread{
     uintptr_t entryPoint;
     threadState state;
     process* parentProcess;
-    uint64_t startTime;
-    uint64_t quanta;
+    uint32_t lock;
 };
 
 struct threadList{

@@ -32,8 +32,6 @@ threadList* prioritySort(threadList* tList){
 }
 
 void runThread(cpuRegs* regs){
-    lock(threadMutex);
-//    asm volatile("cli");
 
     if (processHead == nullptr){
         unlock(threadMutex);
@@ -54,15 +52,9 @@ void runThread(cpuRegs* regs){
             runThread(regs);
         }
     }
-
-//    (3, (uint64_t)PML4);
+    lock(runningThread->lock);
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
-
-//    if (runningThread->startTime == 0){
-//        runningThread->startTime = getPITCount();
-//        runningThread->quanta = pitTicks + getQuanta(runningThread->priority);
-//    }
 
     runningThread->state = THREAD_RUNNING;
     contextSwitch(&runningThread->regs);
@@ -71,14 +63,7 @@ void runThread(cpuRegs* regs){
 
     threadCount--;
     runningThread->state = THREAD_SUSPENDED;
-
-//    if (getPITCount() >= runningThread->quanta){
-//        runningThread->startTime = 0;
-//        runningThread->quanta = 0;
-//        removeThreadFromList(runningThread);
-//    }
-
-    unlock(threadMutex);
+    unlock(runningThread->lock);
 }
 
 
