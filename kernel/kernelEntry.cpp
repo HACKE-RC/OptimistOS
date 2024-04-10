@@ -32,7 +32,7 @@ int setupOptimist(){
     initMADT();
     initLAPIC();
     initIOAPIC();
-//    initSMP();
+    initSMP();
     GlobalRenderer->Print("smp done: \n");
 //  disable PIC
 //    outb(PIC1_DAT, 0xff);

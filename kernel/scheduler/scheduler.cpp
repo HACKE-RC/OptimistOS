@@ -39,7 +39,6 @@ void runThread(cpuRegs* regs){
         unlock(threadMutex);
         return;
     }
-    e9_printf("workie");
 
     threadList* tList = threadHead;
 

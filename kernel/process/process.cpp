@@ -105,7 +105,8 @@ void addThreadToList(thread* thread){
         threadHead->next = nullptr;
     }
 
-    threadList *tHead = threadHead->next;
+    threadList *tHead = threadHead;
+
     while (tHead->next != nullptr) {
         tHead = tHead->next;
     }
@@ -114,7 +115,7 @@ void addThreadToList(thread* thread){
     tHead->next->threadInfo = thread;
     tHead->next->next = nullptr;
 
-    lock(threadMutex);
+    unlock(threadMutex);
 }
 
 thread* createThreadInternal(uintptr_t entrypoint, threadPriority priority, uint64_t cpuID, threadState state, bool user){
@@ -146,7 +147,7 @@ process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority,
         processHead = initProcesses();
     }
 
-    auto* processInfo = (process*)mallocx(sizeof(process));
+    auto* processInfo = (process*)(toVirtualAddr((void*)allocateFrame(sizeof(process))));
     thread* threadInfo;
     processInternal* process = setupProcessInfo();
 
