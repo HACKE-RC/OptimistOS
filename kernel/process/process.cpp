@@ -84,9 +84,9 @@ void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadS
     }
     else{
         thread->regs = {
-                .cs = 0x08,
+                .cs = 0x28,
                 .rsp = thread->kernelStack,
-                .ss = 0x10
+                .ss = 0x30
         };
 
         thread->stackAddress = thread->kernelStack;
@@ -269,7 +269,9 @@ void pitInit(uint8_t hertz)
     // Send the frequency divisor.
     outb(0x40, l);
     outb(0x40, h);
+    handlers[32] = pitHandler;
 }
+
 
 void sleep(int seconds){
     uint64_t startTime = getPITCount();

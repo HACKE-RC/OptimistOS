@@ -41,7 +41,6 @@ void isrInstall(){
     asm volatile("cli");
 
 
-    handlers[32] = pitHandler;
     handlers[0xd] = isr13;
     for (int i = 0; i < 256; i++)
     {
