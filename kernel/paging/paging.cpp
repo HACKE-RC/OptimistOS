@@ -208,5 +208,7 @@ PageTable* newPML4(){
         newPML4->entries[i] = pml4->entries[i];
     }
 
+    newPML4->entries[0] = pml4->entries[0];
+
     return (PageTable*)toPhysicalAddr((void*)newPML4);
 }

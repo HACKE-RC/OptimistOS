@@ -28,5 +28,6 @@ extern BasicRenderer renderer;
 #define PIC2_CMD     PIC2
 #define PIC2_DAT 	 (PIC2+1)
 extern void printNumbers();
+extern void printNumbers2();
 
 #endif //OPTIMISTOS_KERNELENTRY_HPP

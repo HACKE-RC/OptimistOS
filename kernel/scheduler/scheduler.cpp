@@ -32,7 +32,7 @@ threadList* prioritySort(threadList* tList){
 }
 
 void runThread(cpuRegs* regs){
-    if (processHead == nullptr || threadHead == nullptr || threadHead->threadInfo == nullptr){
+    if (processHead == nullptr || threadHead == nullptr || threadHead->threadInfo == nullptr || threadCount == 0){
         return;
     }
 
@@ -53,7 +53,6 @@ void runThread(cpuRegs* regs){
 
     lock(runningThread->lock);
 
-    writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
 
     runningThread->state = THREAD_RUNNING;

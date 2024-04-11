@@ -53,8 +53,8 @@ int setupOptimist(){
     e9_printf("\nLAPIC ID: %d", lapicGetID());
     e9_printf("\nEntry completed successfully!\n");
     GlobalRenderer->Print(" before prco done: \n");
-    createProcessFromRoutine((uintptr_t)idle, PRIORITY_HIGH, 0, THREAD_READY, true);
     createProcessFromRoutine((uintptr_t)printNumbers, PRIORITY_HIGH, 0, THREAD_READY, true);
+    createProcessFromRoutine((uintptr_t)printNumbers2, PRIORITY_HIGH, 0, THREAD_READY, true);
     GlobalRenderer->Print("after proc done: \n");
     pitInit(25);
     GlobalRenderer->Print("after pit done: \n");
@@ -65,6 +65,20 @@ int setupOptimist(){
 
 void printNumbers(){
     for (int i = 0; i <= 400000; i++){
+        if (i * 2 == 400){
+            e9_printf("%d: 200\n", i);
+        }
+        else if (i * 2 == 600){
+            e9_printf("%d: 300\n", i);
+        }
+        else if (i * 2 == 4000){
+            e9_printf("%d: 2000\n", i);
+        }
+    }
+    e9_printf("done1\n");
+}
+void printNumbers2(){
+    for (int i = 0; i <= 40000000; i++){
         if (i * 2 == 400){
             e9_printf("%d: 200\n", i);
         }

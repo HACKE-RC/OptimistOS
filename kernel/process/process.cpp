@@ -43,7 +43,6 @@ extern int getPid(process* process){
 }
 
 processInternal* initProcesses(){
-    void* test = mallocx(200);
     processHead = (processInternal*)(toVirtualAddr((void*)allocateFrame(sizeof(processHead))));
 //    memoryset((void*)processHead, 0, sizeof(processHead));
     // make: create initial process and add to the head
@@ -69,6 +68,7 @@ void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadS
     thread->kernelStack = (uintptr_t)mallocx(THREAD_STACK_SIZE);
     thread->kernelStack += THREAD_STACK_SIZE;
     thread->state = THREAD_READY;
+    thread->lock = 0;
 
     if (user){
         thread->regs = {
@@ -103,6 +103,8 @@ void addThreadToList(thread* thread){
         threadHead = (threadList*)toVirtualAddr((void*)allocateFrame(sizeof(threadList)));
         threadHead->threadInfo = thread;
         threadHead->next = nullptr;
+        unlock(threadMutex);
+        return;
     }
 
     threadList *tHead = threadHead;
