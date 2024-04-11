@@ -50,16 +50,20 @@ void runThread(cpuRegs* regs){
             runThread(regs);
         }
     }
+
     lock(runningThread->lock);
+
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
+
     runningThread->state = THREAD_RUNNING;
     runningThread->regs.rip= runningThread->entryPoint;
+
     contextSwitch(&runningThread->regs);
     writeCrReg(3, (uint64_t)kernelPML4);
+
     runningThread->state = THREAD_SUSPENDED;
     unlock(runningThread->lock);
-
     threadCount--;
 }
 

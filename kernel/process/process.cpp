@@ -141,8 +141,8 @@ thread* createThreadInternal(uintptr_t entrypoint, threadPriority priority, uint
 }
 
 process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority, uint64_t cpuID, threadState state, bool user){
+    asm volatile("cli");
     lock(processMutex);
-
     if (processHead == nullptr){
         processHead = initProcesses();
     }
@@ -172,6 +172,7 @@ process* createProcessFromRoutine(uintptr_t entryPoint, threadPriority priority,
     registerProcess(currentProcessInternal);
     unlock(processMutex);
 
+    asm volatile("sti");
     return processInfo;
 }
 
@@ -261,7 +262,7 @@ void registerProcess(processInternal* process){
 void pitInit(uint8_t hertz)
 {
     unsigned int divisor = (unsigned int )1193180 / (unsigned int)100;
-    asm volatile("sti");
+    asm volatile("cli");
     outb(0x43, 0x34);
     auto l = (uint8_t)(divisor & 0xFF);
     auto h = (uint8_t)((divisor>>8) & 0xFF);
@@ -270,6 +271,7 @@ void pitInit(uint8_t hertz)
     outb(0x40, l);
     outb(0x40, h);
     handlers[32] = pitHandler;
+    asm volatile("sti");
 }
 
 
