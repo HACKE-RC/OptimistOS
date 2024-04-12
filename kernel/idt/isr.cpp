@@ -107,7 +107,7 @@ uint32_t lockx = 0;
 void pitHandler(cpuRegs* regs){
     lock(lockx);
     ++pitTicks;
-
+    asm volatile("sti");
     runThread(regs);
 
     unlock(lockx);

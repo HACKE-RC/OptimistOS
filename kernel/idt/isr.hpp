@@ -55,7 +55,7 @@ extern "C" void isr7();
 
 extern "C" void pitHandler(cpuRegs* regs);
 extern "C" void isr8();
-
+extern uint32_t lockx;
 extern "C" void isr9();
 extern "C" void isr10();
 extern "C" void isr11();

@@ -336,7 +336,7 @@ extern "C" void _start(void) {
 }
 
 void idle(){
-    e9_printf("idle hu bhai\n");
+//    e9_printf("idle hu bhai\n");
     while (true){
         ;;
     }

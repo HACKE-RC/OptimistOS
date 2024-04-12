@@ -1,7 +1,7 @@
 #include "scheduler.hpp"
 uint32_t threadMutex = 0;
 thread* runningThread = nullptr;
-
+cpuRegs savedRegs;
 extern "C" void contextSwitch(cpuRegs* regs);
 
 threadList* prioritySort(threadList* tList){
@@ -32,6 +32,7 @@ threadList* prioritySort(threadList* tList){
 }
 
 void runThread(cpuRegs* regs){
+    asm volatile("sti");
     if (processHead == nullptr || threadHead == nullptr || threadHead->threadInfo == nullptr || threadCount == 0){
         return;
     }
@@ -57,15 +58,32 @@ void runThread(cpuRegs* regs){
 
     runningThread->state = THREAD_RUNNING;
     runningThread->regs.rip= runningThread->entryPoint;
+    runningThread->regs.rdi = (uintptr_t)regs;
+    runningThread->regs.cs = (uintptr_t)threadDone;
+    savedRegs = *regs;
+    *regs = runningThread->regs;
+//    asm volatile("push 0x1234");
 
     contextSwitch(&runningThread->regs);
-    writeCrReg(3, (uint64_t)kernelPML4);
+}
 
+void threadDone(uintptr_t regs){
+    e9_printf("\n in tdone \n ");
+    writeCrReg(3, (uint64_t)kernelPML4);
+    cpuRegs *registers = (cpuRegs*)regs;
+    *registers= savedRegs;
     runningThread->state = THREAD_SUSPENDED;
     unlock(runningThread->lock);
     threadCount--;
-}
+    unlock(lockx);
+    idtInitAgain();
+    pitInit(5);
+//    pitHandler(&savedRegs);
 
+    for (;;){
+        asm volatile ("hlt");
+    }
+}
 
 uint32_t getProcessorCount(){
     return cpusStarted;

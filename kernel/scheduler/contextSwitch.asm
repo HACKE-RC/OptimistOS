@@ -10,12 +10,12 @@ contextSwitch:
 	pop r10
 	pop r9
 	pop r8
-	pop rsi
-	pop rdi
 	pop rbp
+	pop rdi
+	pop rsi
 	pop rdx
 	pop rcx
 	pop rbx
 	pop rax
-	add rsp, 24
-    ret
+	add rsp, 16
+	ret

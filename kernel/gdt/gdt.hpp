@@ -12,7 +12,7 @@ struct gdtEntry {
 
 struct gdtPtrStruct{
     uint16_t limit;
-    gdtEntry* base;
+    uintptr_t base;
 } __attribute__((packed)) ;
 
 void initGDT();
