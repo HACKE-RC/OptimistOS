@@ -18,4 +18,4 @@ contextSwitch:
 	pop rbx
 	pop rax
 	add rsp, 16
-	ret
+	iretq

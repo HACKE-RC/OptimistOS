@@ -44,7 +44,7 @@ isrCommon:
     call isrHandler
     POPALL
 
-    add rsp, 16
+    add rsp, 24
     iretq
 
 

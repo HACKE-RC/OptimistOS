@@ -1,7 +1,6 @@
 #include "scheduler.hpp"
 uint32_t threadMutex = 0;
 thread* runningThread = nullptr;
-cpuRegs savedRegs;
 extern "C" void contextSwitch(cpuRegs* regs);
 
 threadList* prioritySort(threadList* tList){
@@ -57,43 +56,20 @@ void runThread(cpuRegs* regs){
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
 
     runningThread->state = THREAD_RUNNING;
-    runningThread->regs.rip= runningThread->entryPoint;
-    runningThread->regs.rdi = (uintptr_t)regs;
-    runningThread->regs.cs = (uintptr_t)threadDone;
-    savedRegs = *regs;
-    *regs = runningThread->regs;
-//    asm volatile("push 0x1234");
+    runningThread->regs.rip = runningThread->entryPoint;
 
+//    *regs = runningThread->regs;
     contextSwitch(&runningThread->regs);
-}
 
-void threadDone(uintptr_t regs){
-    e9_printf("\n in tdone \n ");
     writeCrReg(3, (uint64_t)kernelPML4);
-    cpuRegs *registers = (cpuRegs*)regs;
-    *registers= savedRegs;
     runningThread->state = THREAD_SUSPENDED;
     unlock(runningThread->lock);
     threadCount--;
-    unlock(lockx);
-    idtInitAgain();
-    pitInit(5);
-//    pitHandler(&savedRegs);
-
-    for (;;){
-        asm volatile ("hlt");
-    }
 }
 
 uint32_t getProcessorCount(){
     return cpusStarted;
 }
-
-void execute(thread* threadInfo, int processorNo, uint8_t quanta){
-    cpuInfo* cpu = getCPUInfo(processorNo);
-    smpInfo* cpuInfo = getSMPInfo(processorNo);
-}
-
 
 
 int getQuanta(threadPriority threadPriority){

@@ -72,15 +72,32 @@ void setupThreadContext(thread* thread, uintptr_t entryPoint, bool user, threadS
 
     if (user){
         thread->regs = {
+                .r15 = 0,
+                .r14 = 0,
+                .r13 = 0,
+                .r12 = 0,
+                .r11 = 0,
+                .r10 = 0,
+                .r9 = 0,
+                .r8 = 0,
+                .rbp = 0,
+                .rdi = 0,
+                .rsi = 0,
+                .rdx = 0,
+                .rcx = 0,
+                .rbx = 0,
+                .rax = 0,
                 .cs = 0x28,
                 .ss = 0x30,
         };
 
         for (uintptr_t i = 0; i < (THREAD_STACK_SIZE); (i += 2 * _1MB)){
-            map(toPhysicalAddr((void*)(stack)) + i, (void*)(((uintptr_t)THREAD_STACK_ADDR - (uintptr_t)THREAD_STACK_SIZE) + i), (pageTableFlag)(ReadWrite | Present | LargerPages), 2 * _1MB);
+            map(toPhysicalAddr((void*)(stack)) + i,
+                (void*)(((uintptr_t)THREAD_STACK_ADDR - (uintptr_t)THREAD_STACK_SIZE) + i),
+                (pageTableFlag)(ReadWrite | Present | LargerPages), 2 * _1MB);
         }
 
-        thread->regs.rsp = ((uintptr_t)stack + (uintptr_t)THREAD_STACK_SIZE);
+        thread->regs.rsp = ((uintptr_t)stack + THREAD_STACK_SIZE);
     }
     else{
         thread->regs = {

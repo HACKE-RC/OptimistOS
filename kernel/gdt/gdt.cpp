@@ -2,22 +2,20 @@
 #include "kernelEntry.hpp"
 
 extern "C" void gdtFlush(void* addr_t);
-uint64_t gdtEntries[] = {
-        0x0000000000000000,
 
-        0x00009a000000ffff,
-        0x000093000000ffff,
-
-        0x00cf9a000000ffff,
-        0x00cf93000000ffff,
-
-        0x00af9b000000ffff,
-        0x00af93000000ffff,
-
-        0x00affb000000ffff,
-        0x00aff3000000ffff
+gdtEntry gdt[] = {
+        {0, 0, 0, 0, 0, 0}, // null
+        {0xffff, 0, 0, 0x9a, 0x80, 0}, // 16-bit code
+        {0xffff, 0, 0, 0x92, 0x80, 0}, // 16-bit data
+        {0xffff, 0, 0, 0x9a, 0xcf, 0}, // 32-bit code
+        {0xffff, 0, 0, 0x92, 0xcf, 0}, // 32-bit data
+        {0, 0, 0, 0x9a, 0xa2, 0}, // 64-bit code
+        {0, 0, 0, 0x92, 0xa0, 0}, // 64-bit data
+        {0, 0, 0, 0xF2, 0, 0}, // user data
+        {0, 0, 0, 0xFA, 0x20, 0}, // user code
 };
 //struct gdtEntry gdtEntries[7];
+
 struct gdtPtrStruct gdtPtr;
 
 void initGDT() {
@@ -41,9 +39,9 @@ void initGDT() {
 //    gdtEntries[6].limit = 0;
 //    gdtEntries[6].flags = 0x00;
 
-    gdtPtr.limit = (sizeof(uintptr_t) * 9) - 1;
-    gdtPtr.base = (uintptr_t)&gdtEntries;
-    asm volatile ("lgdt %0" : : "m"(gdtPtr) : "memory");
+    gdtPtr.limit = (sizeof(gdtEntry) * 10) - 1;
+    gdtPtr.base = (uintptr_t)&gdt;
+    gdtFlush(&gdtPtr);
     e9_printf("done");
 }
 //

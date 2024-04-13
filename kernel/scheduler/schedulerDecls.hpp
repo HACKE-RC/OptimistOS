@@ -24,7 +24,7 @@ typedef struct {
     uint64_t rcx;
     uint64_t rbx;
     uint64_t rax;
-
+    uint64_t core;
     uint64_t int_no;
     uint64_t err;
 
@@ -33,7 +33,7 @@ typedef struct {
     uint64_t eFlags;
     uint64_t rsp;
     uint64_t ss;
-} cpuRegs;
+} __attribute__((packed)) cpuRegs;
 
 typedef enum {
     PRIORITY_LOW,
