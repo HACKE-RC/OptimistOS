@@ -58,7 +58,7 @@ void runThread(cpuRegs* regs){
     runningThread->state = THREAD_RUNNING;
     runningThread->regs.rip = runningThread->entryPoint;
 
-//    *regs = runningThread->regs;
+    *regs = runningThread->regs;
     contextSwitch(&runningThread->regs);
 
     writeCrReg(3, (uint64_t)kernelPML4);
