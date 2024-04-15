@@ -56,9 +56,12 @@ void runThread(cpuRegs* regs){
     writeCrReg(3, (uint64_t)runningThread->parentProcess->PML4);
 
     runningThread->state = THREAD_RUNNING;
-    runningThread->regs.rip = runningThread->entryPoint;
+//    runningThread->regs.rip = runningThread->entryPoint;
+    runningThread->regs.rdi = (uint64_t)runningThread->entryPoint;
+    runningThread->regs.rip = (uint64_t)schedulerWrapper;
 
     *regs = runningThread->regs;
+
     contextSwitch(&runningThread->regs);
 
     writeCrReg(3, (uint64_t)kernelPML4);
@@ -66,6 +69,20 @@ void runThread(cpuRegs* regs){
     unlock(runningThread->lock);
     threadCount--;
 }
+
+void schedulerWrapper(uint64_t func){
+    ((uint64_t(*)())func)();
+    runningThread->state = THREAD_SUSPENDED;
+    unlock(runningThread->lock);
+    unlock(lockx);
+    threadCount--;
+    asm volatile("sti");
+    thread* next = getNextThread(runningThread);
+    runThread(&next->regs);
+    for (;;){
+    }
+}
+
 
 uint32_t getProcessorCount(){
     return cpusStarted;

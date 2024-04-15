@@ -237,7 +237,7 @@ threadList* getThreadList(uint64_t threadID, bool next){
 
 
 thread* getNextThread(thread* currentThread){
-    return getThreadList(currentThread->threadID, true)->threadInfo;
+    return getThreadList(currentThread->threadID, true)->next->threadInfo;
 }
 
 inline PageTable* getPageMap(bool user){

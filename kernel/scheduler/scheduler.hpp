@@ -10,6 +10,7 @@ extern threadList* prioritySort(threadList* tList);
 extern uint32_t getProcessorCount();
 extern void runThread(cpuRegs* regs);
 extern "C" void threadDone(uintptr_t regs);
+void schedulerWrapper(uint64_t func);
 extern void execute(thread* threadInfo, int processorNo, uint8_t quanta);
 extern int getQuanta(threadPriority threadPriority);
 extern threadPriority changePriority(threadPriority currentPriority);
