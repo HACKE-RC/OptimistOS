@@ -5,12 +5,10 @@ xsdtInfo xsdtInformation{};
 
 void *acpiFindTable(const char* name){
     if (rootRSDT != nullptr){
-//      may need to convert to physaddr
         auto *rsdt = (RSDT*) toVirtualAddr(rootRSDT);
         uint32_t entries = (rsdt->systemDescriptorTable.length - sizeof(rsdt->systemDescriptorTable)) / 4;
 
         for (uint32_t i = 0; i < entries; i++){
-//           may need to convert to virtaddr
             SDT* sdt = (SDT*)(void*)(*((uint32_t*)rsdt->table + i));
             if ((memorycmp(sdt->signature, name, 4))){
                 return sdt;
@@ -19,7 +17,6 @@ void *acpiFindTable(const char* name){
         return nullptr;
     }
 
-//   xsdt
     XSDT* xsdt = (XSDT*)toVirtualAddr((void*)xsdtInformation.rootXSDT);
     uint32_t entries = (xsdt->systemDescriptorTable.length - sizeof(xsdt->systemDescriptorTable)) / 8;
 
